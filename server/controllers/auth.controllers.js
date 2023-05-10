@@ -5,6 +5,7 @@ import prisma from "../lib/prisma.lib.js";
 import { trimValues } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import { validateUser } from "../validators/user.validators.js";
+import { getVerificationCode } from "../lib/verification.lib.js";
 
 export const signUserUp = async (request, response, next) => {
     let { firstName, lastName, email, password } = request.body;
@@ -50,12 +51,19 @@ export const signUserUp = async (request, response, next) => {
             },
         });
 
+        // create a verification to verify the new user
+        const verification = await prisma.accountVerification.create({
+            data: {
+                code: getVerificationCode(),
+                userId: createdUser.id,
+            },
+        });
+
         // create a JSON web token
         const token = generateToken(createdUser.id);
 
         response.status(201).json({ user: { ...createdUser, token } });
     } catch (error) {
-        console.log(error);
         next(new HttpError());
     }
 };

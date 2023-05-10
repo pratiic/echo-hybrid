@@ -7,3 +7,8 @@ export const trimValues = (...values) => {
 
     return trimmedValues;
 };
+
+export const capitalizeFirstLetter = (str = "") => {
+    str = String(str);
+    return str.charAt(0).toUpperCase() + str.slice(1);
+};
