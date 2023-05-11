@@ -7,6 +7,7 @@ import {
     validateUser,
 } from "../validators/user.validators.js";
 import prisma from "../lib/prisma.lib.js";
+import { prepareImageData } from "../lib/image.lib.js";
 
 export const updateUser = async (request, response, next) => {
     // only username and avatar can be updated directly
@@ -25,13 +26,7 @@ export const updateUser = async (request, response, next) => {
         if (request.file) {
             // create a new avatar if it does not already exist
             // update an avatar if it exists
-            const uniqueStr = uniqid();
-            const avatarData = {
-                src: `http://localhost:8000/api/images/?type=user&id=${user.id}&uni=${uniqueStr}`,
-                binary: request.file.buffer,
-                userId: user.id,
-            };
-
+            const avatarData = prepareImageData("user", user.id, request.file);
             const createdAvatar = await prisma.image.upsert({
                 where: { userId: user.id },
                 update: avatarData,
@@ -83,7 +78,7 @@ export const resetPassword = async (request, response, next) => {
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
         // update user password
-        const updatedUser = await prisma.user.update({
+        await prisma.user.update({
             where: { id: user.id },
             data: {
                 password: hashedPassword,

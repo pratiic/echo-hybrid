@@ -1,3 +1,6 @@
+import Joi from "joi";
+import { validate } from "./base.validators.js";
+
 const nameRegex = new RegExp(/^[a-zA-Z]/);
 
 export const getErrorMessage = (validationRes) => {
@@ -30,4 +33,14 @@ export const getErrorMessage = (validationRes) => {
     }
 
     return message;
+};
+
+export const idSchema = Joi.number().integer().positive().required();
+
+export const validateId = (id) => {
+    const schema = Joi.object({
+        id: idSchema,
+    });
+
+    return validate({ id }, schema);
 };

@@ -22,6 +22,7 @@ model User {
     accountVerification AccountVerification?
     accountRecovery     AccountRecovery?
     store               Store?
+    reviews             Review[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -55,19 +56,22 @@ model Image {
     src       String
     uniqueStr String?
 
-    userId Int? @unique
+    userId   Int? @unique
+    reviewId Int? @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Store {
-    id   Int       @id @default(autoincrement())
-    type StoreType
+    id        Int       @id @default(autoincrement())
+    storeType StoreType
 
-    user     User      @relation(fields: [userId], references: [id])
+    user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId   Int       @unique
     business Business?
+    product  Product[]
+    reviews  Review[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -83,11 +87,54 @@ model Business {
     phone      BigInt
     isVerified Boolean @default(false)
 
-    store   Store @relation(fields: [storeId], references: [id])
+    store   Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId Int   @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Product {
+    id           Int      @id @default(autoincrement())
+    name         String
+    description  String
+    price        Float
+    per          String?
+    isSecondHand Boolean
+    images       String[]
+    isActive     Boolean  @default(false)
+    brand        String?
+    madeIn       String?
+
+    store   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    storeId Int
+    reviews Review[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Review {
+    id    Int     @id @default(autoincrement())
+    text  String
+    image String?
+
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    Int
+    product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+    productId Int?
+    store     Store?   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    storeId   Int?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique(fields: [userId, storeId], name: "user_store")
+    @@unique(fields: [userId, productId], name: "user_product")
+}
+
+model Rating {
+    id Int @id @default(autoincrement())
 }
 
 enum StoreType {

@@ -27,7 +27,7 @@ export const registerStore = async (request, response, next) => {
 
         const createdStore = await prisma.store.create({
             data: {
-                type: storeType,
+                storeType,
                 userId: user.id,
             },
         });

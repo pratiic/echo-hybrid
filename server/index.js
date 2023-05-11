@@ -7,6 +7,7 @@ import { router as accountRouter } from "./routes/account.routes.js";
 import { router as userRouter } from "./routes/user.routes.js";
 import { router as imageRouter } from "./routes/image.routes.js";
 import { router as storeRouter } from "./routes/store.routes.js";
+import { router as reviewRouter } from "./routes/review.routes.js";
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -18,6 +19,7 @@ app.use("/accounts", accountRouter);
 app.use("/users", userRouter);
 app.use("/images", imageRouter);
 app.use("/stores", storeRouter);
+app.use("/reviews", reviewRouter);
 
 // error handler middleware
 app.use(errorHandler);
