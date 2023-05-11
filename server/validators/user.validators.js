@@ -13,15 +13,16 @@ const createNameSchema = (min) => {
 const firstNameSchema = createNameSchema(3);
 const lastNameSchema = createNameSchema(2);
 const emailSchema = Joi.string().email().required().trim();
+const passwordSchema = Joi.string()
+    .min(7)
+    .pattern(/^[a-zA-Z]/)
+    .required();
 
 const userSignUpSchema = Joi.object({
     firstName: firstNameSchema,
     lastName: lastNameSchema,
     email: emailSchema,
-    password: Joi.string()
-        .min(7)
-        .pattern(/^[a-zA-Z]/)
-        .required(),
+    password: passwordSchema,
 });
 
 const userSignInSchema = Joi.object({
@@ -31,9 +32,15 @@ const userSignInSchema = Joi.object({
         .pattern(/^[a-zA-Z]/),
 });
 
+const userUpdateSchema = Joi.object({
+    firstName: firstNameSchema,
+    lastName: lastNameSchema,
+});
+
 const schemaMap = {
     signin: userSignInSchema,
     signup: userSignUpSchema,
+    update: userUpdateSchema,
 };
 
 export const validateUser = (userInfo, type = "signin") => {
@@ -45,4 +52,12 @@ export const validateUser = (userInfo, type = "signin") => {
     }
 
     return validate(userInfo, schemaMap[type]);
+};
+
+export const validateNewPassword = (newPassword) => {
+    const schema = Joi.object({
+        "new password": passwordSchema,
+    });
+
+    return validate({ "new password": newPassword }, schema);
 };

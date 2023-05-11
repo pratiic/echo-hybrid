@@ -19,6 +19,7 @@ model User {
     password            String
     isVerified          Boolean              @default(false)
     accountVerification AccountVerification?
+    accountRecovery     AccountRecovery?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -30,6 +31,29 @@ model AccountVerification {
 
     user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId Int  @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+}
+
+model AccountRecovery {
+    id   Int    @id @default(autoincrement())
+    code String
+
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId Int  @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Image {
+    id        Int     @id @default(autoincrement())
+    binary    Bytes
+    src       String
+    uniqueStr String?
+
+    userId Int? @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt

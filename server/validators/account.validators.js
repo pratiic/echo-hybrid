@@ -1,3 +1,7 @@
+import Joi from "joi";
+
+import { validate } from "./base.validators.js";
+
 export const validateCode = (inputCode, actualCode, createdAt) => {
     // the verification code may be incorrect or expired
 
@@ -13,6 +17,20 @@ export const validateCode = (inputCode, actualCode, createdAt) => {
     }
 };
 
+export const validatePasswordReset = (resetInfo) => {
+    const { email, password, code } = resetInfo;
+
+    if (!email) {
+        return "provide the email to the account to be recovered";
+    }
+
+    if (!code) {
+        return "you need to provide the recovery code";
+    }
+
+    return validatePassword(password);
+};
+
 export const validateAge = (createdAt, age) => {
     const currentMilliSecs = Date.now();
     const createdDate = new Date(createdAt);
@@ -24,4 +42,12 @@ export const validateAge = (createdAt, age) => {
     }
 
     return true;
+};
+
+const passwordSchema = Joi.object({
+    password: Joi.string().min(7).required().trim(),
+});
+
+export const validatePassword = (password) => {
+    return validate({ password }, passwordSchema);
 };
