@@ -18,3 +18,274 @@ a {
 * {
   box-sizing: border-box;
 }
+
+/* *:not(#gallery-preview, #dropdown) {
+  @apply scrollbar-hide;
+} */
+
+textarea {
+  line-height: 1.3;
+}
+
+@layer components {
+  .wrapper {
+    @apply max-w-[1250px] mx-auto px-3 400:px-5 sm:px-7 md:px-9 xl:px-0;
+  }
+
+  .icon-base {
+    @apply box-content cursor-pointer transition-all duration-200;
+  }
+
+  .icon-general {
+    @apply icon-base text-gray-one dark:text-gray-400;
+  }
+
+  .icon-theme {
+    @apply icon-general h-7 w-7;
+  }
+
+  .icon-bg {
+    @apply icon-general rounded-full hover:bg-gray-two p-2 hover:text-t-black active:bg-gray-four active:text-gray-one dark:hover:bg-gray-700 dark:hover:text-g-white dark:active:bg-gray-600 dark:active:text-gray-300;
+  }
+
+  .icon {
+    @apply h-[23px] w-[23px] icon-bg;
+  }
+
+  .icon-big {
+    @apply icon-bg h-6 w-6;
+  }
+
+  .icon-b-general {
+    @apply icon-general hover:bg-blue-one rounded-full p-2 hover:text-blue-three active:text-gray-one;
+  }
+
+  .icon-b {
+    @apply icon-b-general h-[23px] w-[23px];
+  }
+
+  .icon-b-small {
+    @apply icon-b h-[22px] w-[22px];
+  }
+
+  .icon-b-smaller {
+    @apply icon-b h-[20px] w-[20px];
+  }
+
+  .icon-b-big {
+    @apply icon-b-general h-7 w-7;
+  }
+
+  .icon-small {
+    @apply h-5 w-5 icon-bg min-h-[20px] min-w-[20px];
+  }
+
+  .icon-sidebar {
+    @apply icon-general h-7 w-7;
+  }
+
+  .icon-sidebar-active {
+    @apply icon-sidebar text-gray-500;
+  }
+
+  .icon-dropdown {
+    @apply icon-general h-5 w-5;
+  }
+
+  .icon-no-bg {
+    @apply icon-general h-5 w-5 pointer-events-none;
+  }
+
+  .icon-no-bg-md {
+    @apply icon-no-bg h-[18px] w-[18px];
+  }
+
+  .icon-no-bg-small {
+    @apply icon-no-bg h-[15px] w-[15px];
+  }
+
+  .icon-no-bg-blue {
+    @apply icon-no-bg text-blue-three;
+  }
+
+  .icon-blue {
+    @apply text-blue-three h-6 w-6;
+  }
+
+  .icon-star {
+    @apply h-[25px] w-[25px] text-gray-one;
+  }
+
+  .icon-star-small {
+    @apply h-5 w-5 text-gray-one;
+  }
+
+  .icon-star-blue {
+    @apply icon-star text-blue-three;
+  }
+
+  .icon-star-small-blue {
+    @apply icon-star-small text-blue-three;
+  }
+
+  .icon-active {
+    @apply icon-base text-blue-three bg-gray-four p-2 rounded-full h-[23px] w-[23px] hover:bg-gray-two active:text-gray-one active:bg-gray-four dark:bg-gray-700 dark:active:text-gray-400 dark:hover:bg-gray-600 dark:active:bg-gray-700;
+  }
+
+  .icon-gallery {
+    @apply h-6 w-6 rounded-full bg-gray-300 absolute text-gray-one p-[5px] box-content hover:cursor-pointer hover:bg-gray-200 hover:text-t-black active:bg-gray-300 transition-all duration-200;
+  }
+
+  .icon-gallery-arrow {
+    @apply icon-gallery top-1/2 -translate-y-1/2;
+  }
+
+  .icon-msg-sender {
+    @apply icon-base p-3 text-blue-three rotate-90 h-[23px] w-[23px] active:text-blue-three hover:text-blue-600 dark:hover:text-blue-400 dark:active:text-blue-three;
+  }
+
+  .icon-msg {
+    @apply h-4 w-4 text-gray-one;
+  }
+
+  .status-base {
+    @apply text-center dark-light max-w-sm mx-auto first-letter:capitalize;
+  }
+
+  .status {
+    @apply status-base py-3;
+  }
+
+  .status-secondary {
+    @apply status-base py-2;
+  }
+
+  .status-smaller {
+    @apply status-base text-sm;
+  }
+
+  .image {
+    @apply object-cover block;
+  }
+
+  .error {
+    @apply pl-1 text-red-400 text-sm;
+  }
+
+  .heading-generic-modal-base {
+    @apply mb-3 text-2xl black-white;
+  }
+
+  .heading-generic-modal {
+    @apply heading-generic-modal-base font-semibold;
+  }
+
+  .heading-generic-modal-thin {
+    @apply heading-generic-modal-base;
+  }
+
+  .number-input {
+    @apply border rounded px-2 py-1 text-gray-one mt-2 w-14;
+  }
+
+  .input-pair {
+    @apply flex justify-center items-center space-x-7;
+  }
+
+  .link {
+    @apply cursor-pointer text-blue-three hover:text-blue-four active:text-blue-three transition-all duration-200;
+  }
+
+  .link-form {
+    @apply link block -mt-2 mb-3 link ml-1 rounded;
+  }
+
+  .icon-white {
+    @apply icon-base text-gray-300 h-6 w-6 p-1 rounded-full hover:bg-gray-200 hover:text-t-black active:bg-gray-400;
+  }
+
+  .card-small-common {
+    @apply flex items-center border-b border-faint;
+  }
+
+  .card-small {
+    @apply card-small-common hover:cursor-pointer hover:bg-gray-three dark:hover:bg-gray-700 active:bg-gray-four dark:active:bg-gray-800;
+  }
+
+  .card-small-no-link {
+    @apply card-small-common;
+  }
+
+  .card-transparent {
+    @apply flex flex-col space-y-5 mb-5 relative dark-light border border-faint rounded px-3 py-3 500:px-4 500:py-4 cursor-pointer 750:flex-row 750:space-x-5 750:space-y-0 450:w-fit 450:min-w-[400px];
+  }
+
+  .image-placeholder {
+    @apply h-14 w-14 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-300;
+  }
+
+  .count {
+    @apply bg-blue-three rounded-full  text-white text-xs h-4 w-4 flex items-center justify-center;
+  }
+
+  .real-time {
+    @apply absolute h-0 w-0;
+  }
+
+  .history-message {
+    @apply mb-3 dark-light ml-3;
+  }
+
+  .scrollbar {
+    @apply scrollbar-thin scrollbar-thumb-scrollbar-light
+    scrollbar-thumb-rounded-full dark:scrollbar-thumb-scrollbar-dark;
+  }
+
+  .landing-title {
+    @apply text-5xl font-bold text-gray-800;
+  }
+
+  .landing-title-small {
+    @apply text-3xl font-semibold text-gray-800;
+  }
+
+  .landing-subtitle-base {
+    @apply font-semibold text-gray-one;
+  }
+
+  .landing-subtitle {
+    @apply landing-subtitle-base text-xl;
+  }
+
+  .landing-subtitle-small {
+    @apply landing-subtitle-base text-base;
+  }
+}
+
+.shadow-custom {
+  @apply shadow shadow-xl shadow-gray-100;
+}
+
+.highlight {
+  @apply capitalize black-white;
+}
+
+.black-white {
+  @apply text-t-black dark:text-gray-100;
+}
+
+.dark-light {
+  @apply text-gray-one dark:text-gray-400;
+}
+
+.black-white-full {
+  @apply text-t-black dark:text-g-white;
+}
+
+.toggle-face {
+  @apply flex items-center bg-gray-four px-3 py-2 rounded capitalize text-gray-one cursor-pointer hover:text-t-black hover:bg-gray-two active:bg-gray-300 transition-all duration-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-400 dark:hover:text-g-white dark:active:bg-gray-800;
+}
+
+.border-faint {
+  @apply border-gray-four dark:border-gray-800;
+}

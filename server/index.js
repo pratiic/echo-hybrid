@@ -23,5 +23,5 @@ app.use("/stores", storeRouter);
 app.use(errorHandler);
 
 app.listen(port, () => {
-    console.log(`the server is listening on port ${port}`);
+  console.log(`the server is listening on port ${port}`);
 });
