@@ -14,16 +14,16 @@ const port = process.env.PORT || 8000;
 
 app.use(cors());
 app.use(express.json());
-app.use("/auth", authRouter);
-app.use("/accounts", accountRouter);
-app.use("/users", userRouter);
-app.use("/images", imageRouter);
-app.use("/stores", storeRouter);
-app.use("/reviews", reviewRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/accounts", accountRouter);
+app.use("/api/users", userRouter);
+app.use("/api/images", imageRouter);
+app.use("/api/stores", storeRouter);
+app.use("/api/reviews", reviewRouter);
 
 // error handler middleware
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`the server is listening on port ${port}`);
+    console.log(`the server is listening on port ${port}`);
 });
