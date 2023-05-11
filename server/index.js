@@ -25,5 +25,5 @@ app.use("/reviews", reviewRouter);
 app.use(errorHandler);
 
 app.listen(port, () => {
-    console.log(`the server is listening on port ${port}`);
+  console.log(`the server is listening on port ${port}`);
 });
