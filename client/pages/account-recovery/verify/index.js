@@ -8,126 +8,135 @@ import InputGroup from "../../../components/input-group";
 import Button from "../../../components/button";
 import CustomLink from "../../../components/custom-link";
 import { displayError, clearErrors } from "../../../lib/validation";
+import { fetcher } from "../../../lib/fetcher";
 
 const Verify = () => {
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [repeatedPassword, setRepeatedPassword] = useState("");
-  const [repeatedPasswordError, setRepeatedPasswordError] = useState("");
-  const [code, setCode] = useState("");
-  const [codeError, setCodeError] = useState("");
-  const [resetting, setResetting] = useState(false);
+    const [email, setEmail] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [repeatedPassword, setRepeatedPassword] = useState("");
+    const [repeatedPasswordError, setRepeatedPasswordError] = useState("");
+    const [code, setCode] = useState("");
+    const [codeError, setCodeError] = useState("");
+    const [resetting, setResetting] = useState(false);
 
-  const { authUser } = useSelector((state) => state.auth);
-  const router = useRouter();
+    const { authUser } = useSelector((state) => state.auth);
+    const router = useRouter();
 
-  useEffect(() => {
-    if (authUser) {
-      router.back();
-    }
-  }, [authUser]);
+    useEffect(() => {
+        if (authUser) {
+            router.back();
+        }
+    }, [authUser]);
 
-  const handleFormSubmit = async () => {
-    setResetting(true);
+    const handleFormSubmit = async () => {
+        setResetting(true);
 
-    clearErrors([
-      setEmailError,
-      setPasswordError,
-      setRepeatedPasswordError,
-      setCodeError,
-    ]);
+        clearErrors([
+            setEmailError,
+            setPasswordError,
+            setRepeatedPasswordError,
+            setCodeError,
+        ]);
 
-    if (password !== repeatedPassword) {
-      const msg = "Passwords do not match";
-      setPasswordError(msg);
-      setRepeatedPasswordError(msg);
-      return;
-    }
+        if (password !== repeatedPassword) {
+            const msg = "Passwords do not match";
+            setPasswordError(msg);
+            setRepeatedPasswordError(msg);
+            return;
+        }
 
-    try {
-      await fetcher("accounts/recovery", "PATCH", {
-        email,
-        password,
-        code,
-      });
-      // dispatch(setAlert({ message: "your password has been reset" }));
-      router.push("/signin");
-    } catch (error) {
-      if (
-        error.message === "you need to request for an account recovery first"
-      ) {
-        // dispatch(setErrorAlert(error.message));
-        router.push("/account-recovery/request");
-        return;
-      }
+        try {
+            const data = await fetcher("accounts/recovery", "PATCH", {
+                email,
+                password,
+                code,
+            });
+            console.log(data);
+            // dispatch(setAlert({ message: "your password has been reset" }));
+            router.push("/signin");
+        } catch (error) {
+            console.log(error);
 
-      displayError(
-        error.message,
-        ["email", "password", "code"],
-        [setEmailError, setPasswordError, setCodeError]
-      );
-    } finally {
-      setResetting(false);
-    }
-  };
+            if (
+                error.message ===
+                "you need to request for an account recovery first"
+            ) {
+                // dispatch(setErrorAlert(error.message));
+                router.push("/account-recovery/request");
+                return;
+            }
 
-  return (
-    <section>
-      <Form heading="Recover your account" onSubmit={handleFormSubmit}>
-        <div className="mt-4">
-          <InfoBanner>
-            Check your inbox for the verification code to reset your password.
-            Make sure to check the{" "}
-            <span className="font-semibold">spam folder</span> as well.
-          </InfoBanner>
+            displayError(
+                error.message,
+                ["email", "password", "code"],
+                [setEmailError, setPasswordError, setCodeError]
+            );
+        } finally {
+            setResetting(false);
+        }
+    };
 
-          <InputGroup
-            label="email"
-            placeholder="email of your account"
-            value={email}
-            error={emailError}
-            onChange={setEmail}
-          />
+    return (
+        <section>
+            <Form heading="Recover your account" onSubmit={handleFormSubmit}>
+                <div className="mt-4">
+                    <InfoBanner>
+                        Check your inbox for the verification code to reset your
+                        password. Make sure to check the{" "}
+                        <span className="font-semibold">spam folder</span> as
+                        well.
+                    </InfoBanner>
 
-          <InputGroup
-            label="new password"
-            placeholder="valid new password"
-            value={password}
-            error={passwordError}
-            type="password"
-            onChange={setPassword}
-          />
+                    <InputGroup
+                        label="email"
+                        placeholder="email of your account"
+                        value={email}
+                        error={emailError}
+                        onChange={setEmail}
+                    />
 
-          <InputGroup
-            label="confirm new password"
-            placeholder="repeat new password"
-            value={repeatedPassword}
-            error={repeatedPasswordError}
-            type="password"
-            onChange={setRepeatedPassword}
-          />
+                    <InputGroup
+                        label="new password"
+                        placeholder="valid new password"
+                        value={password}
+                        error={passwordError}
+                        type="password"
+                        onChange={setPassword}
+                    />
 
-          <InputGroup
-            label="verification code"
-            placeholder="8-digit code"
-            value={code}
-            error={codeError}
-            onChange={setCode}
-          />
+                    <InputGroup
+                        label="confirm new password"
+                        placeholder="repeat new password"
+                        value={repeatedPassword}
+                        error={repeatedPasswordError}
+                        type="password"
+                        onChange={setRepeatedPassword}
+                    />
 
-          <CustomLink href="/account-recovery/request" className="link-form">
-            <span>Do not have a code or the code is expired?</span>
-          </CustomLink>
+                    <InputGroup
+                        label="verification code"
+                        placeholder="8-digit code"
+                        value={code}
+                        error={codeError}
+                        onChange={setCode}
+                    />
 
-          <Button loading={resetting}>
-            {resetting ? "Resetting" : "Reset"} Password
-          </Button>
-        </div>
-      </Form>
-    </section>
-  );
+                    <CustomLink
+                        href="/account-recovery/request"
+                        className="link-form"
+                    >
+                        <span>Do not have a code or the code is expired?</span>
+                    </CustomLink>
+
+                    <Button loading={resetting}>
+                        {resetting ? "Resetting" : "Reset"} Password
+                    </Button>
+                </div>
+            </Form>
+        </section>
+    );
 };
 
 export default Verify;
