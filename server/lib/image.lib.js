@@ -27,3 +27,12 @@ export const buildProductImages = (productId, files) => {
 
     return { images, imageSources };
 };
+
+export const getUniqueStr = (src) => {
+    try {
+        const url = new URL(src);
+        return url.searchParams.get("uni");
+    } catch (error) {
+        throw new HttpError("invalid src", 400);
+    }
+};

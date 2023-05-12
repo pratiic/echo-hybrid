@@ -56,7 +56,7 @@ model Image {
     id        Int     @id @default(autoincrement())
     binary    Bytes
     src       String
-    uniqueStr String?
+    uniqueStr String? @unique
 
     userId     Int? @unique
     reviewId   Int? @unique
@@ -110,10 +110,10 @@ model Product {
     brand          String?
     madeIn         String?
     stockType      String?
-    deliveryCharge Int
+    deliveryCharge Json // { type, amount }
 
-    store   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-    storeId Int
+    store   Store?   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    storeId Int?
     reviews Review[]
 
     createdAt DateTime @default(now())
