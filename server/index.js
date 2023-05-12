@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import * as dotenv from "dotenv";
 
 import { errorHandler } from "./middleware/error.middleware.js";
 import { router as authRouter } from "./routes/auth.routes.js";
@@ -8,6 +9,8 @@ import { router as userRouter } from "./routes/user.routes.js";
 import { router as imageRouter } from "./routes/image.routes.js";
 import { router as storeRouter } from "./routes/store.routes.js";
 import { router as reviewRouter } from "./routes/review.routes.js";
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -25,5 +28,5 @@ app.use("/api/reviews", reviewRouter);
 app.use(errorHandler);
 
 app.listen(port, () => {
-    console.log(`the server is listening on port ${port}`);
+  console.log(`the server is listening on port ${port}`);
 });
