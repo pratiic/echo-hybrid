@@ -151,6 +151,8 @@ const InputGroup = ({
           </div>
         )}
       </div>
+
+      {error && <span className="error">{capitalizeFirstLetter(error)}</span>}
     </div>
   );
 };

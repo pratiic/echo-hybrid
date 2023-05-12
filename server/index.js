@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import * as dotenv from "dotenv";
 
 import { errorHandler } from "./middleware/error.middleware.js";
 import { router as authRouter } from "./routes/auth.routes.js";
@@ -12,6 +13,8 @@ import { router as replyRouter } from "./routes/reply.routes.js";
 import { router as businessRouter } from "./routes/business.routes.js";
 import { router as addressRouter } from "./routes/address.routes.js";
 import { router as productRouter } from "./routes/product.routes.js";
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -33,5 +36,5 @@ app.use("/api/products", productRouter);
 app.use(errorHandler);
 
 app.listen(port, () => {
-    console.log(`the server is listening on port ${port}`);
+  console.log(`the server is listening on port ${port}`);
 });
