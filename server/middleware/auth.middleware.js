@@ -26,11 +26,11 @@ const auth = async (request, response, next) => {
 
         if (tokenVerified) {
             // get the user that made the request and attach the user to the request
-
             const requestingUser = await prisma.user.findUnique({
                 where: {
                     id: tokenVerified.id,
                 },
+                include: request.include, // fields within user to include
             });
 
             if (!requestingUser) {

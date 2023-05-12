@@ -1,11 +1,16 @@
+import { genericUserFields } from "../lib/data-source.lib.js";
+import { prepareImageData } from "../lib/image.lib.js";
+import prisma from "../lib/prisma.lib.js";
+import { HttpError } from "../models/http-error.models.js";
+import { validateReply } from "../validators/reply.validators.js";
+
 export const replyToReview = async (request, response, next) => {
     const user = request.user;
     const reviewId = parseInt(request.params.reviewId);
     const { text } = request.body;
-    let finalReply = null;
 
     // validate reply
-    errorMsg = validateReply({ reviewId, text });
+    const errorMsg = validateReply({ reviewId, text });
 
     if (errorMsg) {
         return next(new HttpError(errorMsg, 400));
@@ -18,26 +23,19 @@ export const replyToReview = async (request, response, next) => {
     };
 
     try {
-        const [createdReply, review] = await Promise.all([
-            prisma.reply.create({
-                data: replyData,
-                include: {
-                    user: true,
-                },
-            }),
-            prisma.review.findUnique({
-                where: {
-                    id: reviewId,
-                },
-            }),
-        ]);
+        const createdReply = await prisma.reply.create({
+            data: replyData,
+            include: {
+                user: true,
+            },
+        });
 
-        finalReply = createdReply;
+        let finalReply = createdReply;
 
         if (request.file) {
             // handle reply image
             const replyId = createdReply.id;
-            const imageData = buildImage(request.file, replyId);
+            const imageData = prepareImageData("reply", replyId, request.file);
 
             const [, updatedReply] = await Promise.all([
                 prisma.image.upsert({
@@ -49,7 +47,9 @@ export const replyToReview = async (request, response, next) => {
                     where: { id: replyId },
                     data: { image: imageData.src },
                     include: {
-                        user: true,
+                        user: {
+                            select: genericUserFields,
+                        },
                     },
                 }),
             ]);
@@ -57,26 +57,12 @@ export const replyToReview = async (request, response, next) => {
             finalReply = updatedReply;
         }
 
-        io.emit("new-comment", {
-            type: "reply",
-            comment: finalReply,
-            baseCommentId: reviewId,
-            contentId: review.productId ? review.productId : review.shopId,
-        });
-
         response.status(201).json({ reply: finalReply });
     } catch (error) {
-        let msg, status;
-
-        if (
-            error.message
-                .toLowerCase()
-                .includes("foreign key constraint failed")
-        ) {
-            msg = "review not found";
-            status = 404;
+        if (error.message.includes("Foreign key constraint failed")) {
+            return next(new HttpError("review not found", 404));
         }
 
-        next(new HttpError(msg, status));
+        next(new HttpError());
     }
 };

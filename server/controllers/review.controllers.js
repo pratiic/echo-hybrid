@@ -1,3 +1,4 @@
+import { genericUserFields } from "../lib/data-source.lib.js";
 import { prepareImageData } from "../lib/image.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
@@ -89,7 +90,7 @@ export const postReview = async (request, response, next) => {
             finalReview = updatedReview;
         }
 
-        response.json({ review: finalReview });
+        response.status(201).json({ review: finalReview });
     } catch (error) {
         next(new HttpError());
     }
@@ -116,13 +117,7 @@ export const getReviews = async (request, response, next) => {
             },
             include: {
                 user: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        avatar: true,
-                    },
+                    select: genericUserFields,
                 },
             },
             orderBy: {
