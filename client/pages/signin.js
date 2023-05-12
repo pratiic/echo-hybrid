@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 import Form from "../components/form";
 import InputGroup from "../components/input-group";
 import CustomLink from "../components/custom-link";
 import Button from "../components/button";
 import { clearErrors, displayError } from "../lib/validation";
-import { useRouter } from "next/router";
 import { fetcher } from "../lib/fetcher";
 import { setAuthUser } from "../redux/slices/auth-slice";
 
