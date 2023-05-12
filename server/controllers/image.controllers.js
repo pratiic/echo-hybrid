@@ -1,3 +1,6 @@
+import prisma from "../lib/prisma.lib.js";
+import { HttpError } from "../models/http-error.models.js";
+
 export const getImage = async (request, response, next) => {
     const { type, id, uni } = request.query;
     let image = null;
