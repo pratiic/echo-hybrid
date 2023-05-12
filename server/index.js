@@ -11,6 +11,7 @@ import { router as reviewRouter } from "./routes/review.routes.js";
 import { router as replyRouter } from "./routes/reply.routes.js";
 import { router as businessRouter } from "./routes/business.routes.js";
 import { router as addressRouter } from "./routes/address.routes.js";
+import { router as productRouter } from "./routes/product.routes.js";
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -26,6 +27,7 @@ app.use("/api/reviews", reviewRouter);
 app.use("/api/replies", replyRouter);
 app.use("/api/businesses", businessRouter);
 app.use("/api/addresses", addressRouter);
+app.use("/api/products", productRouter);
 
 // error handler middleware
 app.use(errorHandler);

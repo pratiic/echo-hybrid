@@ -61,6 +61,7 @@ model Image {
     userId     Int? @unique
     reviewId   Int? @unique
     businessId Int? @unique
+    productId  Int?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -98,16 +99,18 @@ model Business {
 }
 
 model Product {
-    id           Int      @id @default(autoincrement())
-    name         String
-    description  String
-    price        Float
-    per          String?
-    isSecondHand Boolean
-    images       String[]
-    isActive     Boolean  @default(false)
-    brand        String?
-    madeIn       String?
+    id             Int      @id @default(autoincrement())
+    name           String
+    description    String
+    price          Float
+    per            String?
+    isSecondHand   Boolean
+    images         String[]
+    isActive       Boolean  @default(false)
+    brand          String?
+    madeIn         String?
+    stockType      String?
+    deliveryCharge Int
 
     store   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId Int
