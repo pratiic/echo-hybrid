@@ -26,6 +26,7 @@ model User {
     reviews             Review[]
     replies             Reply[]
     address             Address?
+    notifications       Notification[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -171,6 +172,20 @@ model Address {
     userId     Int?      @unique
     business   Business? @relation(fields: [businessId], references: [id])
     businessId Int?      @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Notification {
+    id   Int    @id @default(autoincrement())
+    text String
+
+    origin        User     @relation(fields: [originId], references: [id], onDelete: Cascade)
+    originId      Int
+    destinationId Int
+    linkTo        String?  @default("")
+    seen          Boolean? @default(false)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

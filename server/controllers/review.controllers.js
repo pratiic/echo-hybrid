@@ -3,7 +3,6 @@ import { prepareImageData } from "../lib/image.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import { validateReview } from "../validators/review.validators.js";
-import { validateId } from "../validators/utils.js";
 
 export const postReview = async (request, response, next) => {
     const user = request.user;
@@ -97,14 +96,8 @@ export const postReview = async (request, response, next) => {
 };
 
 export const getReviews = async (request, response, next) => {
-    const targetId = parseInt(request.params.targetId);
+    const targetId = parseInt(request.params.targetId) || -1;
     const targetType = request.params.targetType;
-
-    let errorMsg = validateId(targetId);
-
-    if (errorMsg) {
-        return next(new HttpError(errorMsg, 400));
-    }
 
     if (targetType !== "product" && targetType !== "store") {
         return next(new HttpError("invalid content type", 400));
@@ -133,13 +126,7 @@ export const getReviews = async (request, response, next) => {
 
 export const deleteReview = async (request, response, next) => {
     const user = request.user;
-    const reviewId = parseInt(request.params.reviewId);
-
-    const errorMsg = validateId(reviewId);
-
-    if (errorMsg) {
-        return next(new HttpError(errorMsg, 400));
-    }
+    const reviewId = parseInt(request.params.reviewId) || -1;
 
     try {
         const review = await prisma.review.findUnique({
