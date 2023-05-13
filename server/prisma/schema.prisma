@@ -161,6 +161,7 @@ model Rating {
 model Address {
     id          Int     @id @default(autoincrement())
     province    String
+    district    String? @default("")
     city        String
     area        String
     description String? @default("")
