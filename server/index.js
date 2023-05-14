@@ -14,6 +14,8 @@ import { router as businessRouter } from "./routes/business.routes.js";
 import { router as addressRouter } from "./routes/address.routes.js";
 import { router as productRouter } from "./routes/product.routes.js";
 import { router as notificationRouter } from "./routes/notification.routes.js";
+import { router as ratingRouter } from "./routes/rating.routes.js";
+import { router as categoryRouter } from "./routes/category.routes.js";
 
 dotenv.config();
 
@@ -33,6 +35,8 @@ app.use("/api/businesses", businessRouter);
 app.use("/api/addresses", addressRouter);
 app.use("/api/products", productRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/ratings", ratingRouter);
+app.use("/api/categories", categoryRouter);
 
 // error handler middleware
 app.use(errorHandler);

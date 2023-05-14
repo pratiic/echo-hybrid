@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN     "rating" DOUBLE PRECISION DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE "Store" ADD COLUMN     "rating" DOUBLE PRECISION NOT NULL DEFAULT 0;

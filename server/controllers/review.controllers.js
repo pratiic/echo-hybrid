@@ -42,15 +42,10 @@ export const postReview = async (request, response, next) => {
         }
 
         // cannot review a second-hand product
-        if (targetType === "product") {
-            if (target.isSecondHand) {
-                return next(
-                    new HttpError(
-                        "a second-hand product cannot be reviewed",
-                        400
-                    )
-                );
-            }
+        if (targetType === "product" && target.isSecondHand) {
+            return next(
+                new HttpError("a second-hand product cannot be reviewed", 400)
+            );
         }
 
         const createdReview = await prisma.review.upsert({
