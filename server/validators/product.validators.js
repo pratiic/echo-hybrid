@@ -27,6 +27,8 @@ const productSchema = Joi.object({
         is: "fixed",
         then: Joi.number().integer().positive().required(),
     }),
+    category: Joi.string().required(),
+    subCategory: Joi.string().min(3).max(15).required(),
 });
 
 export const validateProduct = (productInfo, isSecondHand) => {

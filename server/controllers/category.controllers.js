@@ -147,3 +147,47 @@ export const controlCategoryRequest = async (request, response, next) => {
         next(new HttpError());
     }
 };
+
+export const deleteCategory = async (request, response, next) => {
+    const name = request.query.name || "";
+
+    try {
+        const category = await prisma.category.findUnique({
+            where: {
+                name,
+            },
+            include: {
+                _count: {
+                    select: {
+                        products: true,
+                    },
+                },
+            },
+        });
+
+        if (!category) {
+            return next(new HttpError("category not found", 404));
+        }
+
+        if (category._count.products > 0) {
+            return next(
+                new HttpError(
+                    "a category must have no product associated with it to be deleted",
+                    400
+                )
+            );
+        }
+
+        await prisma.category.delete({
+            where: {
+                name,
+            },
+        });
+
+        response.json({
+            message: "category has been deleted",
+        });
+    } catch (error) {
+        next(new HttpError());
+    }
+};

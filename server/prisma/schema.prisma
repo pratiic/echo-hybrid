@@ -118,16 +118,28 @@ model Product {
     stockType      String?
     deliveryCharge Json // { type, amount }
     rating         Float?   @default(0)
+    subCategory    String
 
-    store        Store?    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    store        Store?             @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId      Int?
     reviews      Review[]
     ratings      Rating[]
-    category     Category? @relation(fields: [categoryName], references: [name])
+    category     Category?          @relation(fields: [categoryName], references: [name])
     categoryName String?
+    stock        Stock?
+    variations   ProductVariation[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model ProductVariation {
+    id      Int      @id @default(autoincrement())
+    label   String
+    options String[]
+
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
 }
 
 model Category {
@@ -224,6 +236,18 @@ model Notification {
     destinationId Int
     linkTo        String?  @default("")
     seen          Boolean? @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Stock {
+    id       Int   @id @default(autoincrement())
+    quantity Int?
+    variants Json?
+
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int     @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

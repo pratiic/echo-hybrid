@@ -42,17 +42,30 @@ export const postProduct = async (request, response, next) => {
         stockType,
         deliveryChargeType,
         deliveryCharge,
+        category,
+        subCategory,
     } = productInfo;
-    [name, description, per, brand, madeIn, stockType, deliveryChargeType] =
-        trimValues(
-            name,
-            description,
-            per,
-            brand,
-            madeIn,
-            stockType,
-            deliveryChargeType
-        );
+    [
+        name,
+        description,
+        per,
+        brand,
+        madeIn,
+        stockType,
+        deliveryChargeType,
+        category,
+        subCategory,
+    ] = trimValues(
+        name,
+        description,
+        per,
+        brand,
+        madeIn,
+        stockType,
+        deliveryChargeType,
+        category,
+        subCategory
+    );
 
     try {
         const createdProduct = await prisma.product.create({
@@ -70,6 +83,8 @@ export const postProduct = async (request, response, next) => {
                     deliveryChargeType,
                     deliveryCharge
                 ),
+                categoryName: category,
+                subCategory,
                 storeId: store.id,
             },
         });
@@ -94,6 +109,19 @@ export const postProduct = async (request, response, next) => {
             product: updatedProduct,
         });
     } catch (error) {
+        console.log(error);
+
+        // handle invalid category
+        if (
+            error.message
+                .toLowerCase()
+                .includes("foreign key constraint failed")
+        ) {
+            return next(
+                new HttpError("the provided product category does not exist")
+            );
+        }
+
         next(new HttpError());
     }
 };

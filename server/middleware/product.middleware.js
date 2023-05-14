@@ -18,6 +18,7 @@ export const validateProduct = async (request, response, next) => {
                         userId: true,
                     },
                 },
+                ...(request.inclusionFields || {}),
             },
         });
 

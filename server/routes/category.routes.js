@@ -4,6 +4,7 @@ import auth from "../middleware/auth.middleware.js";
 import {
     addCategories,
     controlCategoryRequest,
+    deleteCategory,
     getCategories,
     requestCategory,
 } from "../controllers/category.controllers.js";
@@ -30,4 +31,13 @@ router.patch(
         auth(request, response, next);
     },
     controlCategoryRequest
+);
+
+router.delete(
+    "/",
+    (request, response, next) => {
+        request.validateAdmin = true;
+        auth(request, response, next);
+    },
+    deleteCategory
 );
