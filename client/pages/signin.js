@@ -10,6 +10,7 @@ import Button from "../components/button";
 import { clearErrors, displayError } from "../lib/validation";
 import { fetcher } from "../lib/fetcher";
 import { setAuthUser } from "../redux/slices/auth-slice";
+import Header from "../components/header";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -55,44 +56,48 @@ const SignIn = () => {
   };
 
   return (
-    <Form
-      heading="Sign in to Echo"
-      subheading="Don't have an account?"
-      subheadingLink="signup"
-      hasBackArrow={false}
-      onSubmit={handleFormSubmit}
-    >
-      <Head>
-        <title>Sign in to Echo</title>
-      </Head>
+    <section>
+      <Header />
 
-      <InputGroup
-        label="email"
-        placeholder="email to your account"
-        value={email}
-        error={emailError}
-        onChange={setEmail}
-        showRequired={false}
-      />
+      <Form
+        heading="Sign in to Echo"
+        subheading="Don't have an account?"
+        subheadingLink="signup"
+        hasBackArrow={false}
+        onSubmit={handleFormSubmit}
+      >
+        <Head>
+          <title>Sign in to Echo</title>
+        </Head>
 
-      <InputGroup
-        label="password"
-        placeholder="password to your account"
-        value={password}
-        error={passwordError}
-        type="password"
-        showRequired={false}
-        onChange={setPassword}
-      />
+        <InputGroup
+          label="email"
+          placeholder="email to your account"
+          value={email}
+          error={emailError}
+          onChange={setEmail}
+          showRequired={false}
+        />
 
-      <CustomLink href="/account-recovery/request" className="link-form">
-        <span>Forgot your password ?</span>
-      </CustomLink>
+        <InputGroup
+          label="password"
+          placeholder="password to your account"
+          value={password}
+          error={passwordError}
+          type="password"
+          showRequired={false}
+          onChange={setPassword}
+        />
 
-      <Button loading={signingIn} full>
-        {signingIn ? "signing in" : "sign in"}
-      </Button>
-    </Form>
+        <CustomLink href="/account-recovery/request" className="link-form">
+          <span>Forgot your password ?</span>
+        </CustomLink>
+
+        <Button loading={signingIn} full>
+          {signingIn ? "signing in" : "sign in"}
+        </Button>
+      </Form>
+    </section>
   );
 };
 

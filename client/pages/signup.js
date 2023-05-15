@@ -9,6 +9,7 @@ import { setAuthUser } from "../redux/slices/auth-slice";
 import { displayError } from "../lib/validation";
 import { clearErrors } from "../lib/validation";
 import { useRouter } from "next/router";
+import Header from "../components/header";
 
 const SignUp = () => {
   const [firstName, setfirstName] = useState("");
@@ -73,62 +74,66 @@ const SignUp = () => {
   };
 
   return (
-    <Form
-      heading="Create your account"
-      subheading="Already have an account?"
-      subheadingLink="signin"
-      hasBackArrow={false}
-      onSubmit={handleFormSubmit}
-    >
-      <Head>
-        <title>Create your account</title>
-      </Head>
+    <section>
+      <Header />
 
-      <InputGroup
-        label="first name"
-        placeholder="min 3 chars, max 25"
-        value={firstName}
-        error={firstnameError}
-        onChange={setfirstName}
-      />
+      <Form
+        heading="Create your account"
+        subheading="Already have an account?"
+        subheadingLink="signin"
+        hasBackArrow={false}
+        onSubmit={handleFormSubmit}
+      >
+        <Head>
+          <title>Create your account</title>
+        </Head>
 
-      <InputGroup
-        label="last name"
-        placeholder="min 3 chars, max 25 chars"
-        value={lastName}
-        error={lastnameError}
-        onChange={setlastName}
-      />
+        <InputGroup
+          label="first name"
+          placeholder="min 3 chars, max 25"
+          value={firstName}
+          error={firstnameError}
+          onChange={setfirstName}
+        />
 
-      <InputGroup
-        label="email"
-        placeholder="a valid email"
-        value={email}
-        error={emailError}
-        onChange={setEmail}
-      />
+        <InputGroup
+          label="last name"
+          placeholder="min 3 chars, max 25 chars"
+          value={lastName}
+          error={lastnameError}
+          onChange={setlastName}
+        />
 
-      <InputGroup
-        label="password"
-        placeholder="min 7 chars"
-        value={password}
-        error={passwordError}
-        type="password"
-        onChange={setPassword}
-      />
+        <InputGroup
+          label="email"
+          placeholder="a valid email"
+          value={email}
+          error={emailError}
+          onChange={setEmail}
+        />
 
-      <InputGroup
-        label="repeat password"
-        value={repeatedPassword}
-        error={repeatedPasswordError}
-        type="password"
-        onChange={setrepeatedPassword}
-      />
+        <InputGroup
+          label="password"
+          placeholder="min 7 chars"
+          value={password}
+          error={passwordError}
+          type="password"
+          onChange={setPassword}
+        />
 
-      <Button loading={signingUp} full>
-        {signingUp ? "signing up" : "sign up"}
-      </Button>
-    </Form>
+        <InputGroup
+          label="repeat password"
+          value={repeatedPassword}
+          error={repeatedPasswordError}
+          type="password"
+          onChange={setrepeatedPassword}
+        />
+
+        <Button loading={signingUp} full>
+          {signingUp ? "signing up" : "sign up"}
+        </Button>
+      </Form>
+    </section>
   );
 };
 

@@ -3,27 +3,29 @@ import { Provider } from "react-redux";
 import { store } from "../redux/store";
 
 import "../styles/globals.css";
+import Header from "../components/header";
+import Layout from "../components/layout";
 
 function MyApp({ Component, pageProps }) {
-    const [showChildren, setShowChildren] = useState(false);
+  const [showChildren, setShowChildren] = useState(false);
 
-    useEffect(() => {
-        setShowChildren(true);
-    }, []);
+  useEffect(() => {
+    setShowChildren(true);
+  }, []);
 
-    if (!showChildren) {
-        return null;
-    }
+  if (!showChildren) {
+    return null;
+  }
 
-    if (typeof window === "undefined") {
-        return <></>;
-    }
+  if (typeof window === "undefined") {
+    return <></>;
+  }
 
-    return (
-        <Provider store={store}>
-            <Component {...pageProps} />
-        </Provider>
-    );
+  return (
+    <Provider store={store}>
+      <Component {...pageProps} />
+    </Provider>
+  );
 }
 
 export default MyApp;
