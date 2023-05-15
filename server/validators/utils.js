@@ -3,6 +3,19 @@ import { validate } from "./base.validators.js";
 
 const nameRegex = new RegExp(/^[a-zA-Z]/);
 
+const formatLabel = (label) => {
+    switch (label) {
+        case "firstName":
+            label = "first name";
+            break;
+        case "lastName":
+            label = "last name";
+            break;
+    }
+
+    return label;
+};
+
 export const getErrorMessage = (validationRes) => {
     const {
         type,
@@ -25,7 +38,7 @@ export const getErrorMessage = (validationRes) => {
     }
 
     if (type.includes("empty") || type.includes("required")) {
-        return `${label} cannot be empty`;
+        return `${formatLabel(label)} cannot be empty`;
     }
 
     if (type.includes("email")) {

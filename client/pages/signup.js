@@ -63,7 +63,7 @@ const SignUp = () => {
         } catch (error) {
             displayError(
                 error.message,
-                ["firstName", "lastName", "email", "password"],
+                ["first name", "last name", "email", "password"],
                 [
                     setfirstnameError,
                     setlastnameError,
