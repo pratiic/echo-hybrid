@@ -3,6 +3,7 @@ import { MdOutlineInfo } from "react-icons/md";
 import { EyeOffIcon, EyeIcon } from "@heroicons/react/solid";
 
 import { capitalizeFirstLetter, renderCharLimit } from "../lib/strings";
+
 const InputGroup = ({
   label,
   placeholder,

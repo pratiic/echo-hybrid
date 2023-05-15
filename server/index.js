@@ -21,7 +21,7 @@ import { router as stockRouter } from "./routes/stock.routes.js";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const port = process.env.PORT || 8000;
 
 app.use(cors());

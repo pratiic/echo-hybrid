@@ -10,7 +10,6 @@ import Button from "../components/button";
 import { clearErrors, displayError } from "../lib/validation";
 import { fetcher } from "../lib/fetcher";
 import { setAuthUser } from "../redux/slices/auth-slice";
-import Header from "../components/header";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
