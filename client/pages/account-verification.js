@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import PageHeader from "../components/page-header";
 import InfoBanner from "../components/info-banner";
@@ -8,102 +8,106 @@ import InputGroup from "../components/input-group";
 import Button from "../components/button";
 import { capitalizeFirstLetter } from "../lib/strings";
 import { fetcher } from "../lib/fetcher";
+import { updateAuthUser } from "../redux/slices/auth-slice";
 
 const AccountVerification = () => {
-  const [code, setCode] = useState("");
-  const [verificationError, setVerificationError] = useState("");
-  const [verifying, setVerifying] = useState(false);
-  const [requestError, setRequestError] = useState("");
-  const [requesting, setRequesting] = useState(false);
+    const [code, setCode] = useState("");
+    const [verificationError, setVerificationError] = useState("");
+    const [verifying, setVerifying] = useState(false);
+    const [requestError, setRequestError] = useState("");
+    const [requesting, setRequesting] = useState(false);
 
-  const { authUser } = useSelector((state) => state.auth);
+    const { authUser } = useSelector((state) => state.auth);
+    const router = useRouter();
+    const dispatch = useDispatch();
 
-  const router = useRouter();
+    useEffect(() => {
+        if (authUser?.verified) {
+            router.push("/products");
+        }
+    }, [authUser]);
 
-  useEffect(() => {
-    if (authUser?.verified) {
-      router.push("/products");
-    }
-  }, [authUser]);
+    const verifyAccount = async (event) => {
+        event.preventDefault();
 
-  const verifyAccount = async (event) => {
-    event.preventDefault();
+        setVerifying(true);
+        setVerificationError("");
 
-    setVerifying(true);
-    setVerificationError("");
+        try {
+            await fetcher(`accounts/verification/?code=${code}`, "POST");
+            dispatch(updateAuthUser({ isVerified: true }));
+            router.push("/products");
+        } catch (error) {
+            setVerificationError(error.message);
+        } finally {
+            setVerifying(false);
+        }
+    };
 
-    try {
-      await fetcher(`accounts/verification/?code=${code}`, "POST");
+    const requestCode = async () => {
+        setRequesting(true);
 
-      console.log("verified");
-    } catch (error) {
-      console.log(error.message);
-      setVerificationError(error.message);
-    } finally {
-      setVerifying(false);
-    }
-  };
+        if (requesting) {
+            return;
+        }
 
-  const requestCode = async () => {
-    setRequesting(true);
+        try {
+            await fetcher("accounts/verification");
+        } catch (error) {
+            setRequestError(error.message);
+        } finally {
+            setRequesting(false);
+        }
+    };
 
-    if (requesting) {
-      return;
-    }
+    return (
+        <section>
+            <PageHeader heading="Verify your account" hasBackArrow />
 
-    try {
-      await fetcher("accounts/verification");
-      router.push("/products");
-    } catch (error) {
-      console.log(error);
-      setRequestError(error.message);
-    } finally {
-      setRequesting(false);
-    }
-  };
+            <InfoBanner>
+                <span className="font-semibold">
+                    You cannot access any part of this application before your
+                    account is verified.{" "}
+                </span>
+                Enter the code that you have received in the email associated
+                with your account.{" "}
+                <span className="font-semibold">
+                    Check your spam folder too. Also note that the code expires
+                    after 1 hour.
+                </span>
+            </InfoBanner>
 
-  return (
-    <section>
-      <PageHeader heading="Verify your account" hasBackArrow />
+            <form className="w-96" onSubmit={verifyAccount}>
+                <InputGroup
+                    label="verification code"
+                    placeholder="8-digit code"
+                    value={code}
+                    error={verificationError}
+                    onChange={setCode}
+                />
 
-      <InfoBanner>
-        <span className="font-semibold">
-          You cannot access any part of this application before your account is
-          verified.{" "}
-        </span>
-        Enter the code that you have received in the email associated with your
-        account.{" "}
-        <span className="font-semibold">
-          Check your spam folder too. Also note that the code expires after 1
-          hour.
-        </span>
-      </InfoBanner>
+                <Button laoding={verifying}>
+                    {verifying ? "Verifying" : "Verify"} account
+                </Button>
+            </form>
 
-      <form className="w-96" onSubmit={verifyAccount}>
-        <InputGroup
-          label="verification code"
-          placeholder="8-digit code"
-          value={code}
-          error={verificationError}
-          onChange={setCode}
-        />
-
-        <Button laoding={verifying}>
-          {verifying ? "Verifying" : "Verify"} code
-        </Button>
-      </form>
-
-      <div className="mt-5">
-        <p className="mb-1 dark-light">
-          Do not have a code or the code is expired?
-        </p>
-        <Button type="tertiary" onClick={requestCode} loading={requesting}>
-          {requesting ? "Requesting" : "Request"} Code
-        </Button>
-        <span className="error">{capitalizeFirstLetter(requestError)}</span>
-      </div>
-    </section>
-  );
+            <div className="mt-5">
+                <p className="mb-1 dark-light">
+                    Do not have a code or the code is expired?
+                </p>
+                <Button
+                    type="tertiary"
+                    onClick={requestCode}
+                    loading={requesting}
+                >
+                    {requesting ? "Requesting" : "Request"} Code
+                </Button>
+                <span className="error">
+                    {capitalizeFirstLetter(requestError)}
+                </span>
+            </div>
+        </section>
+    );
 };
 
 export default AccountVerification;
