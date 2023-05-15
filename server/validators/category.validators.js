@@ -6,7 +6,7 @@ const categorySchema = Joi.object({
     name: Joi.string().required(),
 });
 const categoriesSchema = Joi.object({
-    categories: Joi.array().items(categorySchema),
+    categories: Joi.array().items(categorySchema).required(),
 });
 
 export const validateCategories = (categories) => {

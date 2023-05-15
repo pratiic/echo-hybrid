@@ -1,10 +1,10 @@
 import express from "express";
 
 import {
-  createAccountRecovery,
-  createAccountVerification,
-  recoverAccount,
-  verifyAccount,
+    createAccountRecovery,
+    createAccountVerification,
+    recoverAccount,
+    verifyAccount,
 } from "../controllers/account.controllers.js";
 import auth from "../middleware/auth.middleware.js";
 

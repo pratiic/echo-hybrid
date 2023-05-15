@@ -34,7 +34,7 @@ router.patch(
 );
 
 router.delete(
-    "/",
+    "/:categoryName",
     (request, response, next) => {
         request.validateAdmin = true;
         auth(request, response, next);

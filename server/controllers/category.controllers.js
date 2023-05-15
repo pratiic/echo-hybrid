@@ -112,7 +112,7 @@ export const controlCategoryRequest = async (request, response, next) => {
     const action = request.query.action;
 
     if (action !== "accept" && action !== "reject") {
-        return next(new HttpError("action is invalid"));
+        return next(new HttpError("action is invalid", 400));
     }
 
     const errorMsg = validateCategoryName(name);
@@ -149,7 +149,7 @@ export const controlCategoryRequest = async (request, response, next) => {
 };
 
 export const deleteCategory = async (request, response, next) => {
-    const name = request.query.name || "";
+    const name = request.params.categoryName;
 
     try {
         const category = await prisma.category.findUnique({
