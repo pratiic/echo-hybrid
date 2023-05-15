@@ -19,10 +19,6 @@ a {
   box-sizing: border-box;
 }
 
-/* *:not(#gallery-preview, #dropdown) {
-  @apply scrollbar-hide;
-} */
-
 textarea {
   line-height: 1.3;
 }

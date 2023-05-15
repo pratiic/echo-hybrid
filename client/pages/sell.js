@@ -7,23 +7,30 @@ import SellerCard from "../components/seller-card";
 import Button from "../components/button";
 
 const Sell = () => {
-    const [type, setType] = useState("");
+    const [type, setType] = useState("individual");
 
     return (
         <section>
-            <PageHeader heading="sell on echo" hasBackArrow={true} />
+            <PageHeader
+                heading="Sell on Echo"
+                hasBackArrow={true}
+                isHeadingComponent
+            />
 
-            <InfoBanner>
+            <InfoBanner liftUp={false} className="space-y-3">
                 <p className="font-semibold">
                     There are two ways of selling products on Echo:
                 </p>
-                <p className="my-2">
+                <p>
                     1. You may be an individual seller with no business and sell
                     second hand products with no stock or variation.
                 </p>
                 <p>
                     2. You may be a seller with a reigstered business and sell
                     new products with stocks and variations.
+                </p>
+                <p className="font-semibold">
+                    Note that you may not change your seller orientation later.
                 </p>
             </InfoBanner>
 

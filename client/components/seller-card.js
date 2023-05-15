@@ -1,4 +1,5 @@
-import { AiOutlineUser, AiOutlineShop } from "react-icons/ai";
+import { AiOutlineUser } from "react-icons/ai";
+import { OfficeBuildingIcon } from "@heroicons/react/outline";
 
 const SellerCard = ({ type, text, isSelected, clickHandler }) => {
     const handleCardClick = () => {
@@ -17,7 +18,7 @@ const SellerCard = ({ type, text, isSelected, clickHandler }) => {
             {type === "individual" ? (
                 <AiOutlineUser className="seller-icon" />
             ) : (
-                <AiOutlineShop className="seller-icon" />
+                <OfficeBuildingIcon className="seller-icon" />
             )}
 
             <span>{text}</span>
