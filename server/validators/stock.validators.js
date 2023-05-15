@@ -1,7 +1,6 @@
 import Joi from "joi";
 
 import { validate } from "./base.validators.js";
-import { getErrorMessage } from "./utils.js";
 
 export const quantitySchema = Joi.object({
     quantity: Joi.number().integer().min(0).required(),
@@ -11,42 +10,43 @@ export const validateSingularStock = (quantity) => {
     return validate({ quantity }, quantitySchema);
 };
 
-export const validateProductVariants = (variants, variationTypes) => {
+export const validateProductVariants = (variants, variations) => {
+    // variants -> array of atleast one variant
     if (!Array.isArray(variants) || variants.length === 0) {
         return "provide an array of variants";
     }
 
-    const variationLabels = variationTypes.map((type) => {
-        return type.label;
+    const variationLabels = variations.map((variation) => {
+        return variation.label;
     });
 
-    let error = null;
+    let errorMsg = "";
 
     variants.forEach((variant) => {
-        const quantityValidationRes = quantitySchema.validate({
-            quantity: variant.quantity,
-        });
+        // validate variation quantity
+        errorMsg = validate({ quantity: variant.quantity }, quantitySchema);
 
-        if (quantityValidationRes.error) {
-            error = getErrorMessage(quantityValidationRes);
-            return;
+        if (errorMsg) {
+            return (errorMsg = errorMsg);
         }
 
         variationLabels.forEach((label) => {
+            // check if each label is provided -> color, size, etc
             if (!variant[label]) {
-                return (error = `${label} is required`);
+                return (errorMsg = `${label} is required`);
             }
 
-            const options = variationTypes.find((type) => type.label === label)[
-                "options"
-            ];
+            // validate provided option for each label
+            // label -> color, then option may be red, blue, etc
+            const options = variations.find(
+                (variation) => variation.label === label
+            )["options"];
 
             if (!options.find((option) => option === variant[label])) {
-                error = `the value for ${label} is invalid`;
-                return;
+                return (errorMsg = `the value for ${label} is invalid`);
             }
         });
     });
 
-    return error;
+    return errorMsg;
 };
