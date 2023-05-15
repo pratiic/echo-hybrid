@@ -260,6 +260,10 @@ textarea {
   .landing-subtitle-small {
     @apply landing-subtitle-base text-base;
   }
+
+  .seller-icon {
+	@apply h-7 w-7;
+  }
 }
 
 .shadow-custom {

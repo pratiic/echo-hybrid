@@ -31,7 +31,7 @@ export const setStock = async (request, response, next) => {
 
         stockData.quantity = parseInt(quantity);
     } else {
-        // check if the variations of the product have been set
+        // product variations before product stock
         if (product.variations.length === 0) {
             return next(
                 new HttpError(
