@@ -57,8 +57,6 @@ const SignIn = () => {
 
   return (
     <section>
-      <Header />
-
       <Form
         heading="Sign in to Echo"
         subheading="Don't have an account?"

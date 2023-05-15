@@ -75,8 +75,6 @@ const SignUp = () => {
 
   return (
     <section>
-      <Header />
-
       <Form
         heading="Create your account"
         subheading="Already have an account?"

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { capitalizeFirstLetter } from "../lib/strings";
 import { MdOutlineInfo } from "react-icons/md";
 import { EyeOffIcon, EyeIcon } from "@heroicons/react/solid";
 
+import { capitalizeFirstLetter, renderCharLimit } from "../lib/strings";
 const InputGroup = ({
   label,
   placeholder,
@@ -115,7 +115,7 @@ const InputGroup = ({
               onBlur={handleInputBlur}
             ></textarea>
 
-            {/* {renderCharLimit(minChars, maxChars, value)} */}
+            {renderCharLimit(minChars, maxChars, value)}
           </React.Fragment>
         )}
 
