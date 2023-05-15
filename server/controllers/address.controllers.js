@@ -36,15 +36,17 @@ export const setAddress = async (request, response, next) => {
             [`${targetType}Id`]:
                 targetType === "user" ? user.id : user.store.business.id,
         };
-        let { province, city, area, description } = addressInfo;
-        [province, city, area, description] = trimValues(
+        let { province, district, city, area, description } = addressInfo;
+        [province, district, city, area, description] = trimValues(
             province,
+            district,
             city,
             area,
             description
         );
         addressInfo = {
             province: province || currentAddress.province,
+            district: province === "bagmati" ? district : "",
             city: city || currentAddress.city,
             area: area || currentAddress.area,
             description: description || currentAddress.description,

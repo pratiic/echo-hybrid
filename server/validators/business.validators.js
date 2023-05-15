@@ -18,6 +18,18 @@ const businessSchema = Joi.object({
         .max(9999999999),
 });
 
+const statusSchema = Joi.string()
+    .required()
+    .valid("PENDING", "ACCEPTED", "REJECTED");
+
 export const validateBusiness = (businessInfo) => {
     return validate(businessInfo, businessSchema);
+};
+
+export const validateStatus = (status) => {
+    const schema = Joi.object({
+        status: statusSchema,
+    });
+
+    return validate({ status }, schema);
 };

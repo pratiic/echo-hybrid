@@ -14,6 +14,26 @@ export const addressSchema = Joi.object({
         )
         .trim()
         .required(),
+    district: Joi.when("province", {
+        is: "bagmati",
+        then: Joi.string()
+            .required()
+            .valid(
+                "bhaktapur",
+                "dhading",
+                "kathmandu",
+                "kavrepalanchok",
+                "lalitpur",
+                "makwanpur",
+                "nuwakot",
+                "rasuwa",
+                "ramechhap",
+                "sindhuli",
+                "sindhupalchok",
+                "chitwan",
+                "dolakha"
+            ),
+    }),
     city: Joi.string().required().min(5).max(20).trim(),
     area: Joi.string().required().min(5).max(20).trim(),
     description: Joi.string().min(15).max(100).allow("").trim(),

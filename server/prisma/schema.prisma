@@ -18,13 +18,17 @@ model User {
     avatar     String?
     password   String
     isVerified Boolean @default(false)
+    isAdmin    Boolean @default(false)
 
     accountVerification AccountVerification?
     accountRecovery     AccountRecovery?
     store               Store?
     reviews             Review[]
     replies             Reply[]
+    rating              Rating[]
     address             Address?
+    notifications       Notification[]
+    categoryRequests    CategoryRequest[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -56,7 +60,7 @@ model Image {
     id        Int     @id @default(autoincrement())
     binary    Bytes
     src       String
-    uniqueStr String?
+    uniqueStr String? @unique
 
     userId     Int? @unique
     reviewId   Int? @unique
@@ -70,25 +74,27 @@ model Image {
 model Store {
     id        Int       @id @default(autoincrement())
     storeType StoreType
+    rating    Float     @default(0)
 
     user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId   Int       @unique
     business Business?
     product  Product[]
     reviews  Review[]
+    ratings  Rating[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Business {
-    id         Int     @id @default(autoincrement())
-    name       String
-    ownerName  String
-    PAN        String?
-    regImage   String?
-    phone      String
-    isVerified Boolean @default(false)
+    id        Int            @id @default(autoincrement())
+    name      String
+    ownerName String
+    PAN       String?
+    regImage  String?
+    phone     String
+    status    BusinessStatus @default(PENDING)
 
     store   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId Int      @unique
@@ -110,11 +116,43 @@ model Product {
     brand          String?
     madeIn         String?
     stockType      String?
-    deliveryCharge Int
+    deliveryCharge Json // { type, amount }
+    rating         Float?   @default(0)
+    subCategory    String
 
-    store   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-    storeId Int
-    reviews Review[]
+    store        Store?             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    storeId      Int?
+    reviews      Review[]
+    ratings      Rating[]
+    category     Category?          @relation(fields: [categoryName], references: [name])
+    categoryName String?
+    stock        Stock?
+    variations   ProductVariation[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model ProductVariation {
+    id      Int      @id @default(autoincrement())
+    label   String
+    options String[]
+
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
+}
+
+model Category {
+    name String @id @unique
+
+    products Product[]
+}
+
+model CategoryRequest {
+    name String @id @unique
+
+    user   User @relation(fields: [userId], references: [id])
+    userId Int
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -140,6 +178,24 @@ model Review {
     @@unique(fields: [userId, productId], name: "user_product")
 }
 
+model Rating {
+    id    Int @id @default(autoincrement())
+    stars Int
+
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    Int
+    product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+    productId Int?
+    store     Store?   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    storeId   Int?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique(fields: [userId, productId], name: "user_product")
+    @@unique(fields: [userId, storeId], name: "user_store")
+}
+
 model Reply {
     id    Int     @id @default(autoincrement())
     text  String
@@ -154,13 +210,10 @@ model Reply {
     updatedAt DateTime @updatedAt
 }
 
-model Rating {
-    id Int @id @default(autoincrement())
-}
-
 model Address {
     id          Int     @id @default(autoincrement())
     province    String
+    district    String? @default("")
     city        String
     area        String
     description String? @default("")
@@ -174,7 +227,39 @@ model Address {
     updatedAt DateTime @updatedAt
 }
 
+model Notification {
+    id   Int    @id @default(autoincrement())
+    text String
+
+    origin        User     @relation(fields: [originId], references: [id], onDelete: Cascade)
+    originId      Int
+    destinationId Int
+    linkTo        String?  @default("")
+    seen          Boolean? @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Stock {
+    id       Int   @id @default(autoincrement())
+    quantity Int?
+    variants Json?
+
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int     @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
 enum StoreType {
     IND
     BUS
+}
+
+enum BusinessStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
 }

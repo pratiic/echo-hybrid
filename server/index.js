@@ -13,6 +13,11 @@ import { router as replyRouter } from "./routes/reply.routes.js";
 import { router as businessRouter } from "./routes/business.routes.js";
 import { router as addressRouter } from "./routes/address.routes.js";
 import { router as productRouter } from "./routes/product.routes.js";
+import { router as notificationRouter } from "./routes/notification.routes.js";
+import { router as ratingRouter } from "./routes/rating.routes.js";
+import { router as categoryRouter } from "./routes/category.routes.js";
+import { router as productVariationRouter } from "./routes/product-variation.routes.js";
+import { router as stockRouter } from "./routes/stock.routes.js";
 
 dotenv.config();
 
@@ -31,10 +36,15 @@ app.use("/api/replies", replyRouter);
 app.use("/api/businesses", businessRouter);
 app.use("/api/addresses", addressRouter);
 app.use("/api/products", productRouter);
+app.use("/api/notifications", notificationRouter);
+app.use("/api/ratings", ratingRouter);
+app.use("/api/categories", categoryRouter);
+app.use("/api/product-variations", productVariationRouter);
+app.use("/api/stocks", stockRouter);
 
 // error handler middleware
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`the server is listening on port ${port}`);
+    console.log(`the server is listening on port ${port}`);
 });

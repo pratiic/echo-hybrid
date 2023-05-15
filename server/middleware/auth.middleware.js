@@ -37,6 +37,26 @@ const auth = async (request, response, next) => {
                 return next(new HttpError(404, "user not found"));
             }
 
+            if (request.validateAdmin && !requestingUser.isAdmin) {
+                // need to be an admin
+                return next(
+                    new HttpError(
+                        "you need to be an admin to perform this action",
+                        401
+                    )
+                );
+            }
+
+            // if (!request.validateAdmin && requestingUser.isAdmin) {
+            //     // cannot be an admin
+            //     return next(
+            //         new HttpError(
+            //             "an admin is not allowed to perform this action",
+            //             401
+            //         )
+            //     );
+            // }
+
             if (checkVerified && !requestingUser.isVerified) {
                 return next(
                     new HttpError("your account has not been verified yet", 401)
