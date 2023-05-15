@@ -71,7 +71,7 @@ const auth = async (request, response, next) => {
         let msg = "",
             status = null;
 
-        if (error.message === "jwt expired") {
+        if (error.message === "jwt malformed") {
             msg = error.message;
             status = 401;
         }

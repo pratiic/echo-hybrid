@@ -115,7 +115,6 @@ export const deleteAvatar = async (request, response, next) => {
 
         response.json({ avatar: updatedUser.avatar });
     } catch (error) {
-        console.log(error);
         next(new HttpError());
     }
 };
