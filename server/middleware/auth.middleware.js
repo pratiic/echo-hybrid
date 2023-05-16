@@ -70,71 +70,62 @@ const auth = async (request, response, next) => {
     let msg = "",
       status = null;
 
-<<<<<<< HEAD
-    if (error.message === "jwt expired") {
-      msg = error.message;
-      status = 401;
-=======
     const bearer = bearerHeader.split(" ");
     const token = bearer[1] || "";
 
     try {
-        const tokenVerified = jwt.verify(token, process.env.JWT_SECRET);
+      const tokenVerified = jwt.verify(token, process.env.JWT_SECRET);
 
-        if (tokenVerified) {
-            // get the user that made the request and attach the user to the request
-            const requestingUser = await prisma.user.findUnique({
-                where: {
-                    id: tokenVerified.id,
-                },
-                include: request.include, // fields within user to include
-            });
+      if (tokenVerified) {
+        // get the user that made the request and attach the user to the request
+        const requestingUser = await prisma.user.findUnique({
+          where: {
+            id: tokenVerified.id,
+          },
+          include: request.include, // fields within user to include
+        });
 
-            if (!requestingUser) {
-                return next(new HttpError(404, "user not found"));
-            }
-
-            if (request.validateAdmin && !requestingUser.isAdmin) {
-                // need to be an admin
-                return next(
-                    new HttpError(
-                        "you need to be an admin to perform this action",
-                        401
-                    )
-                );
-            }
-
-            // if (!request.validateAdmin && requestingUser.isAdmin) {
-            //     // cannot be an admin
-            //     return next(
-            //         new HttpError(
-            //             "an admin is not allowed to perform this action",
-            //             401
-            //         )
-            //     );
-            // }
-
-            if (checkVerified && !requestingUser.isVerified) {
-                return next(
-                    new HttpError("your account has not been verified yet", 401)
-                );
-            }
-
-            request.user = requestingUser;
-        } else {
-            return next(new HttpError(errorMsg, 401));
+        if (!requestingUser) {
+          return next(new HttpError(404, "user not found"));
         }
+
+        if (request.validateAdmin && !requestingUser.isAdmin) {
+          // need to be an admin
+          return next(
+            new HttpError("you need to be an admin to perform this action", 401)
+          );
+        }
+
+        // if (!request.validateAdmin && requestingUser.isAdmin) {
+        //     // cannot be an admin
+        //     return next(
+        //         new HttpError(
+        //             "an admin is not allowed to perform this action",
+        //             401
+        //         )
+        //     );
+        // }
+
+        if (checkVerified && !requestingUser.isVerified) {
+          return next(
+            new HttpError("your account has not been verified yet", 401)
+          );
+        }
+
+        request.user = requestingUser;
+      } else {
+        return next(new HttpError(errorMsg, 401));
+      }
     } catch (error) {
-        let msg = "",
-            status = null;
+      let msg = "",
+        status = null;
 
-        if (error.message === "jwt malformed") {
-            msg = error.message;
-            status = 401;
-        }
+      if (error.message === "jwt malformed") {
+        msg = error.message;
+        status = 401;
+      }
 
-        return next(new HttpError(msg, status));
->>>>>>> 3cb326e2ce2262dafbc8f62b852f0969884a0cd7
+      return next(new HttpError(msg, status));
     }
 
     return next(new HttpError(msg, status));
