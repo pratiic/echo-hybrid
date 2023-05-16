@@ -45,6 +45,10 @@ export const getErrorMessage = (validationRes) => {
         return "email must be valid";
     }
 
+    if (type === "string.length") {
+        return `${label} must be ${limit} characters long`;
+    }
+
     return message;
 };
 
