@@ -14,108 +14,204 @@ import InputGroup from "../../../components/input-group";
 import FileSelector from "../../../components/file-selector";
 
 const Details = () => {
-  const [name, setName] = useState("");
-  const [nameError, setNameError] = useState("");
-  const [ownerName, setOwnerName] = useState("");
-  const [ownerNameError, setOwnerNameError] = useState("");
-  const [PAN, setPAN] = useState("");
-  const [PANError, setPANError] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneError, setPhoneError] = useState("");
-  const [regImage, setRegImage] = useState(null);
-  const [regImageError, setRegImageError] = useState();
+    const [name, setName] = useState("");
+    const [nameError, setNameError] = useState("");
+    const [ownerName, setOwnerName] = useState("");
+    const [ownerNameError, setOwnerNameError] = useState("");
+    const [PAN, setPAN] = useState("");
+    const [PANError, setPANError] = useState("");
+    const [phone, setPhone] = useState("");
+    const [phoneError, setPhoneError] = useState("");
+    const [regImage, setRegImage] = useState(null);
+    const [regImageError, setRegImageError] = useState("");
+    const [registering, setRegistering] = useState(false);
+    const [business, setBusiness] = useState(null);
+    const [fetching, setFetching] = useState(false);
+    const [fieldsDisabled, setFieldsDisabled] = useState(false);
 
-  const { selectedFiles } = useSelector((state) => state.files);
+    const { selectedFiles } = useSelector((state) => state.files);
+    const { authUser } = useSelector((state) => state.auth);
 
-  const router = useRouter();
+    const router = useRouter();
 
-  useEffect(() => {
-    if (selectedFiles.length > 0) {
-      setRegImage(selectedFiles[0]);
-    }
-  }, [selectedFiles]);
+    useEffect(() => {
+        if (authUser) {
+            fetchUserBusiness();
+        }
+    }, [authUser]);
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
+    useEffect(() => {
+        if (business) {
+            setFieldsDisabled(true);
 
-    clearErrors([
-      setNameError,
-      setOwnerNameError,
-      setPANError,
-      setPhoneError,
-      setRegImageError,
-    ]);
+            if (business.address) {
+                // business has already been registered and address has already been set
+                router.push("/");
+            } else {
+                // business has been already registered
+                const { name, ownerName, PAN, phone } = business;
+                setName(name);
+                setOwnerName(ownerName);
+                setPAN(PAN);
+                setPhone(phone);
+            }
+        }
+    }, [business]);
 
-    try {
-      const formData = generateFormData({ name, ownerName, PAN, phone });
+    useEffect(() => {
+        if (selectedFiles.length > 0) {
+            setRegImage(selectedFiles[0]);
+        }
+    }, [selectedFiles]);
 
-      if (regImage) {
-        formData.append("image", regImage);
-      }
+    const fetchUserBusiness = async () => {
+        setFetching(true);
 
-      await fetcher("businesses", "POST", formData);
+        try {
+            const data = await fetcher(`businesses/0`);
+            setBusiness(data.business);
+        } catch (error) {
+        } finally {
+            setFetching(false);
+        }
+    };
 
-      router.push("/business-registration/address");
-    } catch (error) {
-      if (error.message.toLowerCase() === "file too large") {
-        return setRegImageError(error.message);
-      }
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
 
-      displayError(
-        error.message,
-        ["name", "owner name", "PAN", "phone"],
-        [setNameError, setOwnerNameError, setPANError, setPhoneError]
-      );
-    }
-  };
+        // business registered, address not set and not updating -> simply route to the address set page
+        if (business) {
+            return router.push("/business-registration/address");
+        }
 
-  return (
-    <section>
-      <Head>Register Business</Head>
+        clearErrors([
+            setNameError,
+            setOwnerNameError,
+            setPANError,
+            setPhoneError,
+            setRegImageError,
+        ]);
+        setRegistering(true);
 
-      <PageHeader heading="Register business" hasBackArrow />
+        try {
+            const formData = generateFormData({ name, ownerName, PAN, phone });
 
-      <Form onSubmit={handleFormSubmit} centered={false}>
-        <InputGroup
-          label="name"
-          value={name}
-          error={nameError}
-          onChange={setName}
-        />
+            if (regImage) {
+                formData.append("image", regImage);
+            }
 
-        <InputGroup
-          label="owner name"
-          value={ownerName}
-          error={ownerNameError}
-          onChange={setOwnerName}
-        />
+            await fetcher("businesses", "POST", formData);
 
-        <InputGroup
-          label="PAN"
-          value={PAN}
-          error={PANError}
-          onChange={setPAN}
-        />
+            router.push("/business-registration/address");
+        } catch (error) {
+            if (error.message.toLowerCase() === "file too large") {
+                return setRegImageError(error.message);
+            }
 
-        <InputGroup
-          label="phone"
-          value={phone}
-          error={phoneError}
-          onChange={setPhone}
-        />
+            displayError(
+                error.message,
+                [
+                    "name",
+                    "ownerName",
+                    "PAN",
+                    "phone",
+                    "business registration certificate",
+                ],
+                [
+                    setNameError,
+                    setOwnerNameError,
+                    setPANError,
+                    setPhoneError,
+                    setRegImageError,
+                ]
+            );
+        } finally {
+            setRegistering(false);
+        }
+    };
 
-        <label className="ml-1 block transition-all duration-200 dark-light">
-          Business Registration Certificate{" "}
-          <span className="ml-1 dark-light">*</span>
-        </label>
-        <div className="mt-3">
-          <FileSelector error={regImageError} />
-        </div>
+    const handleCancelClick = async (event) => {
+        event.preventDefault();
 
-        <Button>Next</Button>
-      </Form>
-    </section>
-  );
+        try {
+            await fetcher(`businesses/${business?.id}`, "DELETE");
+            router.push("/");
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    return (
+        <section>
+            <Head>
+                <title>Register business | provide details</title>
+            </Head>
+
+            {/* <PageHeader heading="register your business" hasBackArrow /> */}
+
+            <Form
+                heading="Provide business details"
+                onSubmit={handleFormSubmit}
+            >
+                <InputGroup
+                    label="name"
+                    value={name}
+                    error={nameError}
+                    placeholder="legal business name"
+                    disabled={fieldsDisabled}
+                    onChange={setName}
+                />
+
+                <InputGroup
+                    label="owner name"
+                    value={ownerName}
+                    error={ownerNameError}
+                    placeholder="legal business owner"
+                    disabled={fieldsDisabled}
+                    onChange={setOwnerName}
+                />
+
+                <InputGroup
+                    label="PAN"
+                    value={PAN}
+                    error={PANError}
+                    placeholder="permanent account number"
+                    disabled={fieldsDisabled}
+                    onChange={setPAN}
+                />
+
+                <InputGroup
+                    label="phone"
+                    value={phone}
+                    error={phoneError}
+                    placeholder="landline or mobile"
+                    disabled={fieldsDisabled}
+                    onChange={setPhone}
+                />
+
+                <div className="mt-3">
+                    <FileSelector
+                        prevSrc={business?.regImage}
+                        error={regImageError}
+                        label="Business Registration Certificate"
+                        isRequired={true}
+                        disabled={fieldsDisabled}
+                    />
+                </div>
+
+                <div className="flex items-center justify-between">
+                    {business && (
+                        <Button type="secondary" onClick={handleCancelClick}>
+                            cancel reigstration
+                        </Button>
+                    )}
+                    <Button loading={registering || fetching} full={!business}>
+                        Continue
+                    </Button>
+                </div>
+            </Form>
+        </section>
+    );
 };
 
 export default Details;

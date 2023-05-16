@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { useSelector } from "react-redux";
 
 import { provinceOptions, districtOptions } from "../../../lib/address";
 import { clearErrors, displayError } from "../../../lib/validation";
@@ -12,129 +13,161 @@ import Button from "../../../components/button";
 import PageHeader from "../../../components/page-header";
 
 const Address = () => {
-  const [province, setProvince] = useState("bagmati");
-  const [provinceError, setProvinceError] = useState("");
-  const [district, setDistrict] = useState("kathmandu");
-  const [districtError, setDistrictError] = useState("");
-  const [city, setCity] = useState("");
-  const [cityError, setCityError] = useState("");
-  const [area, setArea] = useState("");
-  const [areaError, setAreaError] = useState("");
-  const [description, setDescription] = useState("");
-  const [descriptionError, setDescriptionError] = useState("");
-  const [requesting, setRequesting] = useState(false);
+    const [province, setProvince] = useState("bagmati");
+    const [provinceError, setProvinceError] = useState("");
+    const [district, setDistrict] = useState("kathmandu");
+    const [districtError, setDistrictError] = useState("");
+    const [city, setCity] = useState("");
+    const [cityError, setCityError] = useState("");
+    const [area, setArea] = useState("");
+    const [areaError, setAreaError] = useState("");
+    const [description, setDescription] = useState("");
+    const [descriptionError, setDescriptionError] = useState("");
+    const [requesting, setRequesting] = useState(false);
+    const [address, setAddress] = useState(null);
+    const [fetching, setFetching] = useState(false);
 
-  const router = useRouter();
+    const router = useRouter();
+    const { authUser } = useSelector((state) => state.auth);
 
-  const handleBackClick = () => {
-    router.back();
-  };
+    useEffect(() => {
+        if (authUser) {
+            fetchBusinessAddress();
+        }
+    }, [authUser]);
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
+    useEffect(() => {
+        if (address) {
+            // business has already been registered and address has already been set
+            router.push("/");
+        }
+    }, [address]);
 
-    setRequesting(true);
-    clearErrors([
-      setProvinceError,
-      setDistrictError,
-      setCityError,
-      setAreaError,
-      setDescriptionError,
-    ]);
+    const fetchBusinessAddress = async () => {
+        setFetching(true);
 
-    try {
-      await fetcher("addresses/business", "POST", {
-        province,
-        district,
-        city,
-        area,
-        description,
-      });
+        try {
+            const data = await fetcher("businesses/0");
 
-      router.push("/products");
-    } catch (error) {
-      displayError(
-        error.message,
-        ["province", "district", "city", "area", "description"],
-        [
-          setProvinceError,
-          setDistrictError,
-          setCityError,
-          setAreaError,
-          setDescriptionError,
-        ]
-      );
-    } finally {
-      setRequesting(false);
-    }
-  };
+            if (data.business.address) {
+                setAddress(data.business.address);
+            }
+        } catch (error) {
+        } finally {
+            setFetching(false);
+        }
+    };
 
-  return (
-    <section>
-      <Head>Register Business</Head>
+    const handleBackClick = (event) => {
+        event.preventDefault();
 
-      <PageHeader heading="Set Address" />
+        router.push("/business-registration/details");
+    };
 
-      <Form onSubmit={handleFormSubmit}>
-        <InputGroup
-          label="province"
-          view="select"
-          options={provinceOptions}
-          value={province}
-          error={provinceError}
-          onChange={setProvince}
-        />
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
 
-        {province === "bagmati" && (
-          <InputGroup
-            label="district"
-            view="select"
-            options={districtOptions}
-            value={district}
-            error={districtError}
-            onChange={setDistrict}
-          />
-        )}
+        setRequesting(true);
+        clearErrors([
+            setProvinceError,
+            setDistrictError,
+            setCityError,
+            setAreaError,
+            setDescriptionError,
+        ]);
 
-        <InputGroup
-          label="city"
-          placeholder="e.g. kathmandu"
-          value={city}
-          error={cityError}
-          onChange={setCity}
-        />
+        try {
+            await fetcher("addresses/business", "POST", {
+                province,
+                district,
+                city,
+                area,
+                description,
+            });
 
-        <InputGroup
-          label="area"
-          placeholder="e.g. koteshwor"
-          value={area}
-          error={areaError}
-          onChange={setArea}
-        />
+            router.push("/");
+        } catch (error) {
+            displayError(
+                error.message,
+                ["province", "district", "city", "area", "description"],
+                [
+                    setProvinceError,
+                    setDistrictError,
+                    setCityError,
+                    setAreaError,
+                    setDescriptionError,
+                ]
+            );
+        } finally {
+            setRequesting(false);
+        }
+    };
 
-        <InputGroup
-          label="description"
-          value={description}
-          error={descriptionError}
-          onChange={setDescription}
-          view="textarea"
-        />
+    return (
+        <section>
+            <Head>Register Business</Head>
 
-        {/* change style later */}
-        <div className="flex items-center">
-          <div className="mr-3">
-            <Button onClick={handleBackClick} type="secondary">
-              Back
-            </Button>
-          </div>
+            {/* <PageHeader heading="Set business address" hasBackArrow={true} /> */}
 
-          <Button loading={requesting}>
-            {requesting ? "requesting" : "request"}
-          </Button>
-        </div>
-      </Form>
-    </section>
-  );
+            <Form heading="Set business address" onSubmit={handleFormSubmit}>
+                <InputGroup
+                    label="province"
+                    view="select"
+                    options={provinceOptions}
+                    value={province}
+                    error={provinceError}
+                    onChange={setProvince}
+                />
+
+                {province === "bagmati" && (
+                    <InputGroup
+                        label="district"
+                        view="select"
+                        options={districtOptions}
+                        value={district}
+                        error={districtError}
+                        onChange={setDistrict}
+                    />
+                )}
+
+                <InputGroup
+                    label="city"
+                    placeholder="e.g. kathmandu"
+                    value={city}
+                    error={cityError}
+                    onChange={setCity}
+                />
+
+                <InputGroup
+                    label="area"
+                    placeholder="e.g. koteshwor"
+                    value={area}
+                    error={areaError}
+                    onChange={setArea}
+                />
+
+                <InputGroup
+                    label="description"
+                    value={description}
+                    placeholder="max 100 chars"
+                    error={descriptionError}
+                    onChange={setDescription}
+                    view="textarea"
+                />
+
+                {/* change style later */}
+                <div className="flex items-center justify-between">
+                    <Button onClick={handleBackClick} type="secondary">
+                        go back
+                    </Button>
+
+                    <Button loading={requesting || fetching}>
+                        {requesting ? "setting" : "set"} address
+                    </Button>
+                </div>
+            </Form>
+        </section>
+    );
 };
 
 export default Address;

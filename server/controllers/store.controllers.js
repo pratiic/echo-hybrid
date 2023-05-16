@@ -21,7 +21,10 @@ export const registerStore = async (request, response, next) => {
 
         if (userStore) {
             return next(
-                new HttpError("a store is already associated with your account")
+                new HttpError(
+                    "a store is already associated with your account",
+                    400
+                )
             );
         }
 

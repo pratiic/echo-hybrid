@@ -3,6 +3,7 @@ import express from "express";
 import auth from "../middleware/auth.middleware.js";
 import {
     deleteBusiness,
+    getBusinessDetails,
     modifyBusinessStatus,
     requestRegistration,
     updateBusiness,
@@ -13,6 +14,27 @@ import { validateBusiness } from "../middleware/business.middleware.js";
 export const router = express.Router();
 
 router.post("/", auth, getUpload().single("image"), requestRegistration);
+
+router.get(
+    "/:businessId",
+    (request, response, next) => {
+        request.include = {
+            store: {
+                select: {
+                    id: true,
+                    business: {
+                        select: {
+                            id: true,
+                        },
+                    },
+                },
+            },
+        };
+
+        auth(request, response, next);
+    },
+    getBusinessDetails
+);
 
 router.patch(
     "/:businessId",

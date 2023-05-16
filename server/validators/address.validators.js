@@ -36,7 +36,7 @@ export const addressSchema = Joi.object({
     }),
     city: Joi.string().required().min(5).max(20).trim(),
     area: Joi.string().required().min(5).max(20).trim(),
-    description: Joi.string().min(15).max(100).allow("").trim(),
+    description: Joi.string().max(100).allow("").trim(),
 });
 
 export const validateAddress = (address) => {

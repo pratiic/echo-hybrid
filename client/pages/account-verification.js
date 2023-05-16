@@ -23,7 +23,7 @@ const AccountVerification = () => {
 
     useEffect(() => {
         if (authUser?.verified) {
-            router.push("/products");
+            router.push("/");
         }
     }, [authUser]);
 
@@ -36,7 +36,7 @@ const AccountVerification = () => {
         try {
             await fetcher(`accounts/verification/?code=${code}`, "POST");
             dispatch(updateAuthUser({ isVerified: true }));
-            router.push("/products");
+            router.push("/");
         } catch (error) {
             setVerificationError(error.message);
         } finally {

@@ -25,7 +25,7 @@ const Layout = ({ children }) => {
                 return;
             }
 
-            router.push("/signin");
+            router.push("/");
         }
 
         if (!authUser?.isVerified) {

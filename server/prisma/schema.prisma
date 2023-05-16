@@ -138,7 +138,7 @@ model ProductVariation {
     label   String
     options String[]
 
-    product   Product @relation(fields: [productId], references: [id])
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
     productId Int
 }
 
@@ -246,7 +246,7 @@ model Stock {
     quantity Int?
     variants Json?
 
-    product   Product @relation(fields: [productId], references: [id])
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
     productId Int     @unique
 
     createdAt DateTime @default(now())
