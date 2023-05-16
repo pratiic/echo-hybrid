@@ -36,7 +36,7 @@ const FileSelector = ({
   }, []);
 
   useEffect(() => {
-    if (selectedFiles.length > 0) {
+    if (selectedFiles?.length > 0) {
       [].forEach.call(selectedFiles, createImagePreview);
     } else {
       setPreviewSrcs([]);
@@ -153,7 +153,7 @@ const FileSelector = ({
             : renderPreviewPlaceholder()}
         </div>
 
-        {selectedFiles.length < max && (
+        {selectedFiles?.length < max && (
           <Button type="secondary" center onClick={handleButtonClick}>
             <CameraIcon className="icon-no-bg mr-2" /> select{" "}
             {multiple ? "images" : "image"}

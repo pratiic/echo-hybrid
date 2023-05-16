@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 
-import Form from "./form";
-import InputGroup from "./input-group";
-import Button from "./button";
 import { provinceOptions, districtOptions } from "../lib/address";
 import { clearErrors, displayError } from "../lib/validation";
 import { fetcher } from "../lib/fetcher";
 import { updateAuthUser } from "../redux/slices/auth-slice";
+
+import Form from "./form";
+import InputGroup from "./input-group";
+import Button from "./button";
 
 const UserAddress = () => {
   const [province, setProvince] = useState("bagmati");

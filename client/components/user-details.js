@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { fetcher } from "../lib/fetcher";
+import { clearErrors, displayError } from "../lib/validation";
+import { generateFormData } from "../lib/form-data";
+import { updateAuthUser } from "../redux/slices/auth-slice";
+
 import FileSelector from "./file-selector";
 import Form from "./form";
 import InputGroup from "./input-group";
 import Button from "./button";
 import CustomLink from "./custom-link";
-import { fetcher } from "../lib/fetcher";
-import { clearErrors, displayError } from "../lib/validation";
-import { generateFormData } from "../lib/form-data";
-import { updateAuthUser } from "../redux/slices/auth-slice";
 
 const UserDetails = () => {
   const { authUser } = useSelector((state) => state.auth);
@@ -32,6 +33,8 @@ const UserDetails = () => {
       setAvatar(selectedFiles[0]);
     }
   }, [selectedFiles]);
+
+  console.log(authUser);
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();

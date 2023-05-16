@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { useSelector } from "react-redux";
+
+import { fetcher } from "../../../lib/fetcher";
+import { clearErrors, displayError } from "../../../lib/validation";
+import { generateFormData } from "../../../lib/form-data";
 
 import Button from "../../../components/button";
 import PageHeader from "../../../components/page-header";
 import Form from "../../../components/form";
 import InputGroup from "../../../components/input-group";
-import { fetcher } from "../../../lib/fetcher";
-import { clearErrors, displayError } from "../../../lib/validation";
 import FileSelector from "../../../components/file-selector";
 
 const Details = () => {
@@ -19,36 +22,51 @@ const Details = () => {
   const [PANError, setPANError] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [regImage, setRegImage] = useState(null);
+  const [regImageError, setRegImageError] = useState();
+
+  const { selectedFiles } = useSelector((state) => state.files);
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (selectedFiles.length > 0) {
+      setRegImage(selectedFiles[0]);
+    }
+  }, [selectedFiles]);
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
-    console.log("click next");
-
-    clearErrors([setNameError, setOwnerNameError, setPANError, setPhoneError]);
+    clearErrors([
+      setNameError,
+      setOwnerNameError,
+      setPANError,
+      setPhoneError,
+      setRegImageError,
+    ]);
 
     try {
-      const data = await fetcher("businesses", "POST", {
-        name,
-        ownerName,
-        PAN,
-        phone,
-      });
+      const formData = generateFormData({ name, ownerName, PAN, phone });
 
-      console.log(data);
+      if (regImage) {
+        formData.append("image", regImage);
+      }
 
-      //  router.push("/business-registration/address");
+      await fetcher("businesses", "POST", formData);
+
+      router.push("/business-registration/address");
     } catch (error) {
-      console.log(error.message);
+      if (error.message.toLowerCase() === "file too large") {
+        return setRegImageError(error.message);
+      }
+
       displayError(
         error.message,
         ["name", "owner name", "PAN", "phone"],
         [setNameError, setOwnerNameError, setPANError, setPhoneError]
       );
     }
-    //  router.push("/business-registration/address");
   };
 
   return (
@@ -91,7 +109,7 @@ const Details = () => {
           <span className="ml-1 dark-light">*</span>
         </label>
         <div className="mt-3">
-          <FileSelector />
+          <FileSelector error={regImageError} />
         </div>
 
         <Button>Next</Button>
