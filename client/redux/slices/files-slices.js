@@ -1,26 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const filesSlice = createSlice({
-  name: "files",
-  initialState: {
-    selectedFiles: [],
-  },
-  reducers: {
-    selectFiles: (state, action) => {
-      state.selectedFiles = [
-        ...state.selectedFiles,
-        ...action.payload.files,
-      ].slice[(0, action.payload.max)];
+    name: "files",
+    initialState: {
+        selectedFiles: [],
     },
-    unselectFiles: (state, action) => {
-      state.selectedFiles = state.selectedFiles.filter(
-        (selectedFile, index) => index != action.payload
-      );
+    reducers: {
+        selectFiles: (state, action) => {
+            state.selectedFiles = [
+                ...state.selectedFiles,
+                ...action.payload.files,
+            ].slice(0, action.payload.max);
+        },
+        unselectFiles: (state, action) => {
+            state.selectedFiles = state.selectedFiles.filter(
+                (selectedFile, index) => index != action.payload
+            );
+        },
+        resetFiles: (state, action) => {
+            state.selectedFiles = [];
+        },
     },
-    resetFiles: (state, action) => {
-      state.selectedFiles = [];
-    },
-  },
 });
 
 export default filesSlice.reducer;
