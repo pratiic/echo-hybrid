@@ -1,6 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useState } from "react";
+import { useRouter } from "next/router";
+
+import { clearErrors, displayError } from "../lib/validation";
+import { generateFormData } from "../lib/form-data";
+import { fetcher } from "../lib/fetcher";
 
 import Form from "../components/form";
 import InputGroup from "../components/input-group";
@@ -18,7 +23,7 @@ const SetProduct = () => {
   const [perError, setPerError] = useState("");
   const [stockType, setStockType] = useState("flat");
   const [category, setCategory] = useState("accessories");
-  const [subcategory, setSubcategory] = useState("");
+  const [subCategory, setSubcategory] = useState("");
   const [subcategoryError, setSubcategoryError] = useState("");
   const [brand, setBrand] = useState("");
   const [brandError, setBrandError] = useState("");
@@ -31,21 +36,88 @@ const SetProduct = () => {
 
   const { categories } = useSelector((state) => state.categories);
   const { authUser } = useSelector((state) => state.auth);
+  const { selectedFiles } = useSelector((state) => state.files);
+
+  const router = useRouter();
 
   const stockTypeOptions = [
     { label: "flat", value: "flat" },
     { label: "varied", value: "varied" },
   ];
-  const categoryOptions = [
-    categories.map((category) => {
-      return { label: category.name, value: category.name };
-    }),
-  ];
+  const categoryOptions = categories.map((category) => {
+    return { label: category.name, value: category.name };
+  });
 
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
-
     console.log("click");
+
+    setLoading(true);
+    clearErrors([
+      setNameError,
+      setDescriptionError,
+      setPriceError,
+      setPerError,
+      setSubcategoryError,
+      setBrandError,
+      setMadeInError,
+      setDeliveryChargeError,
+      setImagesError,
+    ]);
+
+    try {
+      const formData = generateFormData({
+        name,
+        description,
+        price,
+        per,
+        stockType,
+        category,
+        subCategory,
+        deliveryCharge,
+        brand,
+        madeIn,
+      });
+
+      selectedFiles.forEach((selectedFile) => {
+        formData.append("images", selectedFile);
+      });
+
+      const data = await fetcher("products", "POST", formData);
+
+      router.push("/");
+    } catch (error) {
+      if (error.message.toLowerCase() === "file too large") {
+        return setImagesError(error.message);
+      }
+
+      displayError(
+        error.message,
+        [
+          "name",
+          "description",
+          "price",
+          "per",
+          "subCategory",
+          "brand",
+          "madeIn",
+          "deliveryCharge",
+        ],
+        [
+          setNameError,
+          setDescriptionError,
+          setPriceError,
+          setPerError,
+          setSubcategoryError,
+          setBrandError,
+          setMadeInError,
+          setDeliveryChargeError,
+          setImagesError,
+        ]
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,7 +133,7 @@ const SetProduct = () => {
 
         <InputGroup
           label="product description"
-          placeholder="mi  50 chars, max 150 chars"
+          placeholder="min 50 chars, max 150 chars"
           view="textarea"
           minChars={50}
           maxChars={150}
@@ -94,7 +166,7 @@ const SetProduct = () => {
         </div>
 
         <InputGroup
-          label="delivery charge (leave at 0 for free shipping)"
+          label="delivery charge"
           placeholder="leave empty for free shipping"
           view="number"
           min={0}
@@ -104,42 +176,44 @@ const SetProduct = () => {
           onChange={setDeliveryCharge}
         />
 
-        <React.Fragment>
-          <InputGroup
-            label="stock type"
-            view="select"
-            options={stockTypeOptions}
-            value={stockType}
-            info={<StockTypeInfo />}
-            showRequired={false}
-            onChange={setStockType}
-          />
+        {authUser?.store?.storeType === "BUS" && (
+          <React.Fragment>
+            <InputGroup
+              label="stock type"
+              view="select"
+              options={stockTypeOptions}
+              value={stockType}
+              info={<StockTypeInfo />}
+              showRequired={false}
+              onChange={setStockType}
+            />
 
-          <InputGroup
-            label="product category"
-            view="select"
-            options={categoryOptions[0]}
-            showRequired={false}
-            value={category}
-            onChange={setCategory}
-          />
+            <InputGroup
+              label="product category"
+              view="select"
+              options={categoryOptions}
+              showRequired={false}
+              value={category}
+              onChange={setCategory}
+            />
 
-          <InputGroup
-            label="Subcategory"
-            placeholder="e.g. phone for electronics"
-            value={subcategory}
-            error={subcategoryError}
-            onChange={setSubcategory}
-          />
+            <InputGroup
+              label="Subcategory"
+              placeholder="e.g. phone for electronics"
+              value={subCategory}
+              error={subcategoryError}
+              onChange={setSubcategory}
+            />
+          </React.Fragment>
+        )}
 
-          <FileSelector
-            label="product images (up to 5 images, 3 mb each)"
-            multiple
-            max={5}
-            isRequired={true}
-            error={imagesError}
-          />
-        </React.Fragment>
+        <FileSelector
+          label="product images (up to 5 images, 3 mb each)"
+          multiple
+          max={5}
+          isRequired={true}
+          error={imagesError}
+        />
 
         <InputGroup
           label="product brand"
@@ -159,7 +233,7 @@ const SetProduct = () => {
           onChange={setMadeIn}
         />
 
-        <Button full laoding={loading}>
+        <Button full loading={loading}>
           {loading ? "setting" : "set"} product
         </Button>
       </Form>
