@@ -93,7 +93,7 @@ const SignUp = () => {
 
                 <InputGroup
                     label="first name"
-                    placeholder="min 3 chars, max 25"
+                    placeholder="min 3 chars, max 15"
                     value={firstName}
                     error={firstnameError}
                     onChange={setfirstName}
@@ -101,7 +101,7 @@ const SignUp = () => {
 
                 <InputGroup
                     label="last name"
-                    placeholder="min 3 chars, max 25 chars"
+                    placeholder="min 3 chars, max 15 chars"
                     value={lastName}
                     error={lastnameError}
                     onChange={setlastName}

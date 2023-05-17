@@ -40,32 +40,21 @@ export const postProduct = async (request, response, next) => {
         brand,
         madeIn,
         stockType,
-        deliveryChargeType,
         deliveryCharge,
         category,
         subCategory,
     } = productInfo;
-    [
-        name,
-        description,
-        per,
-        brand,
-        madeIn,
-        stockType,
-        deliveryChargeType,
-        category,
-        subCategory,
-    ] = trimValues(
-        name,
-        description,
-        per,
-        brand,
-        madeIn,
-        stockType,
-        deliveryChargeType,
-        category,
-        subCategory
-    );
+    [name, description, per, brand, madeIn, stockType, category, subCategory] =
+        trimValues(
+            name,
+            description,
+            per,
+            brand,
+            madeIn,
+            stockType,
+            category,
+            subCategory
+        );
 
     try {
         const createdProduct = await prisma.product.create({
@@ -79,10 +68,7 @@ export const postProduct = async (request, response, next) => {
                 madeIn,
                 stockType: forBusiness ? stockType : null,
                 isActive: forBusiness ? false : true, // brand new products are activated only after setting the stock
-                deliveryCharge: createDeliveryCharge(
-                    deliveryChargeType,
-                    deliveryCharge
-                ),
+                deliveryCharge: parseInt(deliveryCharge),
                 categoryName: category,
                 subCategory,
                 storeId: store.id,
@@ -109,8 +95,6 @@ export const postProduct = async (request, response, next) => {
             product: updatedProduct,
         });
     } catch (error) {
-        console.log(error);
-
         // handle invalid category
         if (
             error.message
@@ -132,8 +116,6 @@ export const updateProduct = async (request, response, next) => {
 
     const errorMsg = validateProduct({
         ...product,
-        deliveryChargeType: product.deliveryCharge.type,
-        deliveryCharge: product.deliveryCharge.amount,
         ...updateInfo,
     });
 
@@ -141,21 +123,12 @@ export const updateProduct = async (request, response, next) => {
         return next(new HttpError(errorMsg, 400));
     }
 
-    let {
-        name,
-        description,
-        price,
-        per,
-        deliveryChargeType,
-        deliveryCharge,
-        brand,
-        madeIn,
-    } = updateInfo;
-    [name, description, per, deliveryChargeType, brand, madeIn] = trimValues(
+    let { name, description, price, per, deliveryCharge, brand, madeIn } =
+        updateInfo;
+    [name, description, per, brand, madeIn] = trimValues(
         name,
         description,
         per,
-        deliveryChargeType,
         brand,
         madeIn
     );
@@ -170,10 +143,8 @@ export const updateProduct = async (request, response, next) => {
                 description: description || product.description,
                 price: price ? createPrice(price) : createPrice(product.price),
                 per: per || product.per,
-                deliveryCharge: createDeliveryCharge(
-                    deliveryChargeType || product.deliveryCharge.type,
-                    deliveryCharge || product.deliveryCharge.amount
-                ),
+                deliveryCharge:
+                    parseInt(deliveryCharge) || product.deliveryCharge,
                 brand: brand || product.brand,
                 madeIn: madeIn || product.madeIn,
             },

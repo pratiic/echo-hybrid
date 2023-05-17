@@ -25,16 +25,18 @@ export const getErrorMessage = (validationRes) => {
 
     if (regex) {
         if (regex.toString() === nameRegex.toString()) {
-            return `${label} must start with a character`;
+            return `${formatLabel(label)} must start with a character`;
         }
     }
 
     if (type.includes("min")) {
-        return `${label} must be atleast ${limit} characters long`;
+        return `${formatLabel(label)} must be atleast ${limit} characters long`;
     }
 
     if (type.includes("max")) {
-        return `${label} cannot be more than ${limit} characters long`;
+        return `${formatLabel(
+            label
+        )} cannot be more than ${limit} characters long`;
     }
 
     if (type.includes("empty") || type.includes("required")) {

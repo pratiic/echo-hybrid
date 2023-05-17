@@ -4,7 +4,7 @@ import { validate } from "./base.validators.js";
 const createNameSchema = (min) => {
     return Joi.string()
         .min(min)
-        .max(25)
+        .max(15)
         .pattern(/^[a-zA-Z]/)
         .required()
         .trim();

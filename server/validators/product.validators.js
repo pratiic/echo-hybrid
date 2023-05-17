@@ -20,13 +20,7 @@ const productSchema = Joi.object({
     per: Joi.string().max(20).allow("").allow(null).trim(),
     brand: Joi.string().max(30).allow("").allow(null).trim(),
     madeIn: Joi.string().max(30).allow("").allow(null).trim(),
-    deliveryChargeType: Joi.string()
-        .required()
-        .valid("fixed", "free", "depends"),
-    deliveryCharge: Joi.when("deliveryChargeType", {
-        is: "fixed",
-        then: Joi.number().integer().positive().required(),
-    }),
+    deliveryCharge: Joi.number().integer().positive().required(),
     category: Joi.string().required(),
     subCategory: Joi.string().min(3).max(15).required(),
 });

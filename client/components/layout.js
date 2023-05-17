@@ -4,11 +4,14 @@ import { useRouter } from "next/router";
 
 import Header from "./header";
 import Sidebar from "./sidebar";
+import { fetcher } from "../lib/fetcher";
+import { setCategories } from "../redux/slices/categories-slice";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
 
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const unprotectedPaths = [
         "/",
@@ -34,6 +37,17 @@ const Layout = ({ children }) => {
             }
         }
     }, [authUser, router, unprotectedPaths, unverifiedAccessiblePaths]);
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const data = await fetcher("categories");
+            dispatch(setCategories(data.categories));
+        } catch (error) {}
+    };
 
     return (
         <main>

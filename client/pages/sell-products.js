@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
 
 import { fetcher } from "../lib/fetcher";
+import { updateAuthUser } from "../redux/slices/auth-slice";
 
 import PageHeader from "../components/page-header";
 import InfoBanner from "../components/info-banner";
@@ -13,6 +15,23 @@ const Sell = () => {
     const [loading, setLoading] = useState(false);
 
     const router = useRouter();
+    const dispatch = useDispatch();
+    const { authUser } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        // already registered as a seller -> redirect
+        let route = "";
+
+        if (authUser && authUser?.store) {
+            if (authUser.store.storeType === "IND") {
+                route = "/post-product";
+            } else {
+                route = "/business-registration/details";
+            }
+
+            router.push(route);
+        }
+    }, [authUser]);
 
     const handleButtonClick = async () => {
         setLoading(true);
@@ -22,6 +41,9 @@ const Sell = () => {
                 `stores/?type=${type === "business" ? "BUS" : "IND"}`,
                 "POST"
             );
+            const { id, storeType } = data.store;
+
+            dispatch(updateAuthUser({ store: { id, storeType } }));
 
             if (type === "business") {
                 router.push("/business-registration/details");

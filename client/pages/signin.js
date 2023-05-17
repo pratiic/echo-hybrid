@@ -42,8 +42,6 @@ const SignIn = () => {
             });
 
             dispatch(setAuthUser(data.user));
-
-            console.log(data);
         } catch (error) {
             displayError(
                 error.message,

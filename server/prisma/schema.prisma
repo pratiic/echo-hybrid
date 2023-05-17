@@ -29,6 +29,7 @@ model User {
     address             Address?
     notifications       Notification[]
     categoryRequests    CategoryRequest[]
+    orders              Order[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -82,6 +83,7 @@ model Store {
     product  Product[]
     reviews  Review[]
     ratings  Rating[]
+    orders   Order[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -116,7 +118,7 @@ model Product {
     brand          String?
     madeIn         String?
     stockType      String?
-    deliveryCharge Json // { type, amount }
+    deliveryCharge Int
     rating         Float?   @default(0)
     subCategory    String
 
@@ -128,6 +130,7 @@ model Product {
     categoryName String?
     stock        Stock?
     variations   ProductVariation[]
+    orders       Order[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -253,6 +256,29 @@ model Stock {
     updatedAt DateTime @updatedAt
 }
 
+model Order {
+    id        Int         @id @default(autoincrement())
+    status    OrderStatus @default(PLACED)
+    isDeleted Boolean     @default(false)
+
+    unitPrice       Float
+    isDelivered     Boolean
+    deliveryCharge  Int?
+    variant         Json?
+    quantity        Int?
+    consumerAddress Json?
+
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
+    origin    User    @relation(fields: [originId], references: [id])
+    originId  Int
+    store     Store   @relation(fields: [storeId], references: [id])
+    storeId   Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
 enum StoreType {
     IND
     BUS
@@ -262,4 +288,12 @@ enum BusinessStatus {
     PENDING
     ACCEPTED
     REJECTED
+}
+
+enum OrderStatus {
+    PLACED
+    CONFIRMED
+    REJECTED
+    CANCELLED
+    PACKAGED
 }
