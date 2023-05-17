@@ -268,11 +268,11 @@ model Order {
     quantity        Int?
     consumerAddress Json?
 
-    product   Product @relation(fields: [productId], references: [id])
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
     productId Int
-    origin    User    @relation(fields: [originId], references: [id])
+    origin    User    @relation(fields: [originId], references: [id], onDelete: Cascade)
     originId  Int
-    store     Store   @relation(fields: [storeId], references: [id])
+    store     Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId   Int
 
     createdAt DateTime @default(now())
