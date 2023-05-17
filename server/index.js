@@ -19,6 +19,7 @@ import { router as categoryRouter } from "./routes/category.routes.js";
 import { router as productVariationRouter } from "./routes/product-variation.routes.js";
 import { router as stockRouter } from "./routes/stock.routes.js";
 import { router as orderRouter } from "./routes/order.routes.js";
+import { router as chatRouter } from "./routes/chat.routes.js";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/product-variations", productVariationRouter);
 app.use("/api/stocks", stockRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/chats", chatRouter);
 
 // error handler middleware
 app.use(errorHandler);

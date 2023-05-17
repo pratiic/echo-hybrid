@@ -30,6 +30,8 @@ model User {
     notifications       Notification[]
     categoryRequests    CategoryRequest[]
     orders              Order[]
+    chats               UserChat[]
+    messages            Message[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -273,6 +275,45 @@ model Order {
     originId  Int
     store     Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId   Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Chat {
+    id      String @id
+    userIds Int[]
+
+    users    UserChat[]
+    messages Message[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model UserChat {
+    id Int @id @default(autoincrement())
+
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId Int
+    chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+    chatId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Message {
+    id      Int     @id @default(autoincrement())
+    text    String?
+    image   String?
+    seen    Boolean @default(false)
+    deleted Boolean @default(false)
+
+    chat   Chat   @relation(fields: [chatId], references: [id])
+    chatId String
+    user   User   @relation(fields: [userId], references: [id])
+    userId Int
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

@@ -6,16 +6,16 @@ import themeReducer from "./slices/theme-slice";
 import sidebarReducer from "./slices/sidebar-slice";
 import filesReducer from "./slices/files-slices";
 import categoriesReducer from "./slices/categories-slice";
-import modalReducer from "./slices/modal-slices";
+import modalReducer from "./slices/modal-slice";
 
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    theme: themeReducer,
-    sidebar: sidebarReducer,
-    files: filesReducer,
-    categories: categoriesReducer,
-    modal: modalReducer,
-  },
-  middleware: [logger],
+    reducer: {
+        auth: authReducer,
+        theme: themeReducer,
+        sidebar: sidebarReducer,
+        files: filesReducer,
+        categories: categoriesReducer,
+        modal: modalReducer,
+    },
+    middleware: [logger],
 });
