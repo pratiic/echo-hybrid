@@ -50,7 +50,6 @@ const SetProduct = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    console.log("click");
 
     setLoading(true);
     clearErrors([
@@ -87,7 +86,7 @@ const SetProduct = () => {
 
       router.push("/");
     } catch (error) {
-      if (error.message.toLowerCase() === "file too large") {
+      if (error.message.includes("image") || error.message.includes("File")) {
         return setImagesError(error.message);
       }
 
@@ -112,7 +111,6 @@ const SetProduct = () => {
           setBrandError,
           setMadeInError,
           setDeliveryChargeError,
-          setImagesError,
         ]
       );
     } finally {
@@ -176,36 +174,34 @@ const SetProduct = () => {
           onChange={setDeliveryCharge}
         />
 
-        {authUser?.store?.storeType === "BUS" && (
-          <React.Fragment>
-            <InputGroup
-              label="stock type"
-              view="select"
-              options={stockTypeOptions}
-              value={stockType}
-              info={<StockTypeInfo />}
-              showRequired={false}
-              onChange={setStockType}
-            />
-
-            <InputGroup
-              label="product category"
-              view="select"
-              options={categoryOptions}
-              showRequired={false}
-              value={category}
-              onChange={setCategory}
-            />
-
-            <InputGroup
-              label="Subcategory"
-              placeholder="e.g. phone for electronics"
-              value={subCategory}
-              error={subcategoryError}
-              onChange={setSubcategory}
-            />
-          </React.Fragment>
+        {authUser?.store?.storeType === "IND" && (
+          <InputGroup
+            label="stock type"
+            view="select"
+            options={stockTypeOptions}
+            value={stockType}
+            info={<StockTypeInfo />}
+            showRequired={false}
+            onChange={setStockType}
+          />
         )}
+
+        <InputGroup
+          label="product category"
+          view="select"
+          options={categoryOptions}
+          showRequired={false}
+          value={category}
+          onChange={setCategory}
+        />
+
+        <InputGroup
+          label="Subcategory"
+          placeholder="e.g. phone for electronics"
+          value={subCategory}
+          error={subcategoryError}
+          onChange={setSubcategory}
+        />
 
         <FileSelector
           label="product images (up to 5 images, 3 mb each)"
