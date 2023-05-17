@@ -10,8 +10,7 @@ const variedOrderSchema = Joi.object({
     quantity: Joi.number().integer().positive().required(),
     variantId: Joi.string().required(),
 });
-const orderControlSchema = Joi.object({
-    orderId: Joi.number().integer().positive().required(),
+const actionSchema = Joi.object({
     action: Joi.string()
         .valid("confirm", "reject", "cancel", "package")
         .required()
@@ -26,6 +25,6 @@ export const validateOrder = (orderInfo, orderType) => {
     return validate(orderInfo, variedOrderSchema);
 };
 
-export const validateOrderControl = (orderControlInfo) => {
-    return validate(orderControlInfo, orderControlSchema);
+export const validateOrderAction = (action) => {
+    return validate({ action }, actionSchema);
 };

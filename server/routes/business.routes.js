@@ -5,7 +5,7 @@ import {
     deleteBusiness,
     getBusinessDetails,
     modifyBusinessStatus,
-    requestRegistration,
+    registerBusiness,
     updateBusiness,
 } from "../controllers/business.controllers.js";
 import { getUpload } from "../middleware/multer.middleware.js";
@@ -13,7 +13,7 @@ import { validateBusiness } from "../middleware/business.middleware.js";
 
 export const router = express.Router();
 
-router.post("/", auth, getUpload().single("image"), requestRegistration);
+router.post("/", auth, getUpload().single("image"), registerBusiness);
 
 router.get(
     "/:businessId",

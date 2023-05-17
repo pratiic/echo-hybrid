@@ -93,6 +93,20 @@ export const signUserIn = async (request, response, next) => {
         // check if the email matches
         const user = await prisma.user.findFirst({
             where: { email },
+            include: {
+                store: {
+                    select: {
+                        id: true,
+                        storeType: true,
+                        business: {
+                            select: {
+                                id: true,
+                                isVerified: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         if (!user) {
