@@ -1,6 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useState } from "react";
+import { useRouter } from "next/router";
+
+import { clearErrors, displayError } from "../lib/validation";
+import { generateFormData } from "../lib/form-data";
+import { fetcher } from "../lib/fetcher";
 
 import Form from "../components/form";
 import InputGroup from "../components/input-group";
@@ -18,7 +23,7 @@ const SetProduct = () => {
     const [perError, setPerError] = useState("");
     const [stockType, setStockType] = useState("flat");
     const [category, setCategory] = useState("accessories");
-    const [subcategory, setSubcategory] = useState("");
+    const [subCategory, setSubcategory] = useState("");
     const [subcategoryError, setSubcategoryError] = useState("");
     const [brand, setBrand] = useState("");
     const [brandError, setBrandError] = useState("");
@@ -58,10 +63,9 @@ const SetProduct = () => {
                     error={nameError}
                     onChange={setName}
                 />
-
                 <InputGroup
                     label="product description"
-                    placeholder="mi  50 chars, max 150 chars"
+                    placeholder="min 50 chars, max 150 chars"
                     view="textarea"
                     minChars={50}
                     maxChars={150}
@@ -69,7 +73,6 @@ const SetProduct = () => {
                     error={descriptionError}
                     onChange={setDescription}
                 />
-
                 <div className="flex items-center space-x-3">
                     <InputGroup
                         label="price"
@@ -92,9 +95,8 @@ const SetProduct = () => {
                         />
                     </div>
                 </div>
-
                 <InputGroup
-                    label="delivery charge (leave at 0 for free shipping)"
+                    label="delivery charge"
                     placeholder="leave empty for free shipping"
                     view="number"
                     min={0}
@@ -103,7 +105,6 @@ const SetProduct = () => {
                     error={deliveryChargeError}
                     onChange={setDeliveryCharge}
                 />
-
                 <React.Fragment>
                     <InputGroup
                         label="stock type"
@@ -127,20 +128,19 @@ const SetProduct = () => {
                     <InputGroup
                         label="Subcategory"
                         placeholder="e.g. phone for electronics"
-                        value={subcategory}
+                        value={subCategory}
                         error={subcategoryError}
                         onChange={setSubcategory}
                     />
-
-                    <FileSelector
-                        label="product images (up to 5 images, 3 mb each)"
-                        multiple
-                        max={5}
-                        isRequired={true}
-                        error={imagesError}
-                    />
                 </React.Fragment>
-
+                )}
+                <FileSelector
+                    label="product images (up to 5 images, 3 mb each)"
+                    multiple
+                    max={5}
+                    isRequired={true}
+                    error={imagesError}
+                />
                 <InputGroup
                     label="product brand"
                     placeholder="max 30 chars"
@@ -149,7 +149,6 @@ const SetProduct = () => {
                     showRequired={false}
                     onChange={setBrand}
                 />
-
                 <InputGroup
                     label="where was the product made ?"
                     placeholder="max 30 chars"
@@ -158,8 +157,7 @@ const SetProduct = () => {
                     showRequired={false}
                     onChange={setMadeIn}
                 />
-
-                <Button full laoding={loading}>
+                <Button full loading={loading}>
                     {loading ? "setting" : "set"} product
                 </Button>
             </Form>
