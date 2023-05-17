@@ -162,6 +162,58 @@ export const placeOrder = async (request, response, next) => {
     }
 };
 
+export const getOrders = async (request, response, next) => {
+    const user = request.user;
+    const target = request.query.target; // consumer or seller
+
+    if (target !== "consumer" && target !== "seller") {
+        return next(
+            new HttpError(
+                "invalid target, valid target is 'consumer' or 'seller'"
+            )
+        );
+    }
+
+    // consumer -> do not show cancelled orders
+    // seller -> do not show rejected orders
+    // both -> do not show "deleted" or completed orders
+    let filter = {};
+
+    if (target === "consumer") {
+        filter = {
+            originId: user.id,
+            status: {
+                not: "CANCELLED",
+            },
+        };
+    } else {
+        filter = {
+            storeId: user.store.id,
+            status: {
+                not: "REJECTED",
+            },
+        };
+    }
+
+    filter = {
+        ...filter,
+        NOT: {
+            isDeleted: true,
+        },
+    };
+
+    try {
+        const orders = await prisma.order.findMany({
+            where: filter,
+        });
+
+        response.json({ orders });
+    } catch (error) {
+        console.log(error);
+        next(new HttpError());
+    }
+};
+
 export const controlOrder = async (request, response, next) => {
     const user = request.user;
     const action = request.query.action;

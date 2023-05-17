@@ -14,9 +14,7 @@ export const sendNotification = async (request, response, next) => {
     }
 
     if (user.id === notificationInfo.destinationId) {
-        return next(
-            new HttpError("a notification cannot be sent to self", 400)
-        );
+        return next(new HttpError("notification cannot be sent to self", 400));
     }
 
     try {

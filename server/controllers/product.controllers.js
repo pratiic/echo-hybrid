@@ -28,6 +28,15 @@ export const postProduct = async (request, response, next) => {
         return next(new HttpError("you must register a business first", 400));
     }
 
+    if (forBusiness && !store.business.isVerified) {
+        return next(
+            new HttpError(
+                "your business must be verified before you can sell products",
+                400
+            )
+        );
+    }
+
     if (!request.files || request.files.length === 0) {
         return next(new HttpError("provide at least one image", 400));
     }
