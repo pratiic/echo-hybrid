@@ -35,7 +35,7 @@ export const registerStore = async (request, response, next) => {
             },
         });
 
-        response.json({ store: createdStore });
+        response.status(201).json({ store: createdStore });
     } catch (error) {
         next(new HttpError());
     }

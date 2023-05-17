@@ -36,21 +36,89 @@ const SetProduct = () => {
 
     const { categories } = useSelector((state) => state.categories);
     const { authUser } = useSelector((state) => state.auth);
+    const { selectedFiles } = useSelector((state) => state.files);
+
+    const router = useRouter();
 
     const stockTypeOptions = [
         { label: "flat", value: "flat" },
         { label: "varied", value: "varied" },
     ];
-    const categoryOptions = [
-        categories.map((category) => {
-            return { label: category.name, value: category.name };
-        }),
-    ];
+    const categoryOptions = categories.map((category) => {
+        return { label: category.name, value: category.name };
+    });
 
-    const handleFormSubmit = (event) => {
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
 
-        console.log("click");
+        setLoading(true);
+        clearErrors([
+            setNameError,
+            setDescriptionError,
+            setPriceError,
+            setPerError,
+            setSubcategoryError,
+            setBrandError,
+            setMadeInError,
+            setDeliveryChargeError,
+            setImagesError,
+        ]);
+
+        try {
+            const formData = generateFormData({
+                name,
+                description,
+                price,
+                per,
+                stockType,
+                category,
+                subCategory,
+                deliveryCharge,
+                brand,
+                madeIn,
+            });
+
+            selectedFiles.forEach((selectedFile) => {
+                formData.append("images", selectedFile);
+            });
+
+            const data = await fetcher("products", "POST", formData);
+
+            router.push("/");
+        } catch (error) {
+            if (
+                error.message.includes("image") ||
+                error.message.includes("File")
+            ) {
+                return setImagesError(error.message);
+            }
+
+            displayError(
+                error.message,
+                [
+                    "name",
+                    "description",
+                    "price",
+                    "per",
+                    "subCategory",
+                    "brand",
+                    "madeIn",
+                    "deliveryCharge",
+                ],
+                [
+                    setNameError,
+                    setDescriptionError,
+                    setPriceError,
+                    setPerError,
+                    setSubcategoryError,
+                    setBrandError,
+                    setMadeInError,
+                    setDeliveryChargeError,
+                ]
+            );
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -63,6 +131,7 @@ const SetProduct = () => {
                     error={nameError}
                     onChange={setName}
                 />
+
                 <InputGroup
                     label="product description"
                     placeholder="min 50 chars, max 150 chars"
@@ -73,6 +142,7 @@ const SetProduct = () => {
                     error={descriptionError}
                     onChange={setDescription}
                 />
+
                 <div className="flex items-center space-x-3">
                     <InputGroup
                         label="price"
@@ -95,6 +165,7 @@ const SetProduct = () => {
                         />
                     </div>
                 </div>
+
                 <InputGroup
                     label="delivery charge"
                     placeholder="leave empty for free shipping"
@@ -105,7 +176,8 @@ const SetProduct = () => {
                     error={deliveryChargeError}
                     onChange={setDeliveryCharge}
                 />
-                <React.Fragment>
+
+                {authUser?.store?.storeType === "IND" && (
                     <InputGroup
                         label="stock type"
                         view="select"
@@ -115,25 +187,25 @@ const SetProduct = () => {
                         showRequired={false}
                         onChange={setStockType}
                     />
-
-                    <InputGroup
-                        label="product category"
-                        view="select"
-                        options={categoryOptions[0]}
-                        showRequired={false}
-                        value={category}
-                        onChange={setCategory}
-                    />
-
-                    <InputGroup
-                        label="Subcategory"
-                        placeholder="e.g. phone for electronics"
-                        value={subCategory}
-                        error={subcategoryError}
-                        onChange={setSubcategory}
-                    />
-                </React.Fragment>
                 )}
+
+                <InputGroup
+                    label="product category"
+                    view="select"
+                    options={categoryOptions}
+                    showRequired={false}
+                    value={category}
+                    onChange={setCategory}
+                />
+
+                <InputGroup
+                    label="Subcategory"
+                    placeholder="e.g. phone for electronics"
+                    value={subCategory}
+                    error={subcategoryError}
+                    onChange={setSubcategory}
+                />
+
                 <FileSelector
                     label="product images (up to 5 images, 3 mb each)"
                     multiple
@@ -141,6 +213,7 @@ const SetProduct = () => {
                     isRequired={true}
                     error={imagesError}
                 />
+
                 <InputGroup
                     label="product brand"
                     placeholder="max 30 chars"
@@ -149,6 +222,7 @@ const SetProduct = () => {
                     showRequired={false}
                     onChange={setBrand}
                 />
+
                 <InputGroup
                     label="where was the product made ?"
                     placeholder="max 30 chars"
@@ -157,6 +231,7 @@ const SetProduct = () => {
                     showRequired={false}
                     onChange={setMadeIn}
                 />
+
                 <Button full loading={loading}>
                     {loading ? "setting" : "set"} product
                 </Button>

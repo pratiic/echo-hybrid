@@ -74,6 +74,7 @@ export const registerBusiness = async (request, response, next) => {
                 ownerName,
                 PAN,
                 phone,
+                isVerified: true,
                 storeId: store.id,
             },
         });
