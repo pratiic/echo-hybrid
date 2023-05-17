@@ -1,5 +1,5 @@
-export const checkWithinValley = (consumerAddr, sellerAddr) => {
-    const validDistricts = ["kathmandu", "bhatkapur", "lalitpur"];
+export const checkDelivery = (consumerAddr, sellerAddr) => {
+    const valleyDistricts = ["kathmandu", "bhaktapur", "lalitpur"];
 
     if (
         consumerAddr.province !== "bagmati" ||
@@ -7,4 +7,15 @@ export const checkWithinValley = (consumerAddr, sellerAddr) => {
     ) {
         return false;
     }
+
+    if (
+        valleyDistricts.find(
+            (district) => district === consumerAddr.district
+        ) &&
+        valleyDistricts.find((district) => district === consumerAddr.district)
+    ) {
+        return true;
+    }
+
+    return false;
 };

@@ -18,6 +18,7 @@ import { router as ratingRouter } from "./routes/rating.routes.js";
 import { router as categoryRouter } from "./routes/category.routes.js";
 import { router as productVariationRouter } from "./routes/product-variation.routes.js";
 import { router as stockRouter } from "./routes/stock.routes.js";
+import { router as orderRouter } from "./routes/order.routes.js";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use("/api/ratings", ratingRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/product-variations", productVariationRouter);
 app.use("/api/stocks", stockRouter);
+app.use("/api/orders", orderRouter);
 
 // error handler middleware
 app.use(errorHandler);

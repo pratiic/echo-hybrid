@@ -90,13 +90,13 @@ model Store {
 }
 
 model Business {
-    id        Int            @id @default(autoincrement())
-    name      String
-    ownerName String
-    PAN       String?
-    regImage  String?
-    phone     String
-    status    BusinessStatus @default(PENDING)
+    id         Int     @id @default(autoincrement())
+    name       String
+    ownerName  String
+    PAN        String?
+    regImage   String?
+    phone      String
+    isVerified Boolean @default(false)
 
     store   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId Int      @unique
@@ -257,16 +257,15 @@ model Stock {
 }
 
 model Order {
-    id        Int         @id @default(autoincrement())
-    status    OrderStatus @default(PLACED)
-    isDeleted Boolean     @default(false)
-
+    id              Int         @id @default(autoincrement())
+    status          OrderStatus @default(PLACED)
     unitPrice       Float
     isDelivered     Boolean
     deliveryCharge  Int?
     variant         Json?
     quantity        Int?
     consumerAddress Json?
+    isDeleted       Boolean     @default(false)
 
     product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
     productId Int

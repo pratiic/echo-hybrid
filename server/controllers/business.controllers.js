@@ -7,7 +7,7 @@ import {
     validateStatus,
 } from "../validators/business.validators.js";
 
-export const requestRegistration = async (request, response, next) => {
+export const registerBusiness = async (request, response, next) => {
     const user = request.user;
     const businessInfo = request.body;
 
@@ -74,7 +74,6 @@ export const requestRegistration = async (request, response, next) => {
                 ownerName,
                 PAN,
                 phone,
-                status: "PENDING",
                 storeId: store.id,
             },
         });
