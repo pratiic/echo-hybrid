@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useRouter } from "next/router";
@@ -39,6 +39,22 @@ const SetProduct = () => {
   const { selectedFiles } = useSelector((state) => state.files);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const store = authUser?.store;
+
+    //redirect if user has not selected business type
+    if (!store) {
+      router.push("/sell-products");
+    }
+
+    //redirect if business has not been registered and verified
+    if (store && store?.storeType === "BUS") {
+      if (!store?.business && !store?.business.isVerified) {
+        router.push("/business-registration/details");
+      }
+    }
+  }, [authUser]);
 
   const stockTypeOptions = [
     { label: "flat", value: "flat" },
@@ -174,7 +190,7 @@ const SetProduct = () => {
           onChange={setDeliveryCharge}
         />
 
-        {authUser?.store?.storeType === "IND" && (
+        {authUser?.store?.storeType === "BUS" && (
           <InputGroup
             label="stock type"
             view="select"

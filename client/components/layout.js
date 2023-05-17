@@ -6,6 +6,7 @@ import Header from "./header";
 import Sidebar from "./sidebar";
 import { fetcher } from "../lib/fetcher";
 import { setCategories } from "../redux/slices/categories-slice";
+import Modal from "./modal";
 
 const Layout = ({ children }) => {
   const { authUser } = useSelector((state) => state.auth);
@@ -52,6 +53,7 @@ const Layout = ({ children }) => {
   return (
     <main>
       <section className="min-h-screen dark:bg-gray-seven">
+        <Modal />
         <Header />
 
         <section className={authUser && "wrapper relative"}>

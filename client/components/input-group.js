@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { EyeOffIcon, EyeIcon } from "@heroicons/react/solid";
+import { useDispatch } from "react-redux";
 
 import { capitalizeFirstLetter, renderCharLimit } from "../lib/strings";
+import { showGenericModal } from "../redux/slices/modal-slices";
 
 const InputGroup = ({
   label,
@@ -25,6 +27,8 @@ const InputGroup = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const dispatch = useDispatch();
 
   const inputClassName = `border rounded px-2 w-full outline-none block my-[2px] black-white dark:bg-gray-eight ${
     isFocused
@@ -67,7 +71,7 @@ const InputGroup = ({
           {info && (
             <MdOutlineInfo
               className="icon-small"
-              //   onClick={() => dispatch(showGenericModal(info))}
+              onClick={() => dispatch(showGenericModal(info))}
             />
           )}
         </div>
