@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { provinceOptions, districtOptions } from "../../../lib/address";
 import { clearErrors, displayError } from "../../../lib/validation";
 import { fetcher } from "../../../lib/fetcher";
+import { setAlert } from "../../../redux/slices/alerts-slice";
 
 import Form from "../../../components/form";
 import InputGroup from "../../../components/input-group";
@@ -27,8 +28,10 @@ const Address = () => {
   const [address, setAddress] = useState(null);
   const [fetching, setFetching] = useState(false);
 
-  const router = useRouter();
   const { authUser } = useSelector((state) => state.auth);
+
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (authUser) {
@@ -84,6 +87,8 @@ const Address = () => {
         area,
         description,
       });
+
+      dispatch(setAlert({ message: "business address has been set" }));
 
       router.push("/set-product");
     } catch (error) {

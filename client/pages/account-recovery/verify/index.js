@@ -1,142 +1,142 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import { displayError, clearErrors } from "../../../lib/validation";
+import { fetcher } from "../../../lib/fetcher";
+import { setAlert, setErrorAlert } from "../../../redux/slices/alerts-slice";
 
 import Form from "../../../components/form";
 import InfoBanner from "../../../components/info-banner";
 import InputGroup from "../../../components/input-group";
 import Button from "../../../components/button";
 import CustomLink from "../../../components/custom-link";
-import { displayError, clearErrors } from "../../../lib/validation";
-import { fetcher } from "../../../lib/fetcher";
 
 const Verify = () => {
-    const [email, setEmail] = useState("");
-    const [emailError, setEmailError] = useState("");
-    const [password, setPassword] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-    const [repeatedPassword, setRepeatedPassword] = useState("");
-    const [repeatedPasswordError, setRepeatedPasswordError] = useState("");
-    const [code, setCode] = useState("");
-    const [codeError, setCodeError] = useState("");
-    const [resetting, setResetting] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [repeatedPassword, setRepeatedPassword] = useState("");
+  const [repeatedPasswordError, setRepeatedPasswordError] = useState("");
+  const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [resetting, setResetting] = useState(false);
 
-    const { authUser } = useSelector((state) => state.auth);
-    const router = useRouter();
+  const { authUser } = useSelector((state) => state.auth);
 
-    useEffect(() => {
-        if (authUser) {
-            router.back();
-        }
-    }, [authUser]);
+  const router = useRouter();
+  const dispatch = useDispatch();
 
-    const handleFormSubmit = async () => {
-        setResetting(true);
+  useEffect(() => {
+    if (authUser) {
+      router.back();
+    }
+  }, [authUser]);
 
-        clearErrors([
-            setEmailError,
-            setPasswordError,
-            setRepeatedPasswordError,
-            setCodeError,
-        ]);
+  const handleFormSubmit = async () => {
+    setResetting(true);
 
-        if (password !== repeatedPassword) {
-            const msg = "Passwords do not match";
-            setPasswordError(msg);
-            setRepeatedPasswordError(msg);
+    clearErrors([
+      setEmailError,
+      setPasswordError,
+      setRepeatedPasswordError,
+      setCodeError,
+    ]);
 
-            setResetting(false);
-            return;
-        }
+    if (password !== repeatedPassword) {
+      const msg = "Passwords do not match";
+      setPasswordError(msg);
+      setRepeatedPasswordError(msg);
 
-        try {
-            await fetcher("accounts/recovery", "PATCH", {
-                email,
-                password,
-                code,
-            });
+      setResetting(false);
+      return;
+    }
 
-            router.push("/signin");
-        } catch (error) {
-            console.log(error.message);
+    try {
+      await fetcher("accounts/recovery", "PATCH", {
+        email,
+        password,
+        code,
+      });
 
-            if (
-                error.message ===
-                "you need to request for an account recovery first"
-            ) {
-                router.push("/account-recovery/request");
-                return;
-            }
+      dispatch(setAlert({ message: "your password has been reset" }));
 
-            displayError(
-                error.message,
-                ["email", "password", "code"],
-                [setEmailError, setPasswordError, setCodeError]
-            );
-        } finally {
-            setResetting(false);
-        }
-    };
+      router.push("/signin");
+    } catch (error) {
+      if (
+        error.message === "you need to request for an account recovery first"
+      ) {
+        dispatch(setErrorAlert(error.message));
+        router.push("/account-recovery/request");
+        return;
+      }
 
-    return (
-        <section>
-            <Form heading="Recover your account" onSubmit={handleFormSubmit}>
-                <div className="mt-4">
-                    <InfoBanner>
-                        Check your inbox for the verification code to reset your
-                        password. Make sure to check the{" "}
-                        <span className="font-semibold">spam folder</span> as
-                        well.
-                    </InfoBanner>
+      displayError(
+        error.message,
+        ["email", "password", "code"],
+        [setEmailError, setPasswordError, setCodeError]
+      );
+    } finally {
+      setResetting(false);
+    }
+  };
 
-                    <InputGroup
-                        label="email"
-                        placeholder="email of your account"
-                        value={email}
-                        error={emailError}
-                        onChange={setEmail}
-                    />
+  return (
+    <section>
+      <Form heading="Recover your account" onSubmit={handleFormSubmit}>
+        <div className="mt-4">
+          <InfoBanner>
+            Check your inbox for the verification code to reset your password.
+            Make sure to check the{" "}
+            <span className="font-semibold">spam folder</span> as well.
+          </InfoBanner>
 
-                    <InputGroup
-                        label="new password"
-                        placeholder="valid new password"
-                        value={password}
-                        error={passwordError}
-                        type="password"
-                        onChange={setPassword}
-                    />
+          <InputGroup
+            label="email"
+            placeholder="email of your account"
+            value={email}
+            error={emailError}
+            onChange={setEmail}
+          />
 
-                    <InputGroup
-                        label="confirm new password"
-                        placeholder="repeat new password"
-                        value={repeatedPassword}
-                        error={repeatedPasswordError}
-                        type="password"
-                        onChange={setRepeatedPassword}
-                    />
+          <InputGroup
+            label="new password"
+            placeholder="valid new password"
+            value={password}
+            error={passwordError}
+            type="password"
+            onChange={setPassword}
+          />
 
-                    <InputGroup
-                        label="verification code"
-                        placeholder="8-digit code"
-                        value={code}
-                        error={codeError}
-                        onChange={setCode}
-                    />
+          <InputGroup
+            label="confirm new password"
+            placeholder="repeat new password"
+            value={repeatedPassword}
+            error={repeatedPasswordError}
+            type="password"
+            onChange={setRepeatedPassword}
+          />
 
-                    <CustomLink
-                        href="/account-recovery/request"
-                        className="link-form"
-                    >
-                        <span>Do not have a code or the code is expired?</span>
-                    </CustomLink>
+          <InputGroup
+            label="verification code"
+            placeholder="8-digit code"
+            value={code}
+            error={codeError}
+            onChange={setCode}
+          />
 
-                    <Button loading={resetting}>
-                        {resetting ? "Resetting" : "Reset"} Password
-                    </Button>
-                </div>
-            </Form>
-        </section>
-    );
+          <CustomLink href="/account-recovery/request" className="link-form">
+            <span>Do not have a code or the code is expired?</span>
+          </CustomLink>
+
+          <Button loading={resetting}>
+            {resetting ? "Resetting" : "Reset"} Password
+          </Button>
+        </div>
+      </Form>
+    </section>
+  );
 };
 
 export default Verify;
