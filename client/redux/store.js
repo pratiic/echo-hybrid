@@ -8,6 +8,7 @@ import filesReducer from "./slices/files-slices";
 import categoriesReducer from "./slices/categories-slice";
 import modalReducer from "./slices/modal-slice";
 import alertsReducer from "./slices/alerts-slice";
+import productsReducer from "./slices/products-slice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     categories: categoriesReducer,
     modal: modalReducer,
     alerts: alertsReducer,
+    products: productsReducer,
   },
   middleware: [logger],
 });

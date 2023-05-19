@@ -12,6 +12,7 @@ import AlertsContainer from "./alerts-container";
 
 const Layout = ({ children }) => {
   const { authUser } = useSelector((state) => state.auth);
+  const { theme } = useSelector((state) => state.theme);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -53,7 +54,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <main>
+    <main className={theme === "dark" && "dark"}>
       <section className="min-h-screen dark:bg-gray-seven">
         <Modal />
         <Header />
