@@ -10,7 +10,7 @@ export const productsSlice = createSlice({
     fetchCounter: 1,
     query: "",
     category: "",
-    laoding: false,
+    loading: false,
     loadingMore: false,
     noMoreData: false,
     error: "",
@@ -57,7 +57,7 @@ export const productsSlice = createSlice({
       state.loading = action.payload;
     },
     setLoadingMore: (state, action) => {
-      state.laodingMore = action.payload;
+      state.loadingMore = action.payload;
     },
     setNoMoreData: (state, action) => {
       state.noMoreData = action.payload;
