@@ -5,6 +5,8 @@ import { fetcher } from "../lib/fetcher";
 import { clearErrors, displayError } from "../lib/validation";
 import { generateFormData } from "../lib/form-data";
 import { updateAuthUser } from "../redux/slices/auth-slice";
+import { closeModal, showLoadingModal } from "../redux/slices/modal-slice";
+import { setAlert } from "../redux/slices/alerts-slice";
 
 import FileSelector from "./file-selector";
 import Form from "./form";
@@ -42,6 +44,8 @@ const UserDetails = () => {
     setAvatarError("");
 
     try {
+      dispatch(showLoadingModal("updating your details..."));
+
       const formData = generateFormData({ firstName, lastName, email });
 
       if (avatar) {
@@ -59,6 +63,8 @@ const UserDetails = () => {
           avatar: user.avatar,
         })
       );
+
+      dispatch(setAlert({ message: "details updated successfully" }));
     } catch (error) {
       console.log(error);
 
@@ -72,6 +78,7 @@ const UserDetails = () => {
         [setFirstnameError, setLastnameError, setEmailError]
       );
     } finally {
+      dispatch(closeModal());
       setUpdating(false);
     }
   };

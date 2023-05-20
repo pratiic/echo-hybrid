@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { fetcher } from "../../../lib/fetcher";
 import { clearErrors, displayError } from "../../../lib/validation";
 import { generateFormData } from "../../../lib/form-data";
+import { setAlert } from "../../../redux/slices/alerts-slice";
 
 import Button from "../../../components/button";
-import PageHeader from "../../../components/page-header";
 import Form from "../../../components/form";
 import InputGroup from "../../../components/input-group";
 import FileSelector from "../../../components/file-selector";
@@ -33,6 +33,7 @@ const Details = () => {
     const { authUser } = useSelector((state) => state.auth);
 
     const router = useRouter();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (authUser) {
@@ -101,6 +102,8 @@ const Details = () => {
             }
 
             await fetcher("businesses", "POST", formData);
+
+            dispatch(setAlert({ message: "business details has been set" }));
 
             router.push("/business-registration/address");
         } catch (error) {

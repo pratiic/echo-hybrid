@@ -144,6 +144,10 @@ textarea {
     @apply h-4 w-4 text-gray-one;
   }
 
+  .icon-alert {
+    @apply h-[1.4rem] w-[1.4rem];
+  }
+
   .status-base {
     @apply text-center dark-light max-w-sm mx-auto first-letter:capitalize;
   }

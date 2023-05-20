@@ -2,14 +2,12 @@ import Joi from "joi";
 
 import { validate } from "./base.validators.js";
 
+const quantitySchema = Joi.number().integer().positive().required();
 const cartItemSchema = Joi.object({
-    productId: Joi.number().integer().required(),
-    quantity: Joi.number().integer().required(),
+    quantity: quantitySchema,
 });
-
 const variedCartItemSchema = Joi.object({
-    productId: Joi.number().integer().required(),
-    quantity: Joi.number().integer().required(),
+    quantity: quantitySchema,
     variantId: Joi.string().required(),
 });
 

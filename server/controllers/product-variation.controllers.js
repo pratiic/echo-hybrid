@@ -7,10 +7,11 @@ export const setProductVariations = async (request, response, next) => {
     const product = request.product;
     let { variations } = request.body;
 
-    if (product.isSecondHand) {
+    if (product.isSecondHand || product.stockType === "flat") {
         return next(
             new HttpError(
-                "second hand products are not allowed to have variations"
+                "second hand products and products with flat stock are not allowed to have variations",
+                400
             )
         );
     }

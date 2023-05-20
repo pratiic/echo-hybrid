@@ -125,6 +125,7 @@ export const updateProduct = async (request, response, next) => {
 
     const errorMsg = validateProduct({
         ...product,
+        category: product.categoryName,
         ...updateInfo,
     });
 

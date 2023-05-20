@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+
+import { fetcher } from "../../../lib/fetcher";
+import { setAlert } from "../../../redux/slices/alerts-slice";
 
 import Form from "../../../components/form";
 import InputGroup from "../../../components/input-group";
 import CustomLink from "../../../components/custom-link";
 import Button from "../../../components/button";
 import InfoBanner from "../../../components/info-banner";
-import { useDispatch, useSelector } from "react-redux";
-import { fetcher } from "../../../lib/fetcher";
 
 const Request = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +18,7 @@ const Request = () => {
 
   const { authUser } = useSelector((state) => state.auth);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (authUser) {
@@ -36,6 +39,9 @@ const Request = () => {
         email,
       });
 
+      dispatch(
+        setAlert({ message: "verification code has been sent to your email" })
+      );
       router.push("/account-recovery/verify");
     } catch (error) {
       setError(error.message);

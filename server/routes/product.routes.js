@@ -24,6 +24,7 @@ router.post(
                     business: {
                         select: {
                             id: true,
+                            isVerified: true,
                         },
                     },
                 },

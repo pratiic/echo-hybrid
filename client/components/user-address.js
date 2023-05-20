@@ -6,155 +6,159 @@ import { provinceOptions, districtOptions } from "../lib/address";
 import { clearErrors, displayError } from "../lib/validation";
 import { fetcher } from "../lib/fetcher";
 import { updateAuthUser } from "../redux/slices/auth-slice";
+import { closeModal, showLoadingModal } from "../redux/slices/modal-slice";
 
 import Form from "./form";
 import InputGroup from "./input-group";
 import Button from "./button";
+import { setAlert } from "../redux/slices/alerts-slice";
 
 const UserAddress = () => {
-    const [province, setProvince] = useState("bagmati");
-    const [district, setDistrict] = useState("kathmandu");
-    const [city, setCity] = useState("");
-    const [area, setArea] = useState("");
-    const [description, setDescription] = useState("");
-    const [provinceError, setProvinceError] = useState("");
-    const [districtError, setDistrictError] = useState("");
-    const [cityError, setCityError] = useState("");
-    const [areaError, setAreaError] = useState("");
-    const [descriptionError, setDescriptionError] = useState("");
+  const [province, setProvince] = useState("bagmati");
+  const [district, setDistrict] = useState("kathmandu");
+  const [city, setCity] = useState("");
+  const [area, setArea] = useState("");
+  const [description, setDescription] = useState("");
+  const [provinceError, setProvinceError] = useState("");
+  const [districtError, setDistrictError] = useState("");
+  const [cityError, setCityError] = useState("");
+  const [areaError, setAreaError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
 
-    const [updating, setUpdating] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
-    const { authUser } = useSelector((state) => state.auth);
+  const { authUser } = useSelector((state) => state.auth);
 
-    const dispatch = useDispatch();
-    const router = useRouter();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-    useEffect(() => {
-        const address = authUser?.address;
+  useEffect(() => {
+    const address = authUser?.address;
 
-        setProvince(address?.province || "bagmati");
-        setDistrict(address?.district || "kathmandu");
-        setCity(address?.city || "");
-        setArea(address?.area || "");
-        setDescription(address?.description || "");
-    }, [authUser]);
+    setProvince(address?.province || "bagmati");
+    setDistrict(address?.district || "kathmandu");
+    setCity(address?.city || "");
+    setArea(address?.area || "");
+    setDescription(address?.description || "");
+  }, [authUser]);
 
-    const handleFormSubmit = async (event) => {
-        event.preventDefault();
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
 
-        setUpdating(true);
-        clearErrors([
-            setProvinceError,
-            setDistrictError,
-            setCityError,
-            setAreaError,
-            setDescriptionError,
-        ]);
+    setUpdating(true);
+    clearErrors([
+      setProvinceError,
+      setDistrictError,
+      setCityError,
+      setAreaError,
+      setDescriptionError,
+    ]);
 
-        try {
-            // dispatch(showLoadingModal("updating your address..."));
+    try {
+      dispatch(showLoadingModal("updating your address..."));
 
-            const data = await fetcher("addresses/user", "POST", {
-                province,
-                district,
-                city,
-                area,
-                description,
-            });
+      const data = await fetcher("addresses/user", "POST", {
+        province,
+        district,
+        city,
+        area,
+        description,
+      });
 
-            dispatch(
-                updateAuthUser({
-                    address: data.address,
-                })
-            );
+      dispatch(
+        updateAuthUser({
+          address: data.address,
+        })
+      );
 
-            // dispatch(setAlert({ message: "address updated successfully" }));
-            const { redirect, prevRedirect } = router.query;
-            let redirectUrl = "";
+      dispatch(setAlert({ message: "address updated successfully" }));
 
-            if (redirect) {
-                redirectUrl += `/${router.query.redirect}`;
-            }
+      const { redirect, prevRedirect } = router.query;
+      let redirectUrl = "";
 
-            if (prevRedirect) {
-                redirectUrl += `/?redirect=${prevRedirect}`;
-            }
+      if (redirect) {
+        redirectUrl += `/${router.query.redirect}`;
+      }
 
-            if (redirectUrl) {
-                router.push(redirectUrl);
-            }
-        } catch (error) {
-            displayError(
-                error.message,
-                ["province", "district", "city", "area", "description"],
-                [
-                    setProvinceError,
-                    setDistrictError,
-                    setCityError,
-                    setAreaError,
-                    setDescriptionError,
-                ]
-            );
+      if (prevRedirect) {
+        redirectUrl += `/?redirect=${prevRedirect}`;
+      }
 
-            console.log(error.message);
-        } finally {
-            setUpdating(false);
-        }
-    };
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      }
+    } catch (error) {
+      displayError(
+        error.message,
+        ["province", "district", "city", "area", "description"],
+        [
+          setProvinceError,
+          setDistrictError,
+          setCityError,
+          setAreaError,
+          setDescriptionError,
+        ]
+      );
 
-    return (
-        <Form onSubmit={handleFormSubmit}>
-            <InputGroup
-                label="province"
-                view="select"
-                options={provinceOptions}
-                value={province}
-                error={provinceError}
-                onChange={setProvince}
-            />
+      console.log(error.message);
+    } finally {
+      dispatch(closeModal());
+      setUpdating(false);
+    }
+  };
 
-            {province === "bagmati" && (
-                <InputGroup
-                    label="district"
-                    view="select"
-                    options={districtOptions}
-                    value={district}
-                    error={districtError}
-                    onChange={setDistrict}
-                />
-            )}
+  return (
+    <Form onSubmit={handleFormSubmit}>
+      <InputGroup
+        label="province"
+        view="select"
+        options={provinceOptions}
+        value={province}
+        error={provinceError}
+        onChange={setProvince}
+      />
 
-            <InputGroup
-                label="city"
-                placeholder="e.g. kathmandu"
-                value={city}
-                error={cityError}
-                onChange={setCity}
-            />
+      {province === "bagmati" && (
+        <InputGroup
+          label="district"
+          view="select"
+          options={districtOptions}
+          value={district}
+          error={districtError}
+          onChange={setDistrict}
+        />
+      )}
 
-            <InputGroup
-                label="area"
-                placeholder="e.g. koteshwor"
-                value={area}
-                error={areaError}
-                onChange={setArea}
-            />
+      <InputGroup
+        label="city"
+        placeholder="e.g. kathmandu"
+        value={city}
+        error={cityError}
+        onChange={setCity}
+      />
 
-            <InputGroup
-                label="description"
-                value={description}
-                placeholder="max 100 chars"
-                error={descriptionError}
-                onChange={setDescription}
-                view="textarea"
-            />
+      <InputGroup
+        label="area"
+        placeholder="e.g. koteshwor"
+        value={area}
+        error={areaError}
+        onChange={setArea}
+      />
 
-            <Button loading={updating} full>
-                {updating ? "updating" : "update"} address
-            </Button>
-        </Form>
-    );
+      <InputGroup
+        label="description"
+        value={description}
+        placeholder="max 100 chars"
+        error={descriptionError}
+        onChange={setDescription}
+        view="textarea"
+      />
+
+      <Button loading={updating} full>
+        {updating ? "updating" : "update"} address
+      </Button>
+    </Form>
+  );
 };
 
 export default UserAddress;
