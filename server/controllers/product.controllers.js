@@ -4,6 +4,7 @@ import prisma from "../lib/prisma.lib.js";
 import { trimValues } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import { validateProduct } from "../validators/product.validators.js";
+import { genericUserFields } from "../lib/data-source.lib.js";
 
 const MAX_IMAGES = 5;
 
@@ -115,6 +116,41 @@ export const postProduct = async (request, response, next) => {
             );
         }
 
+        next(new HttpError());
+    }
+};
+
+export const getProductDetails = async (request, response, next) => {
+    const productId = parseInt(request.params.productId) || 0;
+
+    try {
+        const product = await prisma.product.findUnique({
+            where: {
+                id: productId,
+            },
+            include: {
+                stock: true,
+                store: {
+                    include: {
+                        user: {
+                            select: {
+                                ...genericUserFields,
+                                address: true,
+                            },
+                        },
+                    },
+                },
+                variations: true,
+                ratings: true,
+            },
+        });
+
+        if (!product) {
+            return next(new HttpError("product not found", 404));
+        }
+
+        response.json({ product });
+    } catch (error) {
         next(new HttpError());
     }
 };
