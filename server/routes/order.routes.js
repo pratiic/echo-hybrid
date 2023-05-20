@@ -16,7 +16,7 @@ router.post("/:productId", auth, placeOrder);
 router.get(
     "",
     (request, response, next) => {
-        request.include = {
+        request.select = {
             store: {
                 select: {
                     id: true,

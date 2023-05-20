@@ -4,4 +4,5 @@ module.exports = {
     },
     type: "commonjs",
     modulePathIgnorePatterns: ["<rootDir>/dist/"],
+    maxConcurrency: 7,
 };

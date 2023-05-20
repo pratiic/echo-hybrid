@@ -8,7 +8,7 @@ export const router = express.Router();
 router.post(
     "/:targetType",
     (request, response, next) => {
-        request.include = {
+        request.select = {
             store: {
                 select: {
                     id: true,

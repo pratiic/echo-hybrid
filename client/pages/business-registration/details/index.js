@@ -46,7 +46,7 @@ const Details = () => {
 
             if (business.address) {
                 // business has already been registered and address has already been set
-                router.push("/");
+                router.push("/set-product");
             } else {
                 // business has been already registered
                 const { name, ownerName, PAN, phone } = business;

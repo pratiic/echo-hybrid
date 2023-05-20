@@ -32,6 +32,7 @@ model User {
     orders              Order[]
     chats               UserChat[]
     messages            Message[]
+    cart                Cart?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -69,6 +70,7 @@ model Image {
     reviewId   Int? @unique
     businessId Int? @unique
     productId  Int?
+    messageId  Int? @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -133,6 +135,7 @@ model Product {
     stock        Stock?
     variations   ProductVariation[]
     orders       Order[]
+    cartItems    CartItem[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -281,8 +284,9 @@ model Order {
 }
 
 model Chat {
-    id      String @id
-    userIds Int[]
+    id               String @id
+    userIds          Int[]
+    unseenMsgsCounts Json
 
     users    UserChat[]
     messages Message[]
@@ -314,6 +318,32 @@ model Message {
     chatId String
     user   User   @relation(fields: [userId], references: [id])
     userId Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Cart {
+    id Int @id @default(autoincrement())
+
+    user   User       @relation(fields: [userId], references: [id])
+    userId Int        @unique
+    items  CartItem[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+    id Int @id @default(autoincrement())
+
+    quantity Int?
+    variant  Json?
+
+    cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+    cartId    Int
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+    productId Int
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

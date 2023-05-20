@@ -68,6 +68,10 @@ export const startChat = async (request, response, next) => {
                     ],
                 },
                 userIds: [reqUser.id, chatUser.id],
+                unseenMsgsCounts: {
+                    [reqUser.id]: 0,
+                    [chatUserId]: 0,
+                },
             },
             include: {
                 users: {

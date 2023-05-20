@@ -16,7 +16,7 @@ export const router = express.Router();
 router.post(
     "/",
     (request, response, next) => {
-        request.include = {
+        request.select = {
             store: {
                 select: {
                     id: true,

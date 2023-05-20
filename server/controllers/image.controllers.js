@@ -6,8 +6,13 @@ export const getImage = async (request, response, next) => {
     let image = null;
 
     let filter = {
-        [`${type}Id`]: Number(id),
+        [`${type}Id`]: parseInt(id),
     };
+
+    // images of a product cannot be selected using productId as it is not unique
+    if (uni && type === "product") {
+        filter = { uniqueStr: uni };
+    }
 
     try {
         image = await prisma.image.findUnique({

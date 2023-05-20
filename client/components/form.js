@@ -14,6 +14,8 @@ const Form = ({
     onSubmit,
     centered = true,
     children,
+    firstColumn,
+    secondColumn,
 }) => {
     const router = useRouter();
 
@@ -32,7 +34,7 @@ const Form = ({
             onSubmit={handleFormSubmit}
         >
             {heading && (
-                <div className="normal-case mb-3 text-center mt-2">
+                <div className="normal-case mb-5 text-center mt-2">
                     <div className="flex items-center justify-center">
                         {hasBackArrow && (
                             <Icon
@@ -62,6 +64,20 @@ const Form = ({
                     )}
                 </div>
             )}
+
+            {/* {firstColumn && secondColumn && (
+                <div
+                    className={`w-fit flex space-x-[75px] ${centered &&
+                        "mx-auto"}`}
+                >
+                    <div className="w-[20rem]">{firstColumn}</div>
+                    <div className="w-[20rem]">
+                        {secondColumn}
+
+                        {children}
+                    </div>
+                </div>
+            )} */}
 
             <div className={`w-[20rem] ${centered && "mx-auto"}`}>
                 {children}
