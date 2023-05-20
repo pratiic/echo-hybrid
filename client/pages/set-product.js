@@ -52,11 +52,15 @@ const SetProduct = () => {
 
     //redirect if business has not been registered and verified
     if (store && store?.storeType === "BUS") {
-      if (!store?.business && !store?.business.isVerified) {
+      if (!store?.business) {
+        router.push("/business-registration/details");
+      }
+
+      if (store?.business && !store?.business?.isVerified) {
         router.push("/business-registration/details");
       }
     }
-  }, [authUser]);
+  }, [authUser?.store]);
 
   const stockTypeOptions = [
     { label: "flat", value: "flat" },
@@ -102,10 +106,12 @@ const SetProduct = () => {
 
       const data = await fetcher("products", "POST", formData);
 
-      router.push("/");
+      console.log(data);
+      router.push(`/products/${data.product.id}`);
 
       dispatch(setAlert({ message: "product added successfully" }));
     } catch (error) {
+      console.log(error.message);
       if (error.message.includes("image") || error.message.includes("File")) {
         return setImagesError(error.message);
       }
