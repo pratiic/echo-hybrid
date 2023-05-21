@@ -118,3 +118,25 @@ export const deleteAvatar = async (request, response, next) => {
         next(new HttpError());
     }
 };
+
+export const getUserDetails = async (request, response, next) => {
+    // for test purposes
+    const email = request.body.email || "";
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        response.json({
+            user,
+        });
+    } catch (error) {
+        next(new HttpError());
+    }
+};

@@ -72,7 +72,7 @@ export const sendMessage = async (request, response, next) => {
             }
         });
 
-        response.json({
+        response.status(201).json({
             message: finalMessage,
         });
     } catch (error) {
