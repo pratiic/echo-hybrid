@@ -106,7 +106,6 @@ const SetProduct = () => {
 
       const data = await fetcher("products", "POST", formData);
 
-      console.log(data);
       router.push(`/products/${data.product.id}`);
 
       dispatch(setAlert({ message: "product added successfully" }));
