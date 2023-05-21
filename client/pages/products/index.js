@@ -14,19 +14,7 @@ const Products = () => {
     const [showCategories, setShowCategories] = useState(false);
     const [showSearchBar, setShowSearchBar] = useState(false);
 
-    const {
-        products,
-        page,
-        query,
-        loading,
-        loadingMore,
-        noMoreData,
-        error,
-        category,
-        totalCount,
-        PAGE_SIZE,
-        value = { query },
-    } = useSelector((state) => state.products);
+    const { query, category } = useSelector((state) => state.products);
 
     const router = useRouter();
     const dispatch = useDispatch();

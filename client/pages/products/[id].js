@@ -10,62 +10,71 @@ import { fetcher } from "../../lib/fetcher";
 import ProductInfo from "../../components/product-info";
 
 const ProductPage = () => {
-  const [loadingDetails, setLoadingDetails] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [isMyProduct, setIsMyProduct] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false);
+    const [loadingDetails, setLoadingDetails] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+    const [isMyProduct, setIsMyProduct] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [isDeleted, setIsDeleted] = useState(false);
 
-  const { authUser } = useSelector((state) => state.auth);
-  const { activeProduct } = useSelector((state) => state.products);
+    const { authUser } = useSelector((state) => state.auth);
+    const { activeProduct } = useSelector((state) => state.products);
 
-  const router = useRouter();
-  const dispatch = useDispatch();
+    const router = useRouter();
+    const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (activeProduct && activeProduct?.store?.userId === authUser.id) {
-      setIsMyProduct(true);
-    } else {
-      setIsMyProduct(false);
+    useEffect(() => {
+        if (activeProduct && activeProduct?.store?.userId === authUser.id) {
+            setIsMyProduct(true);
+        } else {
+            setIsMyProduct(false);
+        }
+    }, [authUser, activeProduct]);
+
+    useEffect(() => {
+        if (router.query.id) {
+            getProductInfo();
+        }
+    }, [router]);
+
+    const getProductInfo = async () => {
+        setLoadingDetails(true);
+        dispatch(setActiveProduct(null));
+
+        try {
+            const data = await fetcher(`products/${router.query.id}`);
+
+            dispatch(setActiveProduct(data.product));
+        } catch (error) {
+            setErrorMsg(error.message);
+        } finally {
+            setLoadingDetails(false);
+        }
+    };
+
+    if (loadingDetails) {
+        return <p className="status">Loading product details... </p>;
     }
-  }, [authUser, activeProduct]);
 
-  useEffect(() => {
-    if (router.query.id) {
-      getProductInfo();
+    if (errorMsg) {
+        // return (
+        //     <Human name="not-found" message={errorMsg} contentType="product" />
+        // );
+        return <p className="status">Product not found</p>;
     }
-  }, [router]);
 
-  const getProductInfo = async () => {
-    setLoadingDetails(true);
-    dispatch(setActiveProduct(null));
+    return (
+        <section className="500:mt-3">
+            <Head>
+                <title>{capitalizeFirstLetter(activeProduct?.name)}</title>
+            </Head>
 
-    try {
-      const data = await fetcher(`products/${router.query.id}`);
-
-      dispatch(setActiveProduct(data.product));
-    } catch (error) {
-      setErrorMsg(error.message);
-    } finally {
-      setLoadingDetails(false);
-    }
-  };
-
-  console.log(activeProduct);
-
-  return (
-    <section className="500:mt-3">
-      <Head>
-        <title>{capitalizeFirstLetter(activeProduct?.name)}</title>
-      </Head>
-
-      <div className="flex relative">
-        <div className="flex-1">
-          <ProductInfo {...activeProduct} isMyProduct={isMyProduct} />
-        </div>
-      </div>
-    </section>
-  );
+            <div className="flex relative">
+                <div className="flex-1">
+                    <ProductInfo {...activeProduct} isMyProduct={isMyProduct} />
+                </div>
+            </div>
+        </section>
+    );
 };
 
 export default ProductPage;

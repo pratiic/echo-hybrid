@@ -22,6 +22,7 @@ import { router as orderRouter } from "./routes/order.routes.js";
 import { router as chatRouter } from "./routes/chat.routes.js";
 import { router as messageRouter } from "./routes/message.routes.js";
 import { router as cartRouter } from "./routes/cart.routes.js";
+import { router as receiptRouter } from "./routes/receipt.routes.js";
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use("/api/orders", orderRouter);
 app.use("/api/chats", chatRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/carts", cartRouter);
+app.use("/receipts", receiptRouter);
 
 // error handler middleware
 app.use(errorHandler);
