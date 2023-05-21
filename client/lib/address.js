@@ -5,13 +5,10 @@ export const getAddress = (address) => {
     return "";
   }
 
-  const { province, district, city, area, description } = address;
+  // const { province, district, city, area, description } = address;
+  const { city, area } = address;
 
-  return `${capitalizeFirstLetter(province)}, ${capitalizeFirstLetter(
-    district
-  )}, ${capitalizeFirstLetter(city)}, ${capitalizeFirstLetter(
-    area
-  )}, ${capitalizeFirstLetter(description)}`;
+  return `${capitalizeFirstLetter(city)}, ${capitalizeFirstLetter(area)}`;
 };
 
 export const provinceOptions = [

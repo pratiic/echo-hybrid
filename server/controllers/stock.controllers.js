@@ -15,7 +15,8 @@ export const setStock = async (request, response, next) => {
     if (product.isSecondHand) {
         return next(
             new HttpError(
-                "second hand products are not allowed to have a stock"
+                "second hand products are not allowed to have a stock",
+                400
             )
         );
     }
@@ -35,7 +36,8 @@ export const setStock = async (request, response, next) => {
         if (product.variations.length === 0) {
             return next(
                 new HttpError(
-                    "product variations must be set before setting stock"
+                    "product variations must be set before setting stock",
+                    400
                 )
             );
         }

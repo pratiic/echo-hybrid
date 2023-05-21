@@ -77,10 +77,10 @@ export const productsSlice = createSlice({
 });
 
 export const {
-  setProduct,
+  setProducts,
   setActiveProduct,
   updateActiveProduct,
-  setNeedToFecth,
+  setNeedToFetch,
   setPage,
   setFetchCounter,
   setQuery,

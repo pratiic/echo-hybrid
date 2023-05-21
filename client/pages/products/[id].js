@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
-import { capitalizeFirstLetter } from "../../lib/strings";
 import { useRouter } from "next/router";
 
+import { capitalizeFirstLetter } from "../../lib/strings";
 import { setActiveProduct } from "../../redux/slices/products-slice";
 import { fetcher } from "../../lib/fetcher";
+
+import ProductInfo from "../../components/product-info";
 
 const ProductPage = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -21,6 +23,14 @@ const ProductPage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (activeProduct && activeProduct?.store?.userId === authUser.id) {
+      setIsMyProduct(true);
+    } else {
+      setIsMyProduct(false);
+    }
+  }, [authUser, activeProduct]);
+
+  useEffect(() => {
     if (router.query.id) {
       getProductInfo();
     }
@@ -33,14 +43,15 @@ const ProductPage = () => {
     try {
       const data = await fetcher(`products/${router.query.id}`);
 
-      console.log(data);
+      dispatch(setActiveProduct(data.product));
     } catch (error) {
-      console.log(error.message);
       setErrorMsg(error.message);
     } finally {
       setLoadingDetails(false);
     }
   };
+
+  console.log(activeProduct);
 
   return (
     <section className="500:mt-3">
@@ -48,7 +59,11 @@ const ProductPage = () => {
         <title>{capitalizeFirstLetter(activeProduct?.name)}</title>
       </Head>
 
-      {/* <Gallery /> */}
+      <div className="flex relative">
+        <div className="flex-1">
+          <ProductInfo {...activeProduct} isMyProduct={isMyProduct} />
+        </div>
+      </div>
     </section>
   );
 };

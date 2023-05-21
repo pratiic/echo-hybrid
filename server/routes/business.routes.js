@@ -18,7 +18,7 @@ router.post("/", auth, getUpload().single("image"), registerBusiness);
 router.get(
     "/:businessId",
     (request, response, next) => {
-        request.include = {
+        request.select = {
             store: {
                 select: {
                     id: true,
