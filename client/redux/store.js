@@ -11,19 +11,21 @@ import alertsReducer from "./slices/alerts-slice";
 import productsReducer from "./slices/products-slice";
 import galleryReducer from "./slices/gallery-slice";
 import filterReducer from "./slices/filter-slice";
+import commentsReducer from "./slices/comments-slice";
 
 export const store = configureStore({
-    reducer: {
-        auth: authReducer,
-        theme: themeReducer,
-        sidebar: sidebarReducer,
-        files: filesReducer,
-        categories: categoriesReducer,
-        modal: modalReducer,
-        alerts: alertsReducer,
-        products: productsReducer,
-        gallery: galleryReducer,
-        filter: filterReducer,
-    },
-    middleware: [logger],
+  reducer: {
+    auth: authReducer,
+    theme: themeReducer,
+    sidebar: sidebarReducer,
+    files: filesReducer,
+    categories: categoriesReducer,
+    modal: modalReducer,
+    alerts: alertsReducer,
+    products: productsReducer,
+    gallery: galleryReducer,
+    filter: filterReducer,
+    comments: commentsReducer,
+  },
+  middleware: [logger],
 });

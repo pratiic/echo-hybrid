@@ -40,8 +40,6 @@ const Products = () => {
     setShowSearchBar(!showSearchBar);
   };
 
-  console.log(products);
-
   return (
     <section>
       <Head>

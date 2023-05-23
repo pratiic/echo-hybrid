@@ -8,6 +8,7 @@ import { setActiveProduct } from "../../redux/slices/products-slice";
 import { fetcher } from "../../lib/fetcher";
 
 import ProductInfo from "../../components/product-info";
+import CommentsContainer from "../../components/comments-container";
 
 const ProductPage = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -62,6 +63,8 @@ const ProductPage = () => {
     return <p className="status">Product not found</p>;
   }
 
+  console.log(activeProduct);
+
   return (
     <section className="500:mt-3">
       <Head>
@@ -73,6 +76,12 @@ const ProductPage = () => {
           <ProductInfo {...activeProduct} isMyProduct={isMyProduct} />
         </div>
       </div>
+
+      <CommentsContainer
+        contentId={activeProduct?.id}
+        contentOwner={activeProduct?.store?.user}
+        contentName={activeProduct?.name}
+      />
     </section>
   );
 };
