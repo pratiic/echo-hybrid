@@ -120,6 +120,72 @@ export const postProduct = async (request, response, next) => {
     }
 };
 
+export const getProducts = async (request, response, next) => {
+    const user = request.user;
+    const filter = request.query.filter || "all";
+    const sortType = request.query.sortType || "desc";
+    const sortBy = request.query.sortBy || "createdAt";
+    const category = request.query.category;
+    const searchQuery = request.query.query || "";
+    const storeId = parseInt(request.query.storeId);
+
+    const filterMap = {
+        all: {},
+        "second hand": {
+            isSecondHand: true,
+        },
+    };
+
+    let primaryFilter = {
+        isDeleted: false,
+        // NOT: {
+        //     stock: null,
+        // },
+    };
+
+    if (storeId) {
+        // products belongining to a store
+        primaryFilter.storeId = storeId;
+    }
+
+    if (category) {
+        // products of a particular category
+        primaryFilter.categoryName = category;
+    }
+
+    try {
+        const products = await prisma.product.findMany({
+            where: {
+                ...filterMap[filter],
+                ...primaryFilter,
+            },
+            include: {
+                store: {
+                    include: {
+                        user: {
+                            include: {
+                                address: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: [
+                {
+                    [sortBy]: sortType,
+                },
+                {
+                    createdAt: "asc",
+                },
+            ],
+        });
+
+        response.json({ products });
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
 export const getProductDetails = async (request, response, next) => {
     const productId = parseInt(request.params.productId) || 0;
 
@@ -135,6 +201,12 @@ export const getProductDetails = async (request, response, next) => {
                         user: {
                             select: {
                                 ...genericUserFields,
+                                address: true,
+                            },
+                        },
+                        business: {
+                            select: {
+                                id: true,
                                 address: true,
                             },
                         },
@@ -323,14 +395,6 @@ export const deleteProductImage = async (request, response, next) => {
         return next(new HttpError());
     }
 };
-
-function createDeliveryCharge(type, charge) {
-    return {
-        type,
-        amount:
-            type === "depends" ? null : type === "free" ? 0 : parseInt(charge),
-    };
-}
 
 function createPrice(price) {
     return parseFloat(parseFloat(price).toFixed());

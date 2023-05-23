@@ -125,6 +125,7 @@ model Product {
     deliveryCharge Int
     rating         Float?   @default(0)
     subCategory    String
+    isDeleted      Boolean  @default(false)
 
     store        Store?             @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId      Int?

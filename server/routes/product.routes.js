@@ -6,6 +6,7 @@ import {
     deleteProduct,
     deleteProductImage,
     getProductDetails,
+    getProducts,
     postProduct,
     updateProduct,
 } from "../controllers/product.controllers.js";
@@ -36,6 +37,8 @@ router.post(
     getUpload().array("images"),
     postProduct
 );
+
+router.get("/", auth, getProducts);
 
 router.get("/:productId", auth, getProductDetails);
 
