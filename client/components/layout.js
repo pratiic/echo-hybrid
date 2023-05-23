@@ -10,6 +10,7 @@ import Sidebar from "./sidebar";
 import Modal from "./modal";
 import AlertsContainer from "./alerts-container";
 import PopupGallery from "./popup-gallery";
+import Products from "../cache/products";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -60,6 +61,13 @@ const Layout = ({ children }) => {
                 <PopupGallery />
                 <Modal />
                 <Header />
+
+                {authUser?.isVerified && (
+                    <>
+                        {/* fake components to preserve cache */}
+                        <Products />
+                    </>
+                )}
 
                 <section className={authUser && "wrapper relative"}>
                     {authUser && <Sidebar />}

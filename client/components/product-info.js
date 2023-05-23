@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { showGenericModal } from "../redux/slices/modal-slice";
@@ -22,29 +23,28 @@ const ProductInfo = ({
     stockType,
     variationTypes,
     createdAt,
+    isSecondHand,
     isMyProduct,
 }) => {
+    const [secondaryProps, setSecondaryProps] = useState({});
     const dispatch = useDispatch();
 
-    const handleSetStockClick = () => {
-        console.log("set");
-    };
+    useEffect(() => {
+        setSecondaryProps({
+            store,
+            deliveryCharge,
+            madeIn,
+            isSecondHand,
+            isMyProduct,
+            createdAt,
+        });
+    }, [store, deliveryCharge, madeIn, isSecondHand, isMyProduct, createdAt]);
 
     const toggleSecondaryInfo = () => {
-        dispatch(
-            showGenericModal(
-                <SecondaryInfo
-                    {...{
-                        store,
-                        deliveryCharge,
-                        madeIn,
-                        createdAt,
-                        isMyProduct,
-                    }}
-                />
-            )
-        );
+        dispatch(showGenericModal(<SecondaryInfo {...secondaryProps} />));
     };
+
+    const handleSetStockClick = () => {};
 
     return (
         <div>
@@ -81,10 +81,7 @@ const ProductInfo = ({
                 />
 
                 <div className="ml-auto hidden 1200:block">
-                    <SecondaryInfo
-                        isMyProduct={isMyProduct}
-                        {...{ store, deliveryCharge, madeIn, createdAt }}
-                    />
+                    <SecondaryInfo {...secondaryProps} />
                 </div>
             </div>
         </div>

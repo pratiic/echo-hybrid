@@ -9,12 +9,25 @@ import { setCategory } from "../../redux/slices/products-slice";
 import Icon from "../../components/icon";
 import PageHeader from "../../components/page-header";
 import CategoriesPanel from "../../components/categories-panel";
+import FilterTrigger from "../../components/filter-trigger";
+import ContentList from "../../components/content-list";
 
 const Products = () => {
     const [showCategories, setShowCategories] = useState(false);
     const [showSearchBar, setShowSearchBar] = useState(false);
 
-    const { query, category } = useSelector((state) => state.products);
+    const {
+        products,
+        page,
+        query,
+        loading,
+        loadingMore,
+        noMoreData,
+        error,
+        category,
+        totalCount,
+        PAGE_SIZE,
+    } = useSelector((state) => state.products);
 
     const router = useRouter();
     const dispatch = useDispatch();
@@ -71,7 +84,7 @@ const Products = () => {
                         hasAddBtn
                         onAddClick={() => router.push("/set-product")}
                     >
-                        {/* <FilterTrigger /> */}
+                        <FilterTrigger />
                     </PageHeader>
                 </div>
             </div>
@@ -84,6 +97,22 @@ const Products = () => {
                     dispatch(setCategory(categoryName))
                 }
                 togglePanel={toggleCategoriesPanel}
+            />
+
+            <ContentList
+                list={products}
+                type="product"
+                loadingMsg={loading && "Loading products..."}
+                error={error}
+                emptyMsg={`There are no products ${query &&
+                    `related to '${query}'`} in this category and filter option`}
+                human="no-items"
+                incrementPageNumber={
+                    products.length >= PAGE_SIZE &&
+                    !noMoreData &&
+                    controlPageNumber
+                }
+                loadingMore={loadingMore}
             />
         </section>
     );
