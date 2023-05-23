@@ -18,7 +18,7 @@ import CommentsContainer from "./comments-container";
 const Comment = ({
   id,
   text,
-  user: { id: userId, firstName, lastName, email, avatar },
+  user,
   createdAt,
   image,
   commentType = "review",
@@ -29,7 +29,7 @@ const Comment = ({
 
   const { authUser } = useSelector((state) => state.auth);
 
-  console.log(authUser);
+  //   console.log(authUser);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -55,16 +55,18 @@ const Comment = ({
       {/* user details  */}
       <div className="flex items-center dark-light">
         <Avatar
-          avatar={avatar}
-          alt={firstName + " " + lastName}
+          avatar={user?.avatar}
+          alt={user?.firstName + " " + user?.lastName}
           small={commentType === "reply"}
         />
 
         <div className="ml-2 flex-1">
           <p className="capitalize black-white">
-            {userId === authUser?.id ? "me" : firstName + " " + lastName}
+            {user?.id === authUser?.id
+              ? "me"
+              : user?.firstName + " " + user?.lastName}
           </p>
-          <p className=" text-xs">{email}</p>
+          <p className=" text-xs">{user?.email}</p>
         </div>
 
         <p className="text-sm">{getHowLongAgo(createdAt)}</p>
@@ -89,7 +91,7 @@ const Comment = ({
       {/* footer of the comment  */}
       <div className="flex items-center justify-end space-x-3">
         {/* icon to chat with a comment user */}
-        {userId !== authUser?.id && <ChatButton small userId={userId} />}
+        {user?.id !== authUser?.id && <ChatButton small userId={user?.id} />}
 
         {commentType === "review" && (
           // icon to reply to a review
@@ -106,7 +108,7 @@ const Comment = ({
         )}
 
         {/* only allow creator of the review to perform certain actions  */}
-        {userId === authUser?.id && (
+        {user?.id === authUser?.id && (
           <div className="relative">
             <Icon onClick={toggleDropdown} toolName="options">
               <DotsHorizontalIcon className="icon" />
@@ -139,7 +141,7 @@ const Comment = ({
             <CommentsContainer
               commentType="reply"
               baseCommentId={id}
-              baseCommentUserId={userId}
+              baseCommentUserId={user?.id}
             />
           </div>
         )}
@@ -149,3 +151,5 @@ const Comment = ({
 };
 
 export default Comment;
+
+//   contentId={router.query.id === "me" ? myShop.id : router.query.id}

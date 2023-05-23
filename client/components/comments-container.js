@@ -59,7 +59,7 @@ const CommentsContainer = ({
 
     const existingReview = reviews.find((review) => {
       // console.log(review.user.id);
-      review.user.id === authUser.id;
+      review.user?.id === authUser?.id;
     });
 
     if (existingReview) {
@@ -179,6 +179,8 @@ const CommentsContainer = ({
       }
 
       return reviews.map((comment) => {
+        //   console.log(comment);
+
         return (
           <Comment
             {...comment}
@@ -197,6 +199,8 @@ const CommentsContainer = ({
     }
 
     return reviewReplies.map((comment) => {
+      // console.log(comment);
+
       return (
         <Comment
           {...comment}
