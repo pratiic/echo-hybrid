@@ -66,3 +66,27 @@ export const replyToReview = async (request, response, next) => {
         next(new HttpError());
     }
 };
+
+export const getReplies = async (request, response, next) => {
+    const reviewId = parseInt(request.params.reviewId) || 0;
+
+    try {
+        const replies = await prisma.reply.findMany({
+            where: {
+                reviewId,
+            },
+            include: {
+                user: {
+                    select: genericUserFields,
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+
+        response.json({ replies });
+    } catch (error) {
+        next(new HttpError());
+    }
+};

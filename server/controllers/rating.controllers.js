@@ -106,7 +106,17 @@ export const provideRating = async (request, response, next) => {
         ]);
 
         response.json({
-            rating: newRating,
+            target: {
+                rating: newRating,
+                ratings: [
+                    ...target.ratings.filter(
+                        (existingRating) => existingRating.id !== rating.id
+                    ),
+                    rating,
+                ],
+            },
+            targetUserId:
+                targetType === "product" ? target.store.userId : target.userId,
         });
     } catch (error) {
         next(new HttpError());
@@ -179,7 +189,12 @@ export const deleteRating = async (request, response, next) => {
         ]);
 
         response.json({
-            rating: newRating,
+            target: {
+                rating: newRating,
+                ratings: target.ratings.filter(
+                    (rating) => rating.userId !== user.id
+                ),
+            },
         });
     } catch (error) {
         console.log(error);
