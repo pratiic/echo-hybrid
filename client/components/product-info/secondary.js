@@ -49,9 +49,7 @@ const SecondaryInfo = ({
                         <span className="capitalize">
                             {isMyProduct
                                 ? "me"
-                                : store?.user?.firstName +
-                                  "" +
-                                  store?.user?.lastName}
+                                : `${store?.user?.firstName} ${store?.user?.lastName}`}
                         </span>
 
                         {/* <CustomLink

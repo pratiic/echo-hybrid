@@ -4,86 +4,146 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { capitalizeFirstLetter } from "../../lib/strings";
-import { setActiveProduct } from "../../redux/slices/products-slice";
+import {
+    setActiveProduct,
+    updateActiveProduct,
+} from "../../redux/slices/products-slice";
 import { fetcher } from "../../lib/fetcher";
 
 import ProductInfo from "../../components/product-info";
+import Rating from "../../components/rating";
 import CommentsContainer from "../../components/comments-container";
 
 const ProductPage = () => {
-  const [loadingDetails, setLoadingDetails] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [isMyProduct, setIsMyProduct] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false);
+    const [loadingDetails, setLoadingDetails] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+    const [isMyProduct, setIsMyProduct] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [isDeleted, setIsDeleted] = useState(false);
 
-  const { authUser } = useSelector((state) => state.auth);
-  const { activeProduct } = useSelector((state) => state.products);
+    const { authUser } = useSelector((state) => state.auth);
+    const { activeProduct } = useSelector((state) => state.products);
 
-  const router = useRouter();
-  const dispatch = useDispatch();
+    const router = useRouter();
+    const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (activeProduct && activeProduct?.store?.userId === authUser.id) {
-      setIsMyProduct(true);
-    } else {
-      setIsMyProduct(false);
+    useEffect(() => {
+        if (activeProduct && activeProduct?.store?.userId === authUser.id) {
+            setIsMyProduct(true);
+        } else {
+            setIsMyProduct(false);
+        }
+    }, [authUser, activeProduct]);
+
+    useEffect(() => {
+        if (router.query.id) {
+            getProductInfo();
+        }
+    }, [router]);
+
+    const getProductInfo = async () => {
+        setLoadingDetails(true);
+        dispatch(setActiveProduct(null));
+
+        try {
+            const data = await fetcher(`products/${router.query.id}`);
+
+            dispatch(setActiveProduct(data.product));
+        } catch (error) {
+            setErrorMsg(error.message);
+        } finally {
+            setLoadingDetails(false);
+        }
+    };
+
+    if (loadingDetails) {
+        return <p className="status">Loading product details... </p>;
     }
-  }, [authUser, activeProduct]);
 
-  useEffect(() => {
-    if (router.query.id) {
-      getProductInfo();
+    if (errorMsg) {
+        // return (
+        //     <Human name="not-found" message={errorMsg} contentType="product" />
+        // );
+        return <p className="status">Product not found</p>;
     }
-  }, [router]);
 
-  const getProductInfo = async () => {
-    setLoadingDetails(true);
-    dispatch(setActiveProduct(null));
+    console.log(activeProduct);
 
-    try {
-      const data = await fetcher(`products/${router.query.id}`);
+    return (
+        <section className="500:mt-3">
+            <Head>
+                <title>{capitalizeFirstLetter(activeProduct?.name)}</title>
+            </Head>
 
-      dispatch(setActiveProduct(data.product));
-    } catch (error) {
-      setErrorMsg(error.message);
-    } finally {
-      setLoadingDetails(false);
-    }
-  };
+            <div className="flex relative">
+                <div className="flex-1">
+                    <ProductInfo {...activeProduct} isMyProduct={isMyProduct} />
+                </div>
+            </div>
 
-  if (loadingDetails) {
-    return <p className="status">Loading product details... </p>;
-  }
+            <div
+                className={`flex ${
+                    activeProduct?.stockType === "flat"
+                        ? `${
+                              isMyProduct
+                                  ? "flex-col 400:flex-row"
+                                  : "flex-col 600:flex-row"
+                          } mb-7`
+                        : "flex-col 875:flex-row 1000:flex-col 1100:flex-row"
+                } mt-5`}
+            >
+                {/* product stock */}
+                {/* {activeProduct?.stock && (
+                    <div
+                        className={`mb-7 activeProduct?.stockType === "flat" ? "" : "mr-0"`}
+                    >
+                        <StockView
+                            productId={activeProduct?.id}
+                            stock={activeProduct?.stock}
+                            stockType={activeProduct?.stockType}
+                            variationTypes={activeProduct?.variationTypes}
+                            canBuy={!isMyProduct}
+                        />
+                    </div>
+                )} */}
 
-  if (errorMsg) {
-    // return (
-    //     <Human name="not-found" message={errorMsg} contentType="product" />
-    // );
-    return <p className="status">Product not found</p>;
-  }
+                {/* product rating */}
+                {!activeProduct?.isSecondHand && (
+                    <div
+                        className={`${
+                            activeProduct?.stockType === "flat"
+                                ? `${activeProduct?.stock &&
+                                      `${
+                                          isMyProduct
+                                              ? "400:ml-7 450:ml-12 500:ml-20"
+                                              : "600:ml-12"
+                                      }`}`
+                                : `mb-7 ${activeProduct?.stock &&
+                                      "875:ml-14 1000:ml-0 1100:ml-14"}`
+                        }`}
+                    >
+                        <Rating
+                            {...activeProduct}
+                            target={{
+                                id: activeProduct?.id,
+                                name: activeProduct?.name,
+                            }}
+                            userCanRate={!isMyProduct}
+                            onRate={(updateInfo) =>
+                                dispatch(updateActiveProduct(updateInfo))
+                            }
+                        />
+                    </div>
+                )}
+            </div>
 
-  console.log(activeProduct);
-
-  return (
-    <section className="500:mt-3">
-      <Head>
-        <title>{capitalizeFirstLetter(activeProduct?.name)}</title>
-      </Head>
-
-      <div className="flex relative">
-        <div className="flex-1">
-          <ProductInfo {...activeProduct} isMyProduct={isMyProduct} />
-        </div>
-      </div>
-
-      <CommentsContainer
-        contentId={activeProduct?.id}
-        contentOwner={activeProduct?.store?.user}
-        contentName={activeProduct?.name}
-      />
-    </section>
-  );
+            <CommentsContainer
+                contentId={activeProduct?.id}
+                contentOwner={activeProduct?.store?.user}
+                contentName={activeProduct?.name}
+            />
+        </section>
+    );
 };
 
 export default ProductPage;

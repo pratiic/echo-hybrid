@@ -26,7 +26,9 @@ export const replyToReview = async (request, response, next) => {
         const createdReply = await prisma.reply.create({
             data: replyData,
             include: {
-                user: true,
+                user: {
+                    select: genericUserFields,
+                },
             },
         });
 
@@ -54,7 +56,7 @@ export const replyToReview = async (request, response, next) => {
                 }),
             ]);
 
-            finalReply = updatedReply;
+            finalReply = { ...updatedReply, user: createdReply.user };
         }
 
         response.status(201).json({ reply: finalReply });
@@ -86,6 +88,40 @@ export const getReplies = async (request, response, next) => {
         });
 
         response.json({ replies });
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
+export const deleteReply = async (request, response, next) => {
+    const user = request.user;
+    const replyId = parseInt(request.params.replyId) || 0;
+
+    try {
+        const reply = await prisma.reply.findUnique({
+            where: {
+                id: replyId,
+            },
+        });
+
+        if (!reply) {
+            return next(new HttpError("reply not found", 404));
+        }
+
+        // check reply user
+        if (reply.userId !== user.id) {
+            return next(
+                new HttpError("you are unauthorized to delete this reply", 401)
+            );
+        }
+
+        await prisma.reply.delete({
+            where: {
+                id: replyId,
+            },
+        });
+
+        response.json({ message: "the reply has been deleted" });
     } catch (error) {
         next(new HttpError());
     }

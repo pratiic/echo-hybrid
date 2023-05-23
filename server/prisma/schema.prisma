@@ -71,6 +71,7 @@ model Image {
     businessId Int? @unique
     productId  Int?
     messageId  Int? @unique
+    replyId    Int? @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt

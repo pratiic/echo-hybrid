@@ -10,12 +10,12 @@ import {
     showGenericModal,
     showLoadingModal,
 } from "../redux/slices/modal-slice";
-import { capitalizeFirstLetter, singularOrPlural } from "../lib/strings";
+import { singularOrPlural } from "../lib/strings";
 import { fetcher } from "../lib/fetcher";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 
 import Button from "./button";
-// import ContentRater from "./content-rater";
+import TargetRater from "./target-rater";
 // import UsersContainer from "./users-container";
 import Icon from "./icon";
 
@@ -24,7 +24,7 @@ const Rating = ({
     ratings = [],
     small,
     onlyStars,
-    content,
+    target,
     userCanRate,
     minRating = 0,
     onRate,
@@ -39,9 +39,9 @@ const Rating = ({
     const fraction = rating - Math.floor(rating);
     const ratingPercentage = Math.floor(fraction * 100);
     const colorBlue = "#1C9BEF";
-    const contentType = router.pathname.includes("products")
+    const targetType = router.pathname.includes("products")
         ? "product"
-        : "shop";
+        : "store";
 
     useEffect(() => {
         if (provRating < minRating) {
@@ -111,14 +111,14 @@ const Rating = ({
     };
 
     const handleRateClick = () => {
-        // dispatch(
-        //     showGenericModal(
-        //         <ContentRater
-        //             content={{ ...content, type: contentType }}
-        //             onRate={onRate}
-        //         />
-        //     )
-        // );
+        dispatch(
+            showGenericModal(
+                <TargetRater
+                    target={{ ...target, type: targetType }}
+                    onRate={onRate}
+                />
+            )
+        );
     };
 
     const handleDeleteClick = () => {
@@ -130,15 +130,16 @@ const Rating = ({
 
                     try {
                         const data = await fetcher(
-                            `ratings/${contentType}/${content.id}`,
+                            `ratings/${authUserRating?.id}`,
                             "DELETE"
                         );
 
                         dispatch(
                             setAlert({ message: "you rating has been deleted" })
                         );
-                        onRate(data.content);
+                        onRate(data.target);
                     } catch (error) {
+                        console.log(error);
                         dispatch(setErrorAlert(error.message));
                     } finally {
                         dispatch(closeModal());
@@ -152,9 +153,9 @@ const Rating = ({
         // dispatch(
         //     showGenericModal(
         //         <UsersContainer
-        //             title={`${capitalizeFirstLetter(contentType)} ratings`}
-        //             contentType="ratings"
-        //             url={`ratings/${contentType}/${content.id}`}
+        //             title={`${capitalizeFirstLetter(targetType)} ratings`}
+        //             targetType="ratings"
+        //             url={`ratings/${targetType}/${target.id}`}
         //         />
         //     )
         // );
@@ -236,7 +237,7 @@ const Rating = ({
                                 // auth user has not rated
                                 <React.Fragment>
                                     <span className="block mb-2">
-                                        You have not rated this {contentType}
+                                        You have not rated this {targetType}
                                     </span>
                                     <Button onClick={handleRateClick}>
                                         rate it

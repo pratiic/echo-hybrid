@@ -57,6 +57,11 @@ export const postReview = async (request, response, next) => {
             },
             create: reviewData,
             update: reviewData,
+            include: {
+                user: {
+                    select: genericUserFields,
+                },
+            },
         });
         let finalReview = createdReview;
 
@@ -81,7 +86,7 @@ export const postReview = async (request, response, next) => {
                     data: { image: imageData.src },
                 }),
             ]);
-            finalReview = updatedReview;
+            finalReview = { ...updatedReview, user: createdReview.user };
         }
 
         response.status(201).json({ review: finalReview });

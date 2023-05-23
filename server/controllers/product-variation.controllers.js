@@ -37,11 +37,11 @@ export const setProductVariations = async (request, response, next) => {
     });
 
     try {
-        const createdVariations = await prisma.productVariation.createMany({
+        await prisma.productVariation.createMany({
             data: variations,
         });
 
-        response.json({ variations: createdVariations });
+        response.json({ variations });
     } catch (error) {
         console.log(error);
         next(new HttpError());

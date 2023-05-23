@@ -6,9 +6,9 @@ import { TrashIcon } from "@heroicons/react/outline";
 import { fetcher } from "../lib/fetcher";
 import { setComments } from "../redux/slices/comments-slice";
 import {
-  showConfirmationModal,
-  showLoadingModal,
-  closeModal,
+    showConfirmationModal,
+    showLoadingModal,
+    closeModal,
 } from "../redux/slices/modal-slice";
 import { setAlert } from "../redux/slices/alerts-slice";
 import { capitalizeFirstLetter } from "../lib/strings";
@@ -18,230 +18,241 @@ import Comment from "./comment";
 import Icon from "./icon";
 
 const CommentsContainer = ({
-  contentId,
-  contentOwner,
-  contentName,
-  commentType = "review",
-  baseCommentId,
-  baseCommentUserId,
+    contentId,
+    contentOwner,
+    contentName,
+    commentType = "review",
+    baseCommentId,
+    baseCommentUserId,
 }) => {
-  const [loadingComments, setLoadingComments] = useState(false);
-  const [disabledMsg, setDisabledMsg] = useState("");
-  const [reviewExists, setReviewExists] = useState(false);
-  const [userReviewId, setUserReviewId] = useState(null);
-  const [error, setError] = useState("");
+    const [loadingComments, setLoadingComments] = useState(false);
+    const [disabledMsg, setDisabledMsg] = useState("");
+    const [reviewExists, setReviewExists] = useState(false);
+    const [userReviewId, setUserReviewId] = useState(null);
+    const [error, setError] = useState("");
 
-  const { reviews, replies, activeComment } = useSelector(
-    (state) => state.comments
-  );
-  const { authUser } = useSelector((state) => state.auth);
+    const { reviews, replies, activeComment } = useSelector(
+        (state) => state.comments
+    );
+    const { authUser } = useSelector((state) => state.auth);
 
-  const dispatch = useDispatch();
-  const router = useRouter();
+    const dispatch = useDispatch();
+    const router = useRouter();
 
-  const pluralMap = {
-    review: "reviews",
-    reply: "replies",
-  };
-
-  const contentType = router.pathname.includes("products")
-    ? "product"
-    : "store";
-
-  useEffect(() => {
-    if (commentType !== "review") {
-      return;
-    }
-
-    if (contentOwner?.id === authUser?.id) {
-      return setDisabledMsg(`You cannot review your own ${contentType}`);
-    }
-
-    const existingReview = reviews.find((review) => {
-      // console.log(review.user.id);
-      review.user?.id === authUser?.id;
-    });
-
-    if (existingReview) {
-      setReviewExists(true);
-      setUserReviewId(existingReview.id);
-      return setDisabledMsg("Delete your existing review to add another one");
-    } else {
-      setReviewExists(false);
-    }
-
-    setDisabledMsg("");
-  }, [contentOwner, authUser, reviews, commentType]);
-
-  useEffect(() => {
-    if (!contentId && contentType === "review") {
-      return;
-    }
-
-    getComments();
-  }, [contentId, contentType]);
-
-  const getComments = async () => {
-    // if replies to a review exist, no need to get them again
-    if (commentType === "reply" && replies[baseCommentId]) {
-      return;
-    }
-
-    setLoadingComments(true);
-    setError("");
-
-    const urlMap = {
-      review: `reviews/${contentType}/${contentId}`,
-      reply: `replies/${baseCommentId}/replies`,
+    const pluralMap = {
+        review: "reviews",
+        reply: "replies",
     };
 
-    try {
-      const data = await fetcher(urlMap[commentType]);
+    const contentType = router.pathname.includes("products")
+        ? "product"
+        : "store";
 
-      dispatch(
-        setComments({
-          comments: data[pluralMap[commentType]],
-          type: commentType,
-          baseCommentId,
-        })
-      );
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoadingComments(false);
-    }
-  };
+    useEffect(() => {
+        if (commentType !== "review") {
+            return;
+        }
 
-  const renderCommentAdder = () => {
-    // if a comment is being edited, show the comment adder
-    if (disabledMsg && !activeComment) {
-      return <p className="dark-light text-sm italic -mt-2">{disabledMsg}</p>;
-    }
+        if (contentOwner?.id === authUser?.id) {
+            return setDisabledMsg(`You cannot review your own ${contentType}`);
+        }
 
-    return (
-      <div className="mb-3">
-        <CommentAdder
-          contentId={contentId}
-          contentType={contentType}
-          contentName={contentName}
-          commentType={commentType}
-          baseCommentId={baseCommentId}
-          contentOwnerId={contentOwner?.id}
-          baseCommentUserId={baseCommentUserId}
-        />
-      </div>
-    );
-  };
+        const existingReview = reviews?.find((review) => {
+            return review?.user?.id === authUser?.id;
+        });
 
-  const handleCommentDeletion = (id) => {
-    if (!id) {
-      return;
-    }
-
-    dispatch(
-      showConfirmationModal({
-        message: `are you sure you want to delete your ${commentType} ?`,
-        handler: async () => {
-          dispatch(showLoadingModal(`deleting your ${commentType}...`));
-          try {
-            await fetcher(
-              `${
-                commentType === "review" ? "reviews" : "replies"
-              }/${id}/?type=${commentType}`,
-              "DELETE"
+        if (existingReview) {
+            setReviewExists(true);
+            setUserReviewId(existingReview.id);
+            return setDisabledMsg(
+                "Delete your existing review to add another one"
             );
+        } else {
+            setReviewExists(false);
+        }
+
+        setDisabledMsg("");
+    }, [contentOwner, authUser, reviews, commentType]);
+
+    useEffect(() => {
+        if (!contentId && contentType === "review") {
+            return;
+        }
+
+        getComments();
+    }, [contentId, contentType]);
+
+    const getComments = async () => {
+        // if replies to a review exist, no need to get them again
+        if (commentType === "reply" && replies[baseCommentId]) {
+            return;
+        }
+
+        setLoadingComments(true);
+        setError("");
+
+        const urlMap = {
+            review: `reviews/${contentType}/${contentId}`,
+            reply: `replies/${baseCommentId}/replies`,
+        };
+
+        try {
+            const data = await fetcher(urlMap[commentType]);
 
             dispatch(
-              setAlert({
-                message: `your ${commentType} has been deleted`,
-              })
+                setComments({
+                    comments: data[pluralMap[commentType]],
+                    type: commentType,
+                    baseCommentId,
+                })
             );
-          } catch (error) {
-            dispatch(setAlert({ message: error.message, type: "error" }));
-          } finally {
-            dispatch(closeModal());
-          }
-        },
-      })
-    );
-  };
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoadingComments(false);
+        }
+    };
 
-  const renderComments = () => {
-    if (error) {
-      return <p className="status">{capitalizeFirstLetter(error)}</p>;
-    }
-
-    if (commentType === "review") {
-      if (reviews.length === 0) {
-        return (
-          <p className="status-smaller mt-5">No reviews in this content yet</p>
-        );
-      }
-
-      return reviews.map((comment) => {
-        //   console.log(comment);
+    const renderCommentAdder = () => {
+        // if a comment is being edited, show the comment adder
+        if (disabledMsg && !activeComment) {
+            return (
+                <p className="dark-light text-sm italic -mt-2">{disabledMsg}</p>
+            );
+        }
 
         return (
-          <Comment
-            {...comment}
-            commentType={commentType}
-            key={comment.id}
-            handleCommentDeletion={handleCommentDeletion}
-          />
+            <div className="mb-3">
+                <CommentAdder
+                    contentId={contentId}
+                    contentType={contentType}
+                    contentName={contentName}
+                    commentType={commentType}
+                    baseCommentId={baseCommentId}
+                    contentOwnerId={contentOwner?.id}
+                    baseCommentUserId={baseCommentUserId}
+                />
+            </div>
         );
-      });
-    }
+    };
 
-    const reviewReplies = replies[baseCommentId] || [];
+    const handleCommentDeletion = (id) => {
+        if (!id) {
+            return;
+        }
 
-    if (reviewReplies.length === 0) {
-      return <p className="status-smaller mb-3">No replies yet</p>;
-    }
+        dispatch(
+            showConfirmationModal({
+                message: `are you sure you want to delete your ${commentType} ?`,
+                handler: async () => {
+                    dispatch(
+                        showLoadingModal(`deleting your ${commentType}...`)
+                    );
+                    try {
+                        await fetcher(
+                            `${
+                                commentType === "review" ? "reviews" : "replies"
+                            }/${id}`,
+                            "DELETE"
+                        );
 
-    return reviewReplies.map((comment) => {
-      // console.log(comment);
+                        dispatch(
+                            setAlert({
+                                message: `your ${commentType} has been deleted`,
+                            })
+                        );
+                    } catch (error) {
+                        dispatch(
+                            setAlert({ message: error.message, type: "error" })
+                        );
+                    } finally {
+                        dispatch(closeModal());
+                    }
+                },
+            })
+        );
+    };
 
-      return (
-        <Comment
-          {...comment}
-          commentType={commentType}
-          baseCommentId={baseCommentId}
-          key={comment.id}
-          handleCommentDeletion={handleCommentDeletion}
-        />
-      );
-    });
-  };
+    const renderComments = () => {
+        if (error) {
+            return <p className="status">{capitalizeFirstLetter(error)}</p>;
+        }
 
-  return (
-    <div
-      className={`w-full 450:w-[400px] ${commentType === "review" && "mb-5"}`}
-    >
-      {commentType === "review" && (
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="black-white text-xl font-semibold">
-            Reviews{" "}
-            <span className="dark-light text-lg">({reviews.length})</span>
-          </h2>
+        if (commentType === "review") {
+            if (reviews.length === 0) {
+                return (
+                    <p className="status-smaller mt-5">
+                        No reviews in this {contentType} yet
+                    </p>
+                );
+            }
 
-          {reviewExists && (
-            <Icon onClick={() => handleCommentDeletion(userReviewId)}>
-              <TrashIcon className="icon-small" />
-            </Icon>
-          )}
+            return reviews.map((comment) => {
+                return (
+                    <Comment
+                        {...comment}
+                        commentType={commentType}
+                        key={comment.id}
+                        handleCommentDeletion={handleCommentDeletion}
+                    />
+                );
+            });
+        }
+
+        const reviewReplies = replies[baseCommentId] || [];
+
+        if (reviewReplies.length === 0) {
+            return <p className="status-smaller mb-3">No replies yet</p>;
+        }
+
+        return reviewReplies.map((comment) => {
+            return (
+                <Comment
+                    {...comment}
+                    commentType={commentType}
+                    baseCommentId={baseCommentId}
+                    key={comment.id}
+                    handleCommentDeletion={handleCommentDeletion}
+                />
+            );
+        });
+    };
+
+    return (
+        <div
+            className={`w-full 450:w-[400px] ${commentType === "review" &&
+                "mb-5"}`}
+        >
+            {commentType === "review" && (
+                <div className="flex items-center justify-between mb-3">
+                    <h2 className="black-white text-xl font-semibold">
+                        Reviews{" "}
+                        <span className="dark-light text-lg">
+                            ({reviews.length})
+                        </span>
+                    </h2>
+
+                    {reviewExists && (
+                        <Icon
+                            toolName="delete your review"
+                            onClick={() => handleCommentDeletion(userReviewId)}
+                        >
+                            <TrashIcon className="icon-small" />
+                        </Icon>
+                    )}
+                </div>
+            )}
+
+            {/* if loading reviews, do not show comment adder or disabled message */}
+            {!loadingComments && renderCommentAdder()}
+
+            {loadingComments ? (
+                <p className="status">Loading {pluralMap[commentType]}...</p>
+            ) : (
+                renderComments()
+            )}
         </div>
-      )}
-
-      {/* if loading reviews, do not show comment adder or disabled message */}
-      {!loadingComments && renderCommentAdder()}
-
-      {loadingComments ? (
-        <p className="status">Loading {pluralMap[commentType]}...</p>
-      ) : (
-        renderComments()
-      )}
-    </div>
-  );
+    );
 };
 
 export default CommentsContainer;

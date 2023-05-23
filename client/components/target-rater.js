@@ -8,8 +8,9 @@ import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 import Rating from "./rating";
 import Button from "./button";
 import InputGroup from "./input-group";
+import { capitalizeFirstLetter } from "../lib/strings";
 
-const ContentRater = ({ content: { id, name, type }, onRate }) => {
+const TargetRater = ({ target: { id, name, type }, onRate }) => {
     const [rating, setRating] = useState(1);
 
     const dispatch = useDispatch();
@@ -29,12 +30,16 @@ const ContentRater = ({ content: { id, name, type }, onRate }) => {
                     type: "success",
                 })
             );
-            onRate(data.content);
+            onRate(data.target);
 
-            // send a notification to the owner of the content
+            // send a notification to the user of the target
             const notification = {
-                text: `${authUser.username} gave a rating of ${rating} to your ${type} - ${name}`,
-                destinationId: data.contentOwnerId,
+                text: `${capitalizeFirstLetter(
+                    authUser.firstName
+                )} ${capitalizeFirstLetter(
+                    authUser.lastName
+                )} gave a rating of ${rating} to your ${type} - ${name}`,
+                destinationId: data.targetUserId,
                 linkTo: `/${type}s/${id}`,
             };
 
@@ -51,24 +56,23 @@ const ContentRater = ({ content: { id, name, type }, onRate }) => {
             <h3 className="heading-generic-modal-thin max-w-[300px]">
                 Rate {name}
             </h3>
-            <div className="flex items-end">
-                <div className="mr-5">
-                    <Rating onlyStars avgRating={rating} minAvgRating={1} />
-                    <div className="-mb-5 mt-2">
-                        <InputGroup
-                            view="number"
-                            value={rating}
-                            min={1}
-                            max={5}
-                            step={0.5}
-                            onChange={setRating}
-                        />
-                    </div>
+            <div>
+                <Rating onlyStars rating={rating} minAvgRating={1} />
+                <div className="flex space-x-5 mt-5">
+                    <InputGroup
+                        view="number"
+                        value={rating}
+                        min={1}
+                        max={5}
+                        step={0.5}
+                        className="mb-0"
+                        onChange={setRating}
+                    />
+                    <Button>rate</Button>
                 </div>
-                <Button>rate</Button>
             </div>
         </form>
     );
 };
 
-export default ContentRater;
+export default TargetRater;
