@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import {
@@ -102,15 +102,15 @@ const Sidebar = () => {
             count: 0,
             activePath: "/orders",
         },
-        {
-            name: "transactions",
-            // linkTo: "/transactions/?show=user",
+        // {
+        //     name: "transactions",
+        //     linkTo: "/transactions/?show=user",
 
-            linkTo: "/transactions",
-            icon: <MdOutlineHistory className="icon-sidebar" />,
-            count: 0,
-            activePath: "/transactions",
-        },
+        //     linkTo: "/transactions",
+        //     icon: <MdOutlineHistory className="icon-sidebar" />,
+        //     count: 0,
+        //     activePath: "/transactions",
+        // },
         {
             name: "profile",
             // linkTo: "/profile/?show=details",
@@ -125,6 +125,22 @@ const Sidebar = () => {
             icon: <LogoutIcon className="icon-sidebar" />,
         },
     ]);
+
+    useEffect(() => {
+        for (let link of links) {
+            if (
+                router.pathname === link.activePath ||
+                router.pathname === link.linkTo
+            ) {
+                setActiveLink(link.name);
+                break;
+            }
+
+            setActiveLink("");
+        }
+    }, [router]);
+
+    console.log(activeLink);
 
     const handleLinkClick = (name, link) => {
         if (showSidebar) {

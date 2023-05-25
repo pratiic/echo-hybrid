@@ -18,6 +18,7 @@ import FileSelector from "./file-selector";
 import Icon from "./icon";
 import Spinner from "./spinner";
 import { setPreview } from "../lib/files";
+import { getCommentNotificationData } from "../lib/notification";
 
 const CommentAdder = ({
     contentId,
@@ -107,33 +108,17 @@ const CommentAdder = ({
 
                 // send a notification to the owner of the content
                 try {
-                    let notificationText = `${authUser.username} `;
-                    let destinationId = null;
+                    const notificationData = getCommentNotificationData(
+                        authUser,
+                        contentType,
+                        contentId,
+                        contentName,
+                        contentOwnerId,
+                        baseCommentId,
+                        baseCommentUserId
+                    );
 
-                    if (baseCommentId) {
-                        if (baseCommentUserId === authUser.id) {
-                            return;
-                        }
-
-                        notificationText += "replied to your review";
-                        destinationId = baseCommentUserId;
-                    } else {
-                        notificationText += `reviewed your ${contentType}`;
-
-                        if (contentName) {
-                            notificationText += ` - ${capitalizeFirstLetter(
-                                contentName
-                            )}`;
-                        }
-
-                        destinationId = contentOwnerId;
-                    }
-
-                    fetcher("notifications", "POST", {
-                        text: notificationText,
-                        destinationId,
-                        linkTo: `/${contentType}s/${contentId}`,
-                    });
+                    fetcher("notifications", "POST", notificationData);
                 } catch (error) {
                     console.log(error);
                 }

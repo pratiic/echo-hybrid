@@ -9,31 +9,33 @@ import Button from "./button";
 import Icon from "./icon";
 
 const ChatButton = ({ small, fullText = false, role = "seller" }) => {
-  // const router = useRouter();
-  const { theme } = useSelector((state) => state.theme);
+    // const router = useRouter();
+    const { theme } = useSelector((state) => state.theme);
 
-  const openChat = () => {
-    // router.push(`/chats/${userId}`);
-    console.log("chat");
-  };
+    const openChat = () => {
+        // router.push(`/chats/${userId}`);
+        console.log("chat");
+    };
 
-  return small ? (
-    <Icon onClick={openChat} toolName="chat">
-      <ChatAlt2Icon className="icon" />
-    </Icon>
-  ) : (
-    <Button
-      small
-      type={theme === "light" ? "secondary" : "tertiary"}
-      textAsIs={true}
-      onClick={openChat}
-    >
-      <span className="flex items-center">
-        <ChatAlt2Icon className="icon-no-bg mr-1 text-blue-400" />
-        {!fullText ? "Chat Now" : `Chat with ${capitalizeFirstLetter(role)}`}
-      </span>
-    </Button>
-  );
+    return small ? (
+        <Icon onClick={openChat} toolName="chat">
+            <ChatAlt2Icon className="icon" />
+        </Icon>
+    ) : (
+        <Button
+            small
+            type={theme === "light" ? "secondary" : "tertiary"}
+            textAsIs={true}
+            onClick={openChat}
+        >
+            <span className="flex items-center">
+                <ChatAlt2Icon className="icon-no-bg mr-1 text-blue-400" />
+                {!fullText
+                    ? "Chat Now"
+                    : `Chat with ${capitalizeFirstLetter(role)}`}
+            </span>
+        </Button>
+    );
 };
 
 export default ChatButton;

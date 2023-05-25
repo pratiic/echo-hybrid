@@ -28,8 +28,8 @@ const Comment = ({
     const [showReplies, setShowReplies] = useState(false);
 
     const { authUser } = useSelector((state) => state.auth);
-
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const toggleDropdown = (event) => {
         event.stopPropagation();
@@ -152,6 +152,7 @@ const Comment = ({
                         commentType="reply"
                         baseCommentId={id}
                         baseCommentUserId={user?.id}
+                        contentId={router.query.id}
                     />
                 </div>
             )}

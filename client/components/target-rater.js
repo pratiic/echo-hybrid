@@ -9,6 +9,7 @@ import Rating from "./rating";
 import Button from "./button";
 import InputGroup from "./input-group";
 import { capitalizeFirstLetter } from "../lib/strings";
+import { getRatingNotificationData } from "../lib/notification";
 
 const TargetRater = ({ target: { id, name, type }, onRate }) => {
     const [rating, setRating] = useState(1);
@@ -33,17 +34,16 @@ const TargetRater = ({ target: { id, name, type }, onRate }) => {
             onRate(data.target);
 
             // send a notification to the user of the target
-            const notification = {
-                text: `${capitalizeFirstLetter(
-                    authUser.firstName
-                )} ${capitalizeFirstLetter(
-                    authUser.lastName
-                )} gave a rating of ${rating} to your ${type} - ${name}`,
-                destinationId: data.targetUserId,
-                linkTo: `/${type}s/${id}`,
-            };
+            const notificationData = getRatingNotificationData(
+                authUser,
+                rating,
+                type,
+                id,
+                name,
+                data.targetUserId
+            );
 
-            fetcher("notifications", "POST", notification);
+            fetcher("notifications", "POST", notificationData);
         } catch (error) {
             dispatch(setErrorAlert(error.message));
         } finally {

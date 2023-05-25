@@ -1,12 +1,14 @@
 import React from "react";
 import { useDispatch } from "react-redux";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/outline";
 
 import { updateActiveProduct } from "../../redux/slices/products-slice";
 import { capitalizeFirstLetter, addCommas } from "../../lib/strings";
-import { setAlert } from "../../redux/slices/alerts-slice";
 
-import Gallery from "../gallery";
 import ChatButton from "../chat-button";
+import Rating from "../rating";
+import Gallery from "../gallery";
+import ProductControl from "../product-control";
 
 const PrimaryInfo = ({
   store,
@@ -19,6 +21,7 @@ const PrimaryInfo = ({
   brand,
   toggleSecondaryInfo,
   isMyProduct,
+  isSecondHand,
 }) => {
   const dispatch = useDispatch();
 
@@ -38,12 +41,12 @@ const PrimaryInfo = ({
 
         <div>
           {/* product name */}
-          <h2 className="text-2xl 500:text-xl 650:text-2xl font-semibold mb-2 dark:text-gray-100 leading-tight">
+          <h2 className="text-2xl 500:text-xl 650:text-2xl font-semibold mb-1 dark:text-gray-100 leading-tight">
             {capitalizeFirstLetter(name)}
           </h2>
 
           {/* product rating */}
-          {/* <Rating avgRating={rating} small onlyStars /> */}
+          <Rating rating={rating} small onlyStars />
 
           {/* brand info */}
           <div className={`flex items-center space-x-2 my-2 dark-light`}>
@@ -55,14 +58,14 @@ const PrimaryInfo = ({
               </span>
             </p>
 
-            {/* <p className="flex items-center text-xs font-semibold">
+            <p className="flex items-center text-xs font-semibold">
               <span className="mr-1">Second hand</span>
-              {secondHand ? (
+              {isSecondHand ? (
                 <CheckCircleIcon className="icon-no-bg" />
               ) : (
                 <XCircleIcon className="icon-no-bg" />
               )}
-            </p> */}
+            </p>
           </div>
 
           {/* product price  */}
@@ -92,6 +95,11 @@ const PrimaryInfo = ({
             </button>
             {isMyProduct && <ChatButton />}
           </div>
+
+          {/* control for second hand products */}
+          {isSecondHand && !isMyProduct && (
+            <ProductControl isSecondHand={true} />
+          )}
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ const initialState = {
   message: "",
   confirmationHandler: null,
   children: null,
-  overflowScroll: true,
+  overflowScroll: false,
 };
 
 export const modalSlice = createSlice({
@@ -34,7 +34,7 @@ export const modalSlice = createSlice({
     },
     closeModal: (state, action) => {
       state.showModal = false;
-      state.overflowScroll = true;
+      // state.overflowScroll = true;
     },
   },
 });

@@ -12,6 +12,8 @@ import productsReducer from "./slices/products-slice";
 import galleryReducer from "./slices/gallery-slice";
 import filterReducer from "./slices/filter-slice";
 import commentsReducer from "./slices/comments-slice";
+import cartReducer from "./slices/cart-slice";
+import notificationsReducer from "./slices/notifications-slice";
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +28,8 @@ export const store = configureStore({
     gallery: galleryReducer,
     filter: filterReducer,
     comments: commentsReducer,
+    cart: cartReducer,
+    notifications: notificationsReducer,
   },
   middleware: [logger],
 });

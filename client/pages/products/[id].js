@@ -13,6 +13,7 @@ import { fetcher } from "../../lib/fetcher";
 import ProductInfo from "../../components/product-info";
 import Rating from "../../components/rating";
 import CommentsContainer from "../../components/comments-container";
+import StockView from "../../components/stock-view";
 
 const ProductPage = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -97,11 +98,11 @@ const ProductPage = () => {
                             productId={activeProduct?.id}
                             stock={activeProduct?.stock}
                             stockType={activeProduct?.stockType}
-                            variationTypes={activeProduct?.variationTypes}
-                            canBuy={!isMyProduct}
+                            variations={activeProduct?.variations}
+                            userCanBuy={!isMyProduct}
                         />
                     </div>
-                )} */}
+                )}
 
         {/* product rating */}
         {!activeProduct?.isSecondHand && (
