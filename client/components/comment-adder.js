@@ -118,7 +118,9 @@ const CommentAdder = ({
                         baseCommentUserId
                     );
 
-                    fetcher("notifications", "POST", notificationData);
+                    if (notificationData.destinationId !== authUser?.id) {
+                        fetcher("notifications", "POST", notificationData);
+                    }
                 } catch (error) {
                     console.log(error);
                 }

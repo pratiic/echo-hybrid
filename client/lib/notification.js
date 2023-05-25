@@ -17,13 +17,13 @@ export const getCommentNotificationData = (
     const { firstName, lastName } = commentUser;
     let notificationText = `${capitalizeAll(`${firstName} ${lastName}`)} `;
 
-    let destinationId = null,
-        linkTo = `/${targetStrMap[targetType]}s/${targetIdMap[targetType]}`;
-
     const targetIdMap = {
         product: targetId,
         store: targetUserId,
     };
+
+    let destinationId = null,
+        linkTo = `/${targetStrMap[targetType]}s/${targetIdMap[targetType]}`;
 
     if (baseCommentId) {
         // reply to a review

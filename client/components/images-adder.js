@@ -6,10 +6,16 @@ import { capitalizeFirstLetter } from "../lib/strings";
 
 import FileSelector from "./file-selector";
 import Button from "./button";
+import { fetcher } from "../lib/fetcher";
+import { setActiveIndex } from "../redux/slices/gallery-slice";
+import { setActiveProduct } from "../redux/slices/products-slice";
+import { closeModal } from "../redux/slices/modal-slice";
+import { setAlert } from "../redux/slices/alerts-slice";
 
 const ImagesAdder = ({ currentCount }) => {
   const { selectedFiles } = useSelector((state) => state.files);
   const { authUser } = useSelector((state) => state.auth);
+  const { activeProduct } = useSelector((state) => state.products);
 
   const [max, setMax] = useState(5 - currentCount - selectedFiles.length);
   const [error, setError] = useState("");
@@ -20,8 +26,42 @@ const ImagesAdder = ({ currentCount }) => {
 
   const productId = router.query.id;
 
-  const handleFormSubmit = () => {
-    console.log("add");
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+
+    setError("");
+    setAddingImages(true);
+
+    if (selectedFiles.length === 0) {
+      return setError("provide atleat one image");
+    }
+
+    try {
+      const formData = new FormData();
+
+      selectedFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      const data = await fetcher(
+        `products/${productId}/images`,
+        "PATCH",
+        formData
+      );
+
+      dispatch(
+        setActiveProduct({
+          images: [...activeProduct.images, ...data.images],
+        })
+      );
+
+      dispatch(closeModal());
+      dispatch(setAlert({ message: "product images have been added" }));
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setAddingImages(false);
+    }
   };
 
   return (

@@ -13,21 +13,23 @@ import galleryReducer from "./slices/gallery-slice";
 import filterReducer from "./slices/filter-slice";
 import commentsReducer from "./slices/comments-slice";
 import cartReducer from "./slices/cart-slice";
+import notificationsReducer from "./slices/notifications-slice";
 
 export const store = configureStore({
-    reducer: {
-        auth: authReducer,
-        theme: themeReducer,
-        sidebar: sidebarReducer,
-        files: filesReducer,
-        categories: categoriesReducer,
-        modal: modalReducer,
-        alerts: alertsReducer,
-        products: productsReducer,
-        gallery: galleryReducer,
-        filter: filterReducer,
-        comments: commentsReducer,
-        cart: cartReducer,
-    },
-    middleware: [logger],
+  reducer: {
+    auth: authReducer,
+    theme: themeReducer,
+    sidebar: sidebarReducer,
+    files: filesReducer,
+    categories: categoriesReducer,
+    modal: modalReducer,
+    alerts: alertsReducer,
+    products: productsReducer,
+    gallery: galleryReducer,
+    filter: filterReducer,
+    comments: commentsReducer,
+    cart: cartReducer,
+    notifications: notificationsReducer,
+  },
+  middleware: [logger],
 });
