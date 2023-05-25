@@ -1,3 +1,4 @@
+import { genericUserFields } from "../lib/data-source.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import { validateNotification } from "../validators/notification.validators.js";
@@ -30,6 +31,36 @@ export const sendNotification = async (request, response, next) => {
         response.status(201).json({
             notification,
         });
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
+export const getNotifications = async (request, response, next) => {
+    const user = request.user;
+    const page = parseInt(request.query.page) || 1;
+    const skip = parseInt(request.query.skip) || 0;
+
+    const PAGE_SIZE = 25;
+
+    try {
+        const notifications = await prisma.notification.findMany({
+            where: {
+                destinationId: user.id,
+            },
+            include: {
+                origin: {
+                    select: genericUserFields,
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            take: PAGE_SIZE,
+            skip: (page - 1) * PAGE_SIZE + skip,
+        });
+
+        response.json({ notifications });
     } catch (error) {
         next(new HttpError());
     }

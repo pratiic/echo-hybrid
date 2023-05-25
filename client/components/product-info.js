@@ -91,6 +91,8 @@ const ProductInfo = ({
                         stock,
                         stockType,
                         variations,
+                        isSecondHand,
+                        isMyProduct,
                     }}
                 />
 

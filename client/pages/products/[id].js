@@ -13,6 +13,7 @@ import { fetcher } from "../../lib/fetcher";
 import ProductInfo from "../../components/product-info";
 import Rating from "../../components/rating";
 import CommentsContainer from "../../components/comments-container";
+import StockView from "../../components/stock-view";
 
 const ProductPage = () => {
     const [loadingDetails, setLoadingDetails] = useState(false);
@@ -67,8 +68,6 @@ const ProductPage = () => {
         return <p className="status">Product not found</p>;
     }
 
-    console.log(activeProduct);
-
     return (
         <section className="500:mt-3">
             <Head>
@@ -93,7 +92,7 @@ const ProductPage = () => {
                 } mt-5`}
             >
                 {/* product stock */}
-                {/* {activeProduct?.stock && (
+                {activeProduct?.stock && (
                     <div
                         className={`mb-7 activeProduct?.stockType === "flat" ? "" : "mr-0"`}
                     >
@@ -101,11 +100,11 @@ const ProductPage = () => {
                             productId={activeProduct?.id}
                             stock={activeProduct?.stock}
                             stockType={activeProduct?.stockType}
-                            variationTypes={activeProduct?.variationTypes}
-                            canBuy={!isMyProduct}
+                            variations={activeProduct?.variations}
+                            userCanBuy={!isMyProduct}
                         />
                     </div>
-                )} */}
+                )}
 
                 {/* product rating */}
                 {!activeProduct?.isSecondHand && (

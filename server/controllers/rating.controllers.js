@@ -61,7 +61,7 @@ export const provideRating = async (request, response, next) => {
             : false;
 
         // calculate the new average rating of the target
-        let totalStars = stars;
+        let totalStars = parseFloat(stars);
         target.ratings.forEach((rating) => {
             if (rating.userId !== user.id) {
                 totalStars += rating.stars;
@@ -78,7 +78,7 @@ export const provideRating = async (request, response, next) => {
 
         // prepare rating data
         const ratingData = {
-            stars: parseInt(stars),
+            stars: parseFloat(stars),
             userId: user.id,
             [`${targetType}Id`]: targetId,
         };
