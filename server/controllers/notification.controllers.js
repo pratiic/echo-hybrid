@@ -6,6 +6,7 @@ import { validateNotification } from "../validators/notification.validators.js";
 export const sendNotification = async (request, response, next) => {
     const user = request.user;
     const notificationInfo = request.body;
+    const io = request.io;
 
     // validate notification
     const errorMsg = validateNotification(notificationInfo);
@@ -27,6 +28,8 @@ export const sendNotification = async (request, response, next) => {
                 seen: false,
             },
         });
+
+        io.emit("notification", notification);
 
         response.status(201).json({
             notification,

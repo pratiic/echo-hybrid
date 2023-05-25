@@ -55,7 +55,9 @@ const PrimaryInfo = ({
                     </h2>
 
                     {/* product rating */}
-                    <Rating rating={rating} small onlyStars />
+                    {!isSecondHand && (
+                        <Rating rating={rating} small onlyStars />
+                    )}
 
                     {/* brand info */}
                     <div

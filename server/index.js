@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import * as dotenv from "dotenv";
+import http from "http";
+import { Server } from "socket.io";
 
 import { errorHandler } from "./middleware/error.middleware.js";
 import { router as authRouter } from "./routes/auth.routes.js";
@@ -13,7 +15,6 @@ import { router as replyRouter } from "./routes/reply.routes.js";
 import { router as businessRouter } from "./routes/business.routes.js";
 import { router as addressRouter } from "./routes/address.routes.js";
 import { router as productRouter } from "./routes/product.routes.js";
-import { router as notificationRouter } from "./routes/notification.routes.js";
 import { router as ratingRouter } from "./routes/rating.routes.js";
 import { router as categoryRouter } from "./routes/category.routes.js";
 import { router as productVariationRouter } from "./routes/product-variation.routes.js";
@@ -23,11 +24,13 @@ import { router as chatRouter } from "./routes/chat.routes.js";
 import { router as messageRouter } from "./routes/message.routes.js";
 import { router as cartRouter } from "./routes/cart.routes.js";
 import { router as receiptRouter } from "./routes/receipt.routes.js";
+import { notificationRouter } from "./routes/notification.routes.js";
 
 dotenv.config();
 
 export const app = express();
-const port = process.env.PORT || 8000;
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
 app.use(cors());
 app.use(express.json());
@@ -41,7 +44,7 @@ app.use("/api/replies", replyRouter);
 app.use("/api/businesses", businessRouter);
 app.use("/api/addresses", addressRouter);
 app.use("/api/products", productRouter);
-app.use("/api/notifications", notificationRouter);
+app.use("/api/notifications", notificationRouter(io));
 app.use("/api/ratings", ratingRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/product-variations", productVariationRouter);
@@ -55,6 +58,7 @@ app.use("/receipts", receiptRouter);
 // error handler middleware
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`the server is listening on port ${port}`);
+const port = process.env.PORT || 8000;
+server.listen(port, () => {
+    console.log(`the server is listening on port ${port}`);
 });

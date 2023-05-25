@@ -9,14 +9,21 @@ import {
     setNotificationsSeen,
 } from "../controllers/notification.controllers.js";
 
-export const router = express.Router();
+export const notificationRouter = (io) => {
+    const router = express.Router();
 
-router.post("/", auth, sendNotification);
+    router.post("/", auth, (request, ...op) => {
+        request.io = io;
+        sendNotification(request, ...op);
+    });
 
-router.get("/", auth, getNotifications);
+    router.get("/", auth, getNotifications);
 
-router.patch("/", auth, setNotificationsSeen);
+    router.patch("/", auth, setNotificationsSeen);
 
-router.delete("/:notificationId", auth, deleteNotification);
+    router.delete("/:notificationId", auth, deleteNotification);
 
-router.delete("/", auth, deleteAllNotifications);
+    router.delete("/", auth, deleteAllNotifications);
+
+    return router;
+};
