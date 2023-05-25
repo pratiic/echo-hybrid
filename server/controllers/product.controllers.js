@@ -121,7 +121,8 @@ export const postProduct = async (request, response, next) => {
 };
 
 export const getProducts = async (request, response, next) => {
-    const user = request.user;
+    let user = request.user;
+    user.address = user.address || {};
     const filter = request.query.filter || "all";
     const sortType = request.query.sortType || "desc";
     const sortBy = request.query.sortBy || "createdAt";
@@ -129,10 +130,43 @@ export const getProducts = async (request, response, next) => {
     const searchQuery = request.query.query || "";
     const storeId = parseInt(request.query.storeId);
 
+    const getAddressFilter = (field) => {
+        return {
+            OR: [
+                {
+                    isSecondHand: true,
+                    store: {
+                        user: {
+                            address: {
+                                [field]: user.address[field],
+                            },
+                        },
+                    },
+                },
+                {
+                    isSecondHand: false,
+                    store: {
+                        business: {
+                            address: {
+                                [field]: user.address[field],
+                            },
+                        },
+                    },
+                },
+            ],
+        };
+    };
+
     const filterMap = {
         all: {},
         "second hand": {
             isSecondHand: true,
+        },
+        province: getAddressFilter("province"),
+        city: getAddressFilter("city"),
+        area: getAddressFilter("area"),
+        delivered: {
+            AND: [],
         },
     };
 
@@ -207,6 +241,7 @@ export const getProductDetails = async (request, response, next) => {
                         business: {
                             select: {
                                 id: true,
+                                name: true,
                                 address: true,
                             },
                         },

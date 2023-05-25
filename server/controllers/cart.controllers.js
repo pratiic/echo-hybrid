@@ -185,7 +185,6 @@ export const setCartItem = async (request, response, next) => {
         }
     } catch (error) {
         console.log(error);
-
         return next(new HttpError());
     }
 };

@@ -48,6 +48,10 @@ textarea {
     @apply h-[23px] w-[23px] icon-bg;
   }
 
+  .icon-disabled {
+    @apply icon pointer-events-none text-gray-400 dark:text-gray-500;
+  }
+
   .icon-big {
     @apply icon-bg h-6 w-6;
   }

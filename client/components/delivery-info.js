@@ -5,11 +5,16 @@ import {
     XCircleIcon,
     CheckCircleIcon,
     CashIcon,
+    ExclamationCircleIcon,
 } from "@heroicons/react/outline";
 import { checkDelivery } from "../lib/delivery";
 
 const DeliveryInfo = ({ consumerAddr, sellerAddr, deliveryCharge }) => {
-    const deliveryType = checkDelivery(consumerAddr, sellerAddr) ? "yes" : "no"; // boolean to string
+    let deliveryType = checkDelivery(consumerAddr, sellerAddr) ? "yes" : "no"; // boolean to string
+
+    if (!consumerAddr) {
+        deliveryType = "unknown";
+    }
 
     const deliveryMap = {
         no: {
@@ -20,6 +25,10 @@ const DeliveryInfo = ({ consumerAddr, sellerAddr, deliveryCharge }) => {
             message: "delivery available",
             icon: <CheckCircleIcon className="icon-no-bg" />,
         },
+        unknown: {
+            message: "set address for delivery info",
+            icon: <ExclamationCircleIcon className="icon-no-bg" />,
+        },
     };
 
     return (
@@ -27,16 +36,12 @@ const DeliveryInfo = ({ consumerAddr, sellerAddr, deliveryCharge }) => {
             <p className="flex items-center ">
                 <span className="mr-1">{deliveryMap[deliveryType].icon}</span>
 
-                {!consumerAddr ? (
-                    <span className="italic">
-                        Set address for delivery info
-                    </span>
-                ) : (
-                    capitalizeFirstLetter(deliveryMap[deliveryType].message)
-                )}
+                <span>
+                    {capitalizeFirstLetter(deliveryMap[deliveryType].message)}
+                </span>
             </p>
 
-            {deliveryType !== "no" && (
+            {deliveryType === "yes" && (
                 <p className="flex items-center mt-2 -mb-[4px] leading-tight">
                     <div>
                         <CashIcon className="icon-no-bg mr-1" />

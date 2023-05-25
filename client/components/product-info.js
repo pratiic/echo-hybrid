@@ -35,6 +35,7 @@ const ProductInfo = ({
 
     useEffect(() => {
         setSecondaryProps({
+            name,
             store,
             deliveryCharge,
             madeIn,
@@ -42,10 +43,22 @@ const ProductInfo = ({
             isMyProduct,
             createdAt,
         });
-    }, [store, deliveryCharge, madeIn, isSecondHand, isMyProduct, createdAt]);
+    }, [
+        name,
+        store,
+        deliveryCharge,
+        madeIn,
+        isSecondHand,
+        isMyProduct,
+        createdAt,
+    ]);
 
     const toggleSecondaryInfo = () => {
-        dispatch(showGenericModal(<SecondaryInfo {...secondaryProps} />));
+        dispatch(
+            showGenericModal(
+                <SecondaryInfo {...secondaryProps} showName={true} />
+            )
+        );
     };
 
     const handleSetStockClick = () => {
@@ -79,6 +92,7 @@ const ProductInfo = ({
                 <PrimaryInfo
                     isMyProduct={isMyProduct}
                     {...{
+                        id,
                         store,
                         name,
                         price,

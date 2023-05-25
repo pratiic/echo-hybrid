@@ -8,9 +8,16 @@ import { capitalizeFirstLetter } from "../lib/strings";
 import Button from "./button";
 import Icon from "./icon";
 
-const ChatButton = ({ small, fullText = false, role = "seller" }) => {
+const ChatButton = ({
+    small,
+    fullText = false,
+    role = "seller",
+    isDisabled,
+}) => {
     // const router = useRouter();
     const { theme } = useSelector((state) => state.theme);
+
+    console.log(isDisabled);
 
     const openChat = () => {
         // router.push(`/chats/${userId}`);
@@ -18,14 +25,17 @@ const ChatButton = ({ small, fullText = false, role = "seller" }) => {
     };
 
     return small ? (
-        <Icon onClick={openChat} toolName="chat">
-            <ChatAlt2Icon className="icon" />
+        <Icon onClick={openChat} toolName={isDisabled ? "" : "chat"}>
+            <ChatAlt2Icon
+                className={`${isDisabled ? "icon-disabled" : "icon"} `}
+            />
         </Icon>
     ) : (
         <Button
             small
             type={theme === "light" ? "secondary" : "tertiary"}
             textAsIs={true}
+            disabled={isDisabled}
             onClick={openChat}
         >
             <span className="flex items-center">

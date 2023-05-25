@@ -106,6 +106,7 @@ export const signUserIn = async (request, response, next) => {
                         },
                     },
                 },
+                address: true,
             },
         });
 

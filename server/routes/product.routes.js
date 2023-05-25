@@ -38,7 +38,16 @@ router.post(
     postProduct
 );
 
-router.get("/", auth, getProducts);
+router.get(
+    "/",
+    (request, response, next) => {
+        request.select = {
+            address: true,
+        };
+        auth(request, response, next);
+    },
+    getProducts
+);
 
 router.get("/:productId", auth, getProductDetails);
 

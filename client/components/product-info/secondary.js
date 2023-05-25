@@ -8,21 +8,23 @@ import { TbBuildingFactory } from "react-icons/tb";
 import { useSelector } from "react-redux";
 
 import { getAddress } from "../../lib/address";
-import { capitalizeFirstLetter } from "../../lib/strings";
 import { getHowLongAgo, getDate } from "../../lib/date-time";
+import { capitalizeFirstLetter } from "../../lib/strings";
 
 import IconInfo from "../icon-info";
 import ChatButton from "../chat-button";
 import DeliveryInfo from "../delivery-info";
-import { checkDelivery } from "../../lib/delivery";
+import SellerInfo from "../seller-info";
 
 const SecondaryInfo = ({
+    name,
     store,
     deliveryCharge,
     madeIn,
     createdAt,
     isSecondHand,
     isMyProduct,
+    showName,
 }) => {
     const sellerAddress = isSecondHand
         ? store?.user?.address
@@ -31,11 +33,20 @@ const SecondaryInfo = ({
 
     return (
         <div className="h-fit max-w-[300px] dark:rounded 1200:dark:bg-gray-800 1200:bg-gray-50 1200:px-5 1200:py-3 ">
+            {/* product name when displayed on a modal */}
+            {showName && (
+                <h3 className="text-2xl black-white mb-3 font-semibold">
+                    {capitalizeFirstLetter(name)}
+                </h3>
+            )}
+
             <div className="dark-light space-y-3 1200:space-y-2 text-sm">
+                {/* seller address */}
                 <IconInfo icon={<LocationMarkerIcon className="icon-no-bg" />}>
                     <span>{getAddress(sellerAddress)}</span>
                 </IconInfo>
 
+                {/* delivery information */}
                 {!isMyProduct && (
                     <DeliveryInfo
                         consumerAddr={authUser?.address}
@@ -44,25 +55,12 @@ const SecondaryInfo = ({
                     />
                 )}
 
-                <IconInfo icon={<UserIcon className="icon-no-bg" />}>
-                    <span className="flex items-center">
-                        <span className="capitalize">
-                            {isMyProduct
-                                ? "me"
-                                : `${store?.user?.firstName} ${store?.user?.lastName}`}
-                        </span>
-
-                        {/* <CustomLink
-              href={`/shops/${shop?.id}`}
-              className="ml-1 rounded"
-              onClick={() => dispatch(closeModal())}
-            >
-              <span className="link font-semibold">
-                {capitalizeFirstLetter(shop?.name)}
-              </span>
-            </CustomLink> */}
-                    </span>
-                </IconInfo>
+                {/* seller information */}
+                <SellerInfo
+                    store={store}
+                    isSecondHand={isSecondHand}
+                    isMyProduct={isMyProduct}
+                />
 
                 <IconInfo icon={<TbBuildingFactory className="icon-no-bg" />}>
                     <span>
@@ -83,14 +81,14 @@ const SecondaryInfo = ({
                         {getDate(createdAt)}
                     </span>
                 </IconInfo>
-
-                {isMyProduct && (
-                    <div className="mt-4 hidden w-fit mx-auto 1200:block">
-                        {" "}
-                        <ChatButton />
-                    </div>
-                )}
             </div>
+
+            {!isMyProduct && (
+                <div className="mt-3 hidden w-fit text-sm 1200:block">
+                    {" "}
+                    <ChatButton />
+                </div>
+            )}
         </div>
     );
 };

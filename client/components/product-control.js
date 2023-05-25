@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 
 import { fetcher } from "../lib/fetcher";
-import { setErrorAlert } from "../redux/slices/alerts-slice";
+import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 import {
     closeModal,
     showGenericModal,
@@ -47,8 +47,7 @@ const ProductControl = ({
         try {
             dispatch(showLoadingModal("adding item to your cart..."));
 
-            const data = await fetcher(`carts/items`, "POST", {
-                productId,
+            const data = await fetcher(`carts/${productId}`, "POST", {
                 variantId,
                 quantity,
             });
@@ -56,6 +55,12 @@ const ProductControl = ({
 
             router.push("/cart");
         } catch (error) {
+            if (error.message.includes("already exists")) {
+                return dispatch(
+                    setAlert({ type: "info", message: error.message })
+                );
+            }
+
             dispatch(setErrorAlert(error.message));
         } finally {
             dispatch(closeModal());

@@ -1,6 +1,10 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/outline";
+import {
+    CheckCircleIcon,
+    XCircleIcon,
+    InformationCircleIcon,
+} from "@heroicons/react/outline";
 
 import { updateActiveProduct } from "../../redux/slices/products-slice";
 import { capitalizeFirstLetter, addCommas } from "../../lib/strings";
@@ -9,8 +13,11 @@ import ChatButton from "../chat-button";
 import Rating from "../rating";
 import Gallery from "../gallery";
 import ProductControl from "../product-control";
+import Button from "../button";
+import Icon from "../icon";
 
 const PrimaryInfo = ({
+    id,
     store,
     name,
     price,
@@ -93,20 +100,26 @@ const PrimaryInfo = ({
                         </p>
                     )}
 
-                    {/* view secondary info button  */}
-                    <div className="flex 1200:hidden mb-2">
-                        <button
-                            className="text-sm mr-3 text-blue-three w-fit px-2 py-1 border border-gray-200 rounded hover:bg-gray-100 transition-all duration-200 active:bg-gray-200 dark:border-gray-700 dark:hover:bg-gray-800 dark:active:bg-gray-700"
+                    <div className="flex text-sm border border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-ten w-fit rounded-full 1200:hidden mb-2 px-1">
+                        <Icon
+                            toolName="more details"
                             onClick={toggleSecondaryInfo}
                         >
-                            View More
-                        </button>
-                        {isMyProduct && <ChatButton />}
+                            <InformationCircleIcon className="icon" />
+                        </Icon>
+
+                        {
+                            <ChatButton
+                                small
+                                // isDisabled={isMyProduct ? true : false}
+                                isDisabled={true}
+                            />
+                        }
                     </div>
 
                     {/* control for second hand products */}
                     {isSecondHand && !isMyProduct && (
-                        <ProductControl isSecondHand={true} />
+                        <ProductControl isSecondHand={true} productId={id} />
                     )}
                 </div>
             </div>
