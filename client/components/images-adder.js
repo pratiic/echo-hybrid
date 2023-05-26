@@ -13,76 +13,78 @@ import { closeModal } from "../redux/slices/modal-slice";
 import { setAlert } from "../redux/slices/alerts-slice";
 
 const ImagesAdder = ({ currentCount }) => {
-  const { selectedFiles } = useSelector((state) => state.files);
-  const { authUser } = useSelector((state) => state.auth);
-  const { activeProduct } = useSelector((state) => state.products);
+    const { selectedFiles } = useSelector((state) => state.files);
+    const { authUser } = useSelector((state) => state.auth);
+    const { activeProduct } = useSelector((state) => state.products);
 
-  const [max, setMax] = useState(5 - currentCount - selectedFiles.length);
-  const [error, setError] = useState("");
-  const [addingImages, setAddingImages] = useState(false);
+    const [max, setMax] = useState(5 - currentCount - selectedFiles.length);
+    const [error, setError] = useState("");
+    const [addingImages, setAddingImages] = useState(false);
 
-  const dispatch = useDispatch();
-  const router = useRouter();
+    const dispatch = useDispatch();
+    const router = useRouter();
 
-  const productId = router.query.id;
+    const productId = router.query.id;
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
 
-    setError("");
-    setAddingImages(true);
+        setError("");
+        setAddingImages(true);
 
-    if (selectedFiles.length === 0) {
-      return setError("provide atleat one image");
-    }
+        if (selectedFiles.length === 0) {
+            return setError("provide atleat one image");
+        }
 
-    try {
-      const formData = new FormData();
+        try {
+            const formData = new FormData();
 
-      selectedFiles.forEach((file) => {
-        formData.append("images", file);
-      });
+            selectedFiles.forEach((file) => {
+                formData.append("images", file);
+            });
 
-      const data = await fetcher(
-        `products/${productId}/images`,
-        "PATCH",
-        formData
-      );
+            const data = await fetcher(
+                `products/${productId}/images`,
+                "PATCH",
+                formData
+            );
 
-      dispatch(
-        setActiveProduct({
-          images: [...activeProduct.images, ...data.images],
-        })
-      );
+            dispatch(
+                setActiveProduct({
+                    images: [...activeProduct.images, ...data.images],
+                })
+            );
 
-      dispatch(closeModal());
-      dispatch(setAlert({ message: "product images have been added" }));
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setAddingImages(false);
-    }
-  };
+            dispatch(closeModal());
+            dispatch(setAlert({ message: "product images have been added" }));
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setAddingImages(false);
+        }
+    };
 
-  return (
-    <form>
-      <h3 className="heading-generic-modal">Add product images</h3>
+    return (
+        <form>
+            <h3 className="heading-generic-modal">Add product images</h3>
 
-      <p className="dark-light mb-3 -mt-2">
-        you can still add {max} {max > 1 ? "images" : "image"}
-      </p>
+            <p className="dark-light mb-3 -mt-2">
+                You can still add {max} {max > 1 ? "images" : "image"}
+            </p>
 
-      <FileSelector multiple max={max} />
+            <FileSelector multiple max={max} />
 
-      {error && (
-        <p className="error mb-3 -mt-1">{capitalizeFirstLetter(error)}</p>
-      )}
+            {error && (
+                <p className="error mb-3 -mt-1">
+                    {capitalizeFirstLetter(error)}
+                </p>
+            )}
 
-      <Button loading={addingImages} full onClick={handleFormSubmit}>
-        {addingImages ? "adding" : "add"} images
-      </Button>
-    </form>
-  );
+            <Button loading={addingImages} full onClick={handleFormSubmit}>
+                {addingImages ? "adding" : "add"} images
+            </Button>
+        </form>
+    );
 };
 
 export default ImagesAdder;

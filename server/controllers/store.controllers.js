@@ -1,3 +1,4 @@
+import { genericUserFields } from "../lib/data-source.lib.js";
 import { notFoundHandler } from "../lib/errors.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
@@ -36,6 +37,41 @@ export const registerStore = async (request, response, next) => {
         });
 
         response.status(201).json({ store: createdStore });
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
+export const getStoreDetails = async (request, response, next) => {
+    const storeId = parseInt(request.params.storeId) || 0;
+
+    try {
+        const store = await prisma.store.findUnique({
+            where: {
+                id: storeId,
+            },
+            include: {
+                user: {
+                    select: { ...genericUserFields, address: true },
+                },
+                business: {
+                    include: {
+                        address: true,
+                    },
+                },
+            },
+        });
+
+        // check if the business has been verified
+        if (store.storeType === "BUS" && !store.business.isVerified) {
+            return next(
+                new HttpError(
+                    "the business of this seller has not been verified yet"
+                )
+            );
+        }
+
+        response.json({ store });
     } catch (error) {
         next(new HttpError());
     }

@@ -47,7 +47,7 @@ const NotificationCard = ({ id, origin, text, createdAt, linkTo }) => {
             >
                 {/* user avatar  */}
                 <div className="w-9 h-9">
-                    <Avatar avatar={origin.avatar} smaller />
+                    <Avatar avatar={origin?.avatar} smaller />
                 </div>
 
                 {/* notification text  */}

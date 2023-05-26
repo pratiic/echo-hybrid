@@ -53,9 +53,9 @@ const Comment = ({
 
     return (
         <div
-            className={`px-4 pt-5 ${
+            className={`px-4 pt-5 w-full ${
                 commentType === "reply"
-                    ? "bg-gray-50 pt-3 mb-3 rounded dark:bg-gray-800"
+                    ? "border border-gray-four pt-3 mb-3 rounded dark:border-gray-800"
                     : "border-b border-gray-four dark:border-gray-800"
             }`}
         >
@@ -80,7 +80,7 @@ const Comment = ({
             </div>
 
             {/* text of the comment */}
-            <p className=" pt-3 pb-1 text-gray-one dark:text-gray-100 whitespace-pre-wrap">
+            <p className=" pt-3 pb-1 dark-light whitespace-pre-wrap">
                 {capitalizeFirstLetter(text)}
             </p>
 

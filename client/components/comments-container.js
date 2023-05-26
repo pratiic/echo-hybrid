@@ -4,7 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { TrashIcon } from "@heroicons/react/outline";
 
 import { fetcher } from "../lib/fetcher";
-import { setComments } from "../redux/slices/comments-slice";
+import {
+    addComment,
+    deleteComment,
+    setComments,
+} from "../redux/slices/comments-slice";
 import {
     showConfirmationModal,
     showLoadingModal,
@@ -12,6 +16,7 @@ import {
 } from "../redux/slices/modal-slice";
 import { setAlert } from "../redux/slices/alerts-slice";
 import { capitalizeFirstLetter } from "../lib/strings";
+import useSocket from "../hooks/use-socket";
 
 import CommentAdder from "./comment-adder";
 import Comment from "./comment";
@@ -35,9 +40,9 @@ const CommentsContainer = ({
         (state) => state.comments
     );
     const { authUser } = useSelector((state) => state.auth);
-
     const dispatch = useDispatch();
     const router = useRouter();
+    const socket = useSocket();
 
     const pluralMap = {
         review: "reviews",
@@ -81,6 +86,19 @@ const CommentsContainer = ({
 
         getComments();
     }, [contentId, contentType]);
+
+    useEffect(() => {
+        socket.on("comment", (commentInfo) => {
+            if (commentInfo.targetId === contentId) {
+                // review belongs to the current product or seller
+                dispatch(addComment(commentInfo));
+            }
+        });
+
+        socket.on("comment-delete", (data) => {
+            dispatch(deleteComment(data));
+        });
+    }, []);
 
     const getComments = async () => {
         // if replies to a review exist, no need to get them again
@@ -219,10 +237,7 @@ const CommentsContainer = ({
     };
 
     return (
-        <div
-            className={`w-full 450:w-[400px] ${commentType === "review" &&
-                "mb-5"}`}
-        >
+        <div className={`${commentType === "review" && "mb-5"} max-w-[450px]`}>
             {commentType === "review" && (
                 <div className="flex items-center justify-between mb-3">
                     <h2 className="black-white text-xl font-semibold">

@@ -30,6 +30,7 @@ const Rating = ({
     onRate,
 }) => {
     const { authUser } = useSelector((state) => state.auth);
+    const { activeProduct } = useSelector((state) => state.products);
     const [authUserRating, setAuthUserRating] = useState(null);
     const [rating, setRating] = useState(1);
 

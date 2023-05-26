@@ -191,16 +191,52 @@ export const setCartItem = async (request, response, next) => {
 
 export const getCartItems = async (request, response, next) => {
     const user = request.user;
-    const cart = user.cart;
-
-    if (!cart) {
-        return next(new HttpError("you do not have a shopping cart", 400));
-    }
+    let cart = user.cart;
 
     try {
+        if (!cart) {
+            try {
+                cart = await prisma.cart.create({
+                    data: {
+                        userId: user.id,
+                    },
+                });
+
+                response.json({ items: [] });
+            } catch (error) {
+                console.log(error);
+                return next(new HttpError());
+            }
+        }
+
         const cartItems = await prisma.cartItem.findMany({
             where: {
                 cartId: cart.id,
+            },
+            include: {
+                product: {
+                    include: {
+                        store: {
+                            select: {
+                                id: true,
+
+                                user: {
+                                    select: {
+                                        id: true,
+                                        address: true,
+                                    },
+                                },
+                                business: {
+                                    select: {
+                                        id: true,
+                                        address: true,
+                                    },
+                                },
+                            },
+                        },
+                        stock: true,
+                    },
+                },
             },
             orderBy: {
                 updatedAt: "desc",
@@ -209,6 +245,7 @@ export const getCartItems = async (request, response, next) => {
 
         response.json({ items: cartItems });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

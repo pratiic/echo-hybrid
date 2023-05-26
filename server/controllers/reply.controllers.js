@@ -8,6 +8,7 @@ export const replyToReview = async (request, response, next) => {
     const user = request.user;
     const reviewId = parseInt(request.params.reviewId);
     const { text } = request.body;
+    const io = request.io;
 
     // validate reply
     const errorMsg = validateReply({ reviewId, text });
@@ -23,14 +24,26 @@ export const replyToReview = async (request, response, next) => {
     };
 
     try {
-        const createdReply = await prisma.reply.create({
-            data: replyData,
-            include: {
-                user: {
-                    select: genericUserFields,
+        const [createdReply, review] = await Promise.all([
+            prisma.reply.create({
+                data: replyData,
+                include: {
+                    user: {
+                        select: genericUserFields,
+                    },
                 },
-            },
-        });
+            }),
+            prisma.review.findUnique({
+                where: {
+                    id: reviewId,
+                },
+                select: {
+                    id: true,
+                    productId: true,
+                    storeId: true,
+                },
+            }),
+        ]);
 
         let finalReply = createdReply;
 
@@ -58,6 +71,13 @@ export const replyToReview = async (request, response, next) => {
 
             finalReply = { ...updatedReply, user: createdReply.user };
         }
+
+        io.emit("comment", {
+            type: "reply",
+            comment: finalReply,
+            baseCommentId: reviewId,
+            targetId: review.productId ? review.productId : review.storeId,
+        });
 
         response.status(201).json({ reply: finalReply });
     } catch (error) {
@@ -96,11 +116,17 @@ export const getReplies = async (request, response, next) => {
 export const deleteReply = async (request, response, next) => {
     const user = request.user;
     const replyId = parseInt(request.params.replyId) || 0;
+    const io = request.io;
 
     try {
         const reply = await prisma.reply.findUnique({
             where: {
                 id: replyId,
+            },
+            select: {
+                id: true,
+                userId: true,
+                reviewId: true,
             },
         });
 
@@ -119,6 +145,12 @@ export const deleteReply = async (request, response, next) => {
             where: {
                 id: replyId,
             },
+        });
+
+        io.emit("comment-delete", {
+            type: "reply",
+            id: replyId,
+            baseCommentId: reply.reviewId,
         });
 
         response.json({ message: "the reply has been deleted" });
