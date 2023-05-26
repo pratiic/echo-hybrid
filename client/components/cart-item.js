@@ -27,14 +27,13 @@ const CartItem = ({ id, product, variant, quantity }) => {
     const [isDelivered, setIsDelivered] = useState(false);
 
     const dispatch = useDispatch();
-    const productDestr = product;
     const {
         id: productId,
         price,
         deliveryType,
         deliveryCharge,
         stock,
-    } = productDestr;
+    } = product;
     const router = useRouter();
     const { authUser } = useSelector((state) => state.auth);
 
@@ -63,7 +62,7 @@ const CartItem = ({ id, product, variant, quantity }) => {
         dispatch(showLoadingModal("updating cart item..."));
 
         try {
-            const data = await fetcher(`carts/items`, "POST", {
+            const data = await fetcher(`carts/${productId}`, "POST", {
                 productId,
                 variantId: variant?.id,
                 quantity: quantity,
@@ -109,7 +108,7 @@ const CartItem = ({ id, product, variant, quantity }) => {
     };
 
     return (
-        <div className="flex flex-col 600:flex-row mb-7 relative w-fit border-b border-faint pb-3">
+        <div className="flex flex-col 600:flex-row mb-7 relative w-fit border-b border-faint pb-1">
             <div className="flex flex-col">
                 <div className="cursor-pointer" onClick={handleItemClick}>
                     <OrderHead {...{ product, variant, quantity }} />
@@ -157,7 +156,7 @@ const CartItem = ({ id, product, variant, quantity }) => {
                         <CountController
                             count={quantity}
                             max={maxQuantity}
-                            canBuy={true}
+                            userCanBuy={true}
                             setCount={handleQuantityChange}
                         />
 

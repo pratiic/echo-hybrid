@@ -11,168 +11,160 @@ import { setAlert } from "../../../redux/slices/alerts-slice";
 import Form from "../../../components/form";
 import InputGroup from "../../../components/input-group";
 import Button from "../../../components/button";
-import PageHeader from "../../../components/page-header";
 
 const Address = () => {
-  const [province, setProvince] = useState("bagmati");
-  const [provinceError, setProvinceError] = useState("");
-  const [district, setDistrict] = useState("kathmandu");
-  const [districtError, setDistrictError] = useState("");
-  const [city, setCity] = useState("");
-  const [cityError, setCityError] = useState("");
-  const [area, setArea] = useState("");
-  const [areaError, setAreaError] = useState("");
-  const [description, setDescription] = useState("");
-  const [descriptionError, setDescriptionError] = useState("");
-  const [requesting, setRequesting] = useState(false);
-  const [address, setAddress] = useState(null);
-  const [fetching, setFetching] = useState(false);
+    const [province, setProvince] = useState("bagmati");
+    const [provinceError, setProvinceError] = useState("");
+    const [city, setCity] = useState("");
+    const [cityError, setCityError] = useState("");
+    const [area, setArea] = useState("");
+    const [areaError, setAreaError] = useState("");
+    const [description, setDescription] = useState("");
+    const [descriptionError, setDescriptionError] = useState("");
+    const [requesting, setRequesting] = useState(false);
+    const [address, setAddress] = useState(null);
+    const [fetching, setFetching] = useState(false);
 
-  const { authUser } = useSelector((state) => state.auth);
+    const { authUser } = useSelector((state) => state.auth);
 
-  const router = useRouter();
-  const dispatch = useDispatch();
+    const router = useRouter();
+    const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (authUser) {
-      fetchBusinessAddress();
-    }
-  }, [authUser]);
+    useEffect(() => {
+        setCity(province === "bagmati" ? "kathmandu" : "");
+    }, [province]);
 
-  useEffect(() => {
-    if (address) {
-      // business has already been registered and address has already been set
-      router.push("/");
-    }
-  }, [address]);
+    useEffect(() => {
+        if (authUser) {
+            fetchBusinessAddress();
+        }
+    }, [authUser]);
 
-  const fetchBusinessAddress = async () => {
-    setFetching(true);
+    useEffect(() => {
+        if (address) {
+            // business has already been registered and address has already been set
+            router.push("/");
+        }
+    }, [address]);
 
-    try {
-      const data = await fetcher("businesses/0");
+    const fetchBusinessAddress = async () => {
+        setFetching(true);
 
-      if (data.business.address) {
-        setAddress(data.business.address);
-      }
-    } catch (error) {
-    } finally {
-      setFetching(false);
-    }
-  };
+        try {
+            const data = await fetcher("businesses/0");
 
-  const handleBackClick = (event) => {
-    event.preventDefault();
+            if (data.business.address) {
+                setAddress(data.business.address);
+            }
+        } catch (error) {
+        } finally {
+            setFetching(false);
+        }
+    };
 
-    router.push("/business-registration/details");
-  };
+    const handleBackClick = (event) => {
+        event.preventDefault();
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
+        router.push("/business-registration/details");
+    };
 
-    setRequesting(true);
-    clearErrors([
-      setProvinceError,
-      setDistrictError,
-      setCityError,
-      setAreaError,
-      setDescriptionError,
-    ]);
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
 
-    try {
-      await fetcher("addresses/business", "POST", {
-        province,
-        district,
-        city,
-        area,
-        description,
-      });
+        setRequesting(true);
+        clearErrors([
+            setProvinceError,
+            setCityError,
+            setAreaError,
+            setDescriptionError,
+        ]);
 
-      dispatch(setAlert({ message: "business address has been set" }));
+        try {
+            await fetcher("addresses/business", "POST", {
+                province,
+                city,
+                area,
+                description,
+            });
 
-      router.push("/set-product");
-    } catch (error) {
-      displayError(
-        error.message,
-        ["province", "district", "city", "area", "description"],
-        [
-          setProvinceError,
-          setDistrictError,
-          setCityError,
-          setAreaError,
-          setDescriptionError,
-        ]
-      );
-    } finally {
-      setRequesting(false);
-    }
-  };
+            dispatch(setAlert({ message: "business address has been set" }));
 
-  return (
-    <section>
-      <Head>Register Business</Head>
+            router.push("/set-product");
+        } catch (error) {
+            displayError(
+                error.message,
+                ["province", "district", "city", "area", "description"],
+                [
+                    setProvinceError,
+                    setCityError,
+                    setAreaError,
+                    setDescriptionError,
+                ]
+            );
+        } finally {
+            setRequesting(false);
+        }
+    };
 
-      {/* <PageHeader heading="Set business address" hasBackArrow={true} /> */}
+    return (
+        <section>
+            <Head>Register Business</Head>
 
-      <Form heading="Set business address" onSubmit={handleFormSubmit}>
-        <InputGroup
-          label="province"
-          view="select"
-          options={provinceOptions}
-          value={province}
-          error={provinceError}
-          onChange={setProvince}
-        />
+            {/* <PageHeader heading="Set business address" hasBackArrow={true} /> */}
 
-        {province === "bagmati" && (
-          <InputGroup
-            label="district"
-            view="select"
-            options={districtOptions}
-            value={district}
-            error={districtError}
-            onChange={setDistrict}
-          />
-        )}
+            <Form heading="Set business address" onSubmit={handleFormSubmit}>
+                <InputGroup
+                    label="province"
+                    view="select"
+                    options={provinceOptions}
+                    value={province}
+                    error={provinceError}
+                    onChange={setProvince}
+                />
 
-        <InputGroup
-          label="city"
-          placeholder="e.g. kathmandu"
-          value={city}
-          error={cityError}
-          onChange={setCity}
-        />
+                <InputGroup
+                    label="city"
+                    view={province === "bagmati" ? "select" : "input"}
+                    options={districtOptions}
+                    value={city}
+                    error={cityError}
+                    onChange={setCity}
+                />
 
-        <InputGroup
-          label="area"
-          placeholder="e.g. koteshwor"
-          value={area}
-          error={areaError}
-          onChange={setArea}
-        />
+                <InputGroup
+                    label="area"
+                    placeholder="e.g. koteshwor"
+                    value={area}
+                    error={areaError}
+                    onChange={setArea}
+                />
 
-        <InputGroup
-          label="description"
-          value={description}
-          placeholder="max 100 chars"
-          error={descriptionError}
-          onChange={setDescription}
-          view="textarea"
-        />
+                <InputGroup
+                    label="description"
+                    value={description}
+                    placeholder="max 100 chars"
+                    error={descriptionError}
+                    onChange={setDescription}
+                    view="textarea"
+                />
 
-        {/* change style later */}
-        <div className="flex items-center justify-between">
-          <Button onClick={handleBackClick} type="secondary">
-            go back
-          </Button>
+                {/* change style later */}
+                <div className="flex items-center justify-between">
+                    <Button
+                        type="tertiary"
+                        rounded={false}
+                        onClick={handleBackClick}
+                    >
+                        go back
+                    </Button>
 
-          <Button loading={requesting || fetching}>
-            {requesting ? "setting" : "set"} address
-          </Button>
-        </div>
-      </Form>
-    </section>
-  );
+                    <Button loading={requesting || fetching} rounded={false}>
+                        {requesting ? "setting" : "set"} address
+                    </Button>
+                </div>
+            </Form>
+        </section>
+    );
 };
 
 export default Address;

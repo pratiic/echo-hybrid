@@ -14,7 +14,7 @@ export const addressSchema = Joi.object({
         )
         .trim()
         .required(),
-    district: Joi.when("province", {
+    city: Joi.when("province", {
         is: "bagmati",
         then: Joi.string()
             .required()
@@ -33,8 +33,8 @@ export const addressSchema = Joi.object({
                 "chitwan",
                 "dolakha"
             ),
+        otherwise: Joi.string().required().min(5).max(20).trim(),
     }),
-    city: Joi.string().required().min(5).max(20).trim(),
     area: Joi.string().required().min(5).max(20).trim(),
     description: Joi.string().max(100).allow("").trim(),
 });

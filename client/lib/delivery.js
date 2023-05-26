@@ -9,10 +9,8 @@ export const checkDelivery = (consumerAddr, sellerAddr) => {
     }
 
     if (
-        valleyDistricts.find(
-            (district) => district === consumerAddr?.district
-        ) &&
-        valleyDistricts.find((district) => district === consumerAddr?.district)
+        valleyDistricts.find((district) => district === consumerAddr?.city) &&
+        valleyDistricts.find((district) => district === consumerAddr?.city)
     ) {
         return true;
     }

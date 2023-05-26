@@ -95,7 +95,10 @@ const VariationsSetter = ({ productId }) => {
                                 {variation.label}
                             </span>
 
-                            <span className="dark-light mr-3" key="option">
+                            <span
+                                className="dark-light mr-3 uppercase text-sm"
+                                key="option"
+                            >
                                 {variation.options.map((option, index) => {
                                     return `${option}${
                                         index === variation.options.length - 1

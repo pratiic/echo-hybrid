@@ -1,10 +1,7 @@
 import React from "react";
-import {
-    CalendarIcon,
-    LocationMarkerIcon,
-    UserIcon,
-} from "@heroicons/react/outline";
+import { CalendarIcon, LocationMarkerIcon } from "@heroicons/react/outline";
 import { TbBuildingFactory } from "react-icons/tb";
+import { MdOutlinePrecisionManufacturing } from "react-icons/md";
 import { useSelector } from "react-redux";
 
 import { getAddress } from "../../lib/address";
@@ -25,6 +22,7 @@ const SecondaryInfo = ({
     isSecondHand,
     isMyProduct,
     showName,
+    brand,
 }) => {
     const sellerAddress = isSecondHand
         ? store?.user?.address
@@ -70,7 +68,24 @@ const SecondaryInfo = ({
                                 {madeIn}
                             </span>
                         ) : (
-                            "not available"
+                            <span className="italic">not available</span>
+                        )}
+                    </span>
+                </IconInfo>
+
+                <IconInfo
+                    icon={
+                        <MdOutlinePrecisionManufacturing className="icon-no-bg" />
+                    }
+                >
+                    <span>
+                        Brand -{" "}
+                        {brand ? (
+                            <span className="capitalize font-semibold">
+                                {brand}
+                            </span>
+                        ) : (
+                            <span className="italic">not available</span>
                         )}
                     </span>
                 </IconInfo>

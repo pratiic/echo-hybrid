@@ -2,6 +2,7 @@ import React from "react";
 import { capitalizeFirstLetter } from "../lib/strings";
 
 import ProductControl from "./product-control";
+import Tag from "./tag";
 
 const OrderHead = ({ product, variant, quantity }) => {
     return (
@@ -46,9 +47,7 @@ const OrderHead = ({ product, variant, quantity }) => {
 
                 {product.isSecondHand && (
                     <React.Fragment>
-                        <div className="bg-gray-100 w-fit rounded-full dark-light px-2 py-[3px] text-xs mt-2 capitalize">
-                            second hand
-                        </div>
+                        <Tag text="second hand" />
 
                         <ProductControl
                             productId={product?.id}

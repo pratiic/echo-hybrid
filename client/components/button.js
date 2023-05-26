@@ -9,7 +9,7 @@ const Button = ({
     large,
     disabled = false,
     children,
-    rounded,
+    rounded = true,
     textAsIs,
     onClick,
 }) => {
@@ -27,19 +27,19 @@ const Button = ({
         primary: `text-white hover:bg-blue-four active:bg-blue-three ${
             loading ? "bg-blue-two" : "bg-blue-three"
         }`,
-        secondary: `bg-gray-50 border hover:bg-blue-one hover:border-blue-one active:bg-blue-two active:text-blue-four active:border-blue-two dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 dark:active:bg-gray-800 ${
-            loading ? "text-blue-two dark:text-gray-500" : "text-blue-three"
+        secondary: `border border-gray-300 hover:bg-gray-100 hover:border-gray-100 active:bg-gray-200 active:border-gray-200 dark:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:border-gray-800 dark:active:bg-gray-700 dark:active:border-gray-700 ${
+            loading ? "text-blue-two dark:text-gray-500" : "text-gray-one"
         }`,
-        tertiary: `bg-blue-one border border-blue-one hover:bg-blue-one active:bg-blue-two active:text-blue-four active:border-blue-two dark:bg-gray-700 dark:border-gray-700 dark:active:bg-gray-800 dark:active:border-gray-800 ${
+        tertiary: `bg-gray-100 active:bg-gray-200 dark:bg-gray-800 dark:active:bg-gray-700 ${
             loading
                 ? "text-blue-two dark:text-gray-500"
-                : "text-blue-three dark:text-gray-300"
+                : "text-gray-500 dark:text-gray-300"
         }`,
     };
 
     return (
         <button
-            className={`flex items-center justify-center rounded h-fit min-w-[75px] outline-blue-three transition-all duration-200 ${
+            className={`flex items-center justify-center h-fit min-w-[75px] outline-blue-three transition-all duration-200 ${
                 classNameMap[type]
             } ${full && "w-full"} ${center && "mx-auto"} ${
                 small

@@ -208,7 +208,8 @@ const Rating = ({
                         {ratings.length > 0 && (
                             <Button
                                 small
-                                type="secondary"
+                                type="tertiary"
+                                rounded={false}
                                 onClick={viewRatings}
                             >
                                 view ratings

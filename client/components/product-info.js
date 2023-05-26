@@ -41,6 +41,7 @@ const ProductInfo = ({
             madeIn,
             isSecondHand,
             isMyProduct,
+            brand,
             createdAt,
         });
     }, [
@@ -50,6 +51,7 @@ const ProductInfo = ({
         madeIn,
         isSecondHand,
         isMyProduct,
+        brand,
         createdAt,
     ]);
 

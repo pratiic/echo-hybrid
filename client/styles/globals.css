@@ -52,6 +52,10 @@ textarea {
     @apply icon pointer-events-none text-gray-400 dark:text-gray-500;
   }
 
+  .icon-button {
+    @apply icon p-0 rounded-none mr-2 h-5 w-5;
+  }
+
   .icon-big {
     @apply icon-bg h-6 w-6;
   }

@@ -125,10 +125,14 @@ export const getProducts = async (request, response, next) => {
     user.address = user.address || {};
     const filter = request.query.filter || "all";
     const sortType = request.query.sortType || "desc";
-    const sortBy = request.query.sortBy || "createdAt";
+    let sortBy = request.query.sortBy || "createdAt";
     const category = request.query.category;
     const searchQuery = request.query.query || "";
     const storeId = parseInt(request.query.storeId);
+
+    if (sortBy === "date added") {
+        sortBy = "createdAt";
+    }
 
     const getAddressFilter = (field) => {
         return {

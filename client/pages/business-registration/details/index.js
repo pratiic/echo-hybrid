@@ -103,7 +103,7 @@ const Details = () => {
 
             await fetcher("businesses", "POST", formData);
 
-            dispatch(setAlert({ message: "business details has been set" }));
+            dispatch(setAlert({ message: "business details have been set" }));
 
             router.push("/business-registration/address");
         } catch (error) {
@@ -204,11 +204,19 @@ const Details = () => {
 
                 <div className="flex items-center justify-between">
                     {business && (
-                        <Button type="secondary" onClick={handleCancelClick}>
+                        <Button
+                            type="tertiary"
+                            rounded={false}
+                            onClick={handleCancelClick}
+                        >
                             cancel reigstration
                         </Button>
                     )}
-                    <Button loading={registering || fetching} full={!business}>
+                    <Button
+                        loading={registering || fetching}
+                        full={!business}
+                        rounded={false}
+                    >
                         Continue
                     </Button>
                 </div>

@@ -7,20 +7,18 @@ import { clearErrors, displayError } from "../lib/validation";
 import { fetcher } from "../lib/fetcher";
 import { updateAuthUser } from "../redux/slices/auth-slice";
 import { closeModal, showLoadingModal } from "../redux/slices/modal-slice";
+import { setAlert } from "../redux/slices/alerts-slice";
 
 import Form from "./form";
 import InputGroup from "./input-group";
 import Button from "./button";
-import { setAlert } from "../redux/slices/alerts-slice";
 
 const UserAddress = () => {
-    const [province, setProvince] = useState("bagmati");
-    const [district, setDistrict] = useState("kathmandu");
+    const [province, setProvince] = useState("");
     const [city, setCity] = useState("");
     const [area, setArea] = useState("");
     const [description, setDescription] = useState("");
     const [provinceError, setProvinceError] = useState("");
-    const [districtError, setDistrictError] = useState("");
     const [cityError, setCityError] = useState("");
     const [areaError, setAreaError] = useState("");
     const [descriptionError, setDescriptionError] = useState("");
@@ -36,11 +34,19 @@ const UserAddress = () => {
         const address = authUser?.address;
 
         setProvince(address?.province || "bagmati");
-        setDistrict(address?.district || "kathmandu");
         setCity(address?.city || "");
         setArea(address?.area || "");
         setDescription(address?.description || "");
     }, [authUser]);
+
+    useEffect(() => {
+        if (
+            province === "bagmati" &&
+            !districtOptions.find((option) => option.value === city)
+        ) {
+            setCity("kathmandu");
+        }
+    }, [province, city]);
 
     const handleFormSubmit = async (event) => {
         event.preventDefault();
@@ -48,7 +54,6 @@ const UserAddress = () => {
         setUpdating(true);
         clearErrors([
             setProvinceError,
-            setDistrictError,
             setCityError,
             setAreaError,
             setDescriptionError,
@@ -59,7 +64,6 @@ const UserAddress = () => {
 
             const data = await fetcher("addresses/user", "POST", {
                 province,
-                district,
                 city,
                 area,
                 description,
@@ -89,17 +93,14 @@ const UserAddress = () => {
         } catch (error) {
             displayError(
                 error.message,
-                ["province", "district", "city", "area", "description"],
+                ["province", "city", "area", "description"],
                 [
                     setProvinceError,
-                    setDistrictError,
                     setCityError,
                     setAreaError,
                     setDescriptionError,
                 ]
             );
-
-            console.log(error.message);
         } finally {
             dispatch(closeModal());
             setUpdating(false);
@@ -117,20 +118,10 @@ const UserAddress = () => {
                 onChange={setProvince}
             />
 
-            {province === "bagmati" && (
-                <InputGroup
-                    label="district"
-                    view="select"
-                    options={districtOptions}
-                    value={district}
-                    error={districtError}
-                    onChange={setDistrict}
-                />
-            )}
-
             <InputGroup
                 label="city"
-                placeholder="e.g. kathmandu"
+                view={province === "bagmati" ? "select" : "input"}
+                options={districtOptions}
                 value={city}
                 error={cityError}
                 onChange={setCity}
@@ -151,6 +142,7 @@ const UserAddress = () => {
                 error={descriptionError}
                 onChange={setDescription}
                 view="textarea"
+                showRequired={false}
             />
 
             <Button loading={updating} full>
