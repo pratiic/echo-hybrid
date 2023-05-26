@@ -8,10 +8,25 @@ import {
 } from "../controllers/reply.controllers.js";
 import { getUpload } from "../middleware/multer.middleware.js";
 
-export const router = express.Router();
+export const replyRouter = (io) => {
+    const router = express.Router();
 
-router.post("/:reviewId", auth, getUpload().single("image"), replyToReview);
+    router.post(
+        "/:reviewId",
+        auth,
+        getUpload().single("image"),
+        (request, ...op) => {
+            request.io = io;
+            replyToReview(request, ...op);
+        }
+    );
 
-router.get("/:reviewId/replies", auth, getReplies);
+    router.get("/:reviewId/replies", auth, getReplies);
 
-router.delete("/:replyId", auth, deleteReply);
+    router.delete("/:replyId", auth, (request, ...op) => {
+        request.io = io;
+        deleteReply(request, ...op);
+    });
+
+    return router;
+};

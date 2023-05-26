@@ -27,6 +27,11 @@ export const sendNotification = async (request, response, next) => {
                 destinationId: parseInt(notificationInfo.destinationId),
                 seen: false,
             },
+            include: {
+                origin: {
+                    select: genericUserFields,
+                },
+            },
         });
 
         io.emit("notification", notification);

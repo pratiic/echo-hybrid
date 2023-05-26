@@ -12,6 +12,7 @@ import AlertsContainer from "./alerts-container";
 import PopupGallery from "./popup-gallery";
 import Products from "../cache/products";
 import Notification from "../real-time/notification";
+import Rating from "../real-time/rating";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -67,6 +68,7 @@ const Layout = ({ children }) => {
                     <>
                         {/* fake components for real time  */}
                         <Notification />
+                        <Rating />
 
                         {/* fake components to preserve cache */}
                         <Products />

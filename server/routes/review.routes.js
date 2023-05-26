@@ -7,15 +7,25 @@ import {
 } from "../controllers/review.controllers.js";
 import { getUpload } from "../middleware/multer.middleware.js";
 
-export const router = express.Router();
+export const reviewRouter = (io) => {
+    const router = express.Router();
 
-router.post(
-    "/:targetType/:targetId",
-    auth,
-    getUpload().single("image"),
-    postReview
-);
+    router.post(
+        "/:targetType/:targetId",
+        auth,
+        getUpload().single("image"),
+        (request, ...op) => {
+            request.io = io;
+            postReview(request, ...op);
+        }
+    );
 
-router.get("/:targetType/:targetId", auth, getReviews);
+    router.get("/:targetType/:targetId", auth, getReviews);
 
-router.delete("/:reviewId", auth, deleteReview);
+    router.delete("/:reviewId", auth, (request, ...op) => {
+        request.io = io;
+        deleteReview(request, ...op);
+    });
+
+    return router;
+};

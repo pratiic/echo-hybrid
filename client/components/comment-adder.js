@@ -155,7 +155,7 @@ const CommentAdder = ({
 
                 <textarea
                     placeholder={`Write a ${commentType}...`}
-                    className={`resize-none w-full flex-1 px-2 py-2 outline-none rounded min-h-[7rem] transition-all duration-200 black-white ${
+                    className={`resize-none flex-1 px-2 py-2 outline-none rounded min-h-[7rem] transition-all duration-200 black-white ${
                         isFocused
                             ? "bg-gray-100 dark:bg-gray-700"
                             : "bg-gray-50 dark:bg-gray-800"

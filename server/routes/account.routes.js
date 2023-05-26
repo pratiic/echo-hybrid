@@ -10,9 +10,28 @@ import auth from "../middleware/auth.middleware.js";
 
 export const router = express.Router();
 
-router.get("/verification", auth, createAccountVerification);
+router.get(
+    "/verification",
+    (request, response, next) => {
+        request.select = {
+            isVerified: true,
+            email: true,
+        };
+        auth(request, response, next);
+    },
+    createAccountVerification
+);
 
-router.post("/verification", auth, verifyAccount);
+router.post(
+    "/verification",
+    (request, response, next) => {
+        request.select = {
+            isVerified: true,
+        };
+        auth(request, response, next);
+    },
+    verifyAccount
+);
 
 router.post("/recovery", createAccountRecovery);
 

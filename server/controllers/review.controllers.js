@@ -9,6 +9,7 @@ export const postReview = async (request, response, next) => {
     const targetId = parseInt(request.params.targetId);
     const targetType = request.params.targetType;
     const { text } = request.body;
+    const io = request.io;
 
     const errorMsg = validateReview({ targetId, targetType, text });
 
@@ -89,6 +90,12 @@ export const postReview = async (request, response, next) => {
             finalReview = { ...updatedReview, user: createdReview.user };
         }
 
+        io.emit("comment", {
+            type: "review",
+            comment: finalReview,
+            targetId,
+        });
+
         response.status(201).json({ review: finalReview });
     } catch (error) {
         next(new HttpError());
@@ -127,6 +134,7 @@ export const getReviews = async (request, response, next) => {
 export const deleteReview = async (request, response, next) => {
     const user = request.user;
     const reviewId = parseInt(request.params.reviewId) || -1;
+    const io = request.io;
 
     try {
         const review = await prisma.review.findUnique({
@@ -151,10 +159,16 @@ export const deleteReview = async (request, response, next) => {
             },
         });
 
+        io.emit("comment-delete", {
+            type: "review",
+            id: reviewId,
+        });
+
         response.json({
             message: "review has been deleted",
         });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

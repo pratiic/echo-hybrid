@@ -25,6 +25,7 @@ const ProductControl = ({
     canAddToCart = true,
     product,
     isSecondHand,
+    className,
 }) => {
     const { activeProduct } = useSelector((state) => state.products);
     const dispatch = useDispatch();
@@ -68,7 +69,7 @@ const ProductControl = ({
     };
 
     return (
-        <div className="flex items-center mt-3">
+        <div className={`flex items-center mt-3 ${className}`}>
             <div className={canAddToCart && "mr-3"}>
                 <Button small={!canAddToCart} onClick={handleOrderClick}>
                     order now

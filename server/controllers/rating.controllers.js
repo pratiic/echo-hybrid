@@ -7,6 +7,7 @@ export const provideRating = async (request, response, next) => {
     const targetId = parseInt(request.params.targetId);
     const targetType = request.params.targetType;
     const stars = request.body.stars;
+    const io = request.io;
     const selectionFilter =
         targetType === "product"
             ? {
@@ -105,6 +106,11 @@ export const provideRating = async (request, response, next) => {
             }),
         ]);
 
+        io.emit("rating", {
+            rating,
+            ratingNum: newRating,
+        });
+
         response.json({
             target: {
                 rating: newRating,
@@ -126,6 +132,7 @@ export const provideRating = async (request, response, next) => {
 export const deleteRating = async (request, response, next) => {
     const user = request.user;
     const ratingId = parseInt(request.params.ratingId) || -1;
+    const io = request.io;
 
     try {
         const rating = await prisma.rating.findUnique({
@@ -188,6 +195,12 @@ export const deleteRating = async (request, response, next) => {
             }),
         ]);
 
+        io.emit("rating-delete", {
+            id: rating.id,
+            targetId: target.id,
+            ratingNum: newRating,
+        });
+
         response.json({
             target: {
                 rating: newRating,
@@ -197,7 +210,6 @@ export const deleteRating = async (request, response, next) => {
             },
         });
     } catch (error) {
-        console.log(error);
         next(new HttpError());
     }
 };

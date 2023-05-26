@@ -5,23 +5,17 @@ export const cartSlice = createSlice({
     initialState: {
         items: [],
         loading: false,
-        loadingMore: false,
-        error: false,
-        page: 1,
-        noMoreData: false,
+        error: "",
         needToFetch: true,
-        totalCount: 0,
-        addedItemsCount: 0,
-        PAGE_SIZE: 5,
     },
     reducers: {
         setCartItems: (state, action) => {
             state.items = action.payload;
+            state.needToFetch = false;
         },
         addCartItem: (state, action) => {
             if (!state.items.find((item) => item.id === action.payload.id)) {
                 state.items = [action.payload, ...state.items];
-                state.addedItemsCount += 1;
             }
         },
         updateCartItem: (state, action) => {
@@ -45,26 +39,9 @@ export const cartSlice = createSlice({
         setLoading: (state, action) => {
             state.loading = action.payload;
         },
-        setLoadingMore: (state, action) => {
-            state.loadingMore = action.payload;
-        },
+
         setError: (state, action) => {
             state.error = action.payload;
-        },
-        setPage: (state, action) => {
-            state.page = action.payload;
-        },
-        setNoMoreData: (state, action) => {
-            state.noMoreData = action.payload;
-        },
-        setNeedToFetch: (state, action) => {
-            state.needToFetch = action.payload;
-        },
-        setTotalCount: (state, action) => {
-            state.totalCount = action.payload;
-        },
-        resetPageCount: (state, action) => {
-            state.PAGE_SIZE = 5;
         },
     },
 });
@@ -76,11 +53,6 @@ export const {
     updateCartItem,
     deleteCartItem,
     setLoading,
-    setLoadingMore,
     setError,
-    setPage,
-    setNoMoreData,
     setNeedToFetch,
-    setTotalCount,
-    resetPageCount,
 } = cartSlice.actions;

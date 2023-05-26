@@ -12,100 +12,112 @@ import { updateAuthUser } from "../redux/slices/auth-slice";
 import { setAlert } from "../redux/slices/alerts-slice";
 
 const AccountVerification = () => {
-  const [code, setCode] = useState("");
-  const [verificationError, setVerificationError] = useState("");
-  const [verifying, setVerifying] = useState(false);
-  const [requestError, setRequestError] = useState("");
-  const [requesting, setRequesting] = useState(false);
+    const [code, setCode] = useState("");
+    const [verificationError, setVerificationError] = useState("");
+    const [verifying, setVerifying] = useState(false);
+    const [requestError, setRequestError] = useState("");
+    const [requesting, setRequesting] = useState(false);
 
-  const { authUser } = useSelector((state) => state.auth);
-  const router = useRouter();
-  const dispatch = useDispatch();
+    const { authUser } = useSelector((state) => state.auth);
+    const router = useRouter();
+    const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (authUser?.verified) {
-      router.push("/");
-    }
-  }, [authUser]);
+    useEffect(() => {
+        if (authUser?.verified) {
+            router.push("/");
+        }
+    }, [authUser]);
 
-  const verifyAccount = async (event) => {
-    event.preventDefault();
+    const verifyAccount = async (event) => {
+        event.preventDefault();
 
-    setVerifying(true);
-    setVerificationError("");
+        setVerifying(true);
+        setVerificationError("");
 
-    try {
-      await fetcher(`accounts/verification/?code=${code}`, "POST");
+        try {
+            await fetcher(`accounts/verification/?code=${code}`, "POST");
 
-      dispatch(setAlert({ message: "your account has been verified" }));
-      dispatch(updateAuthUser({ isVerified: true }));
+            dispatch(setAlert({ message: "your account has been verified" }));
+            dispatch(updateAuthUser({ isVerified: true }));
 
-      router.push("/");
-    } catch (error) {
-      setVerificationError(error.message);
-    } finally {
-      setVerifying(false);
-    }
-  };
+            router.push("/");
+        } catch (error) {
+            setVerificationError(error.message);
+        } finally {
+            setVerifying(false);
+        }
+    };
 
-  const requestCode = async () => {
-    setRequesting(true);
+    const requestCode = async () => {
+        setRequesting(true);
 
-    if (requesting) {
-      return;
-    }
+        if (requesting) {
+            return;
+        }
 
-    try {
-      await fetcher("accounts/verification");
-    } catch (error) {
-      setRequestError(error.message);
-    } finally {
-      setRequesting(false);
-    }
-  };
+        try {
+            await fetcher("accounts/verification");
 
-  return (
-    <section>
-      <PageHeader heading="Verify your account" hasBackArrow />
+            dispatch(
+                setAlert({
+                    message: "verification code has been sent to your email",
+                })
+            );
+        } catch (error) {
+            setRequestError(error.message);
+        } finally {
+            setRequesting(false);
+        }
+    };
 
-      <InfoBanner>
-        <span className="font-semibold">
-          You cannot access any part of this application before your account is
-          verified.{" "}
-        </span>
-        Enter the code that you have received in the email associated with your
-        account.{" "}
-        <span className="font-semibold">
-          Check your spam folder too. Also note that the code expires after 1
-          hour.
-        </span>
-      </InfoBanner>
+    return (
+        <section>
+            <PageHeader heading="Verify your account" hasBackArrow />
 
-      <form className="w-96" onSubmit={verifyAccount}>
-        <InputGroup
-          label="verification code"
-          placeholder="8-digit code"
-          value={code}
-          error={verificationError}
-          onChange={setCode}
-        />
+            <InfoBanner>
+                <span className="font-semibold">
+                    You cannot access any part of this application before your
+                    account is verified.{" "}
+                </span>
+                Enter the code that you have received in the email associated
+                with your account.{" "}
+                <span className="font-semibold">
+                    Check your spam folder too. Also note that the code expires
+                    after 1 hour.
+                </span>
+            </InfoBanner>
 
-        <Button laoding={verifying}>
-          {verifying ? "Verifying" : "Verify"} account
-        </Button>
-      </form>
+            <form className="w-96" onSubmit={verifyAccount}>
+                <InputGroup
+                    label="verification code"
+                    placeholder="8-digit code"
+                    value={code}
+                    error={verificationError}
+                    onChange={setCode}
+                />
 
-      <div className="mt-5">
-        <p className="mb-1 dark-light">
-          Do not have a code or the code is expired?
-        </p>
-        <Button type="tertiary" onClick={requestCode} loading={requesting}>
-          {requesting ? "Requesting" : "Request"} Code
-        </Button>
-        <span className="error">{capitalizeFirstLetter(requestError)}</span>
-      </div>
-    </section>
-  );
+                <Button laoding={verifying}>
+                    {verifying ? "Verifying" : "Verify"} account
+                </Button>
+            </form>
+
+            <div className="mt-5">
+                <p className="mb-1 dark-light">
+                    Do not have a code or the code is expired?
+                </p>
+                <Button
+                    type="tertiary"
+                    onClick={requestCode}
+                    loading={requesting}
+                >
+                    {requesting ? "Requesting" : "Request"} Code
+                </Button>
+                <span className="error">
+                    {capitalizeFirstLetter(requestError)}
+                </span>
+            </div>
+        </section>
+    );
 };
 
 export default AccountVerification;
