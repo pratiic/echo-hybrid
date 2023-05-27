@@ -101,7 +101,7 @@ const SecondaryInfo = ({
             {!isMyProduct && (
                 <div className="mt-3 hidden w-fit text-sm 1200:block">
                     {" "}
-                    <ChatButton />
+                    <ChatButton userId={store?.userId} />
                 </div>
             )}
         </div>

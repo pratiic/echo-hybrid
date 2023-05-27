@@ -1,14 +1,16 @@
 import { capitalizeFirstLetter } from "./strings";
 
-export const getAddress = (address) => {
+export const getAddress = (address, includeProvince) => {
     if (!address) {
         return "";
     }
 
     // const { province, district, city, area, description } = address;
-    const { city, area } = address;
+    const { city, area, description, province } = address;
 
-    return `${capitalizeFirstLetter(area)}, ${capitalizeFirstLetter(city)}`;
+    return `${capitalizeFirstLetter(area)}, ${capitalizeFirstLetter(city)}${
+        includeProvince ? `, ${province}` : ""
+    } ${description ? `\n(${description})` : ""}`;
 };
 
 export const provinceOptions = [

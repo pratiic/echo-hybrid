@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
+import Head from "next/head";
 
 import { fetcher } from "../../lib/fetcher";
 import { setAlert, setErrorAlert } from "../../redux/slices/alerts-slice";
@@ -132,6 +133,10 @@ const BusinessRegistration = () => {
 
     return (
         <section>
+            <Head>
+                <title>Register business | {viewTitleMap[activeView]}</title>
+            </Head>
+
             <PageHeader
                 heading={`register business - ${viewTitleMap[activeView]}`}
                 hasBackArrow
@@ -145,7 +150,10 @@ const BusinessRegistration = () => {
             )}
 
             {activeView === "address" && (
-                <BusinessAddress address={business?.address} />
+                <BusinessAddress
+                    business={business}
+                    setBusiness={setBusiness}
+                />
             )}
 
             {activeView === "pending" && (

@@ -31,17 +31,15 @@ import ThemeToggler from "./theme-toggler";
 import SidebarItem from "./sidebar-item";
 
 const Sidebar = () => {
-    const { authuser } = useSelector((state) => state.auth);
+    const { authUser } = useSelector((state) => state.auth);
     const { showSidebar } = useSelector((state) => state.sidebar);
     const { notifications } = useSelector((state) => state.notifications);
-    const { items } = useSelector((state) => state.cart);
 
     const [counts, setCounts] = useState({});
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [ordersCount, setOrdersCount] = useState(0);
     const [chatsCount, setChatsCount] = useState(0);
     const [transactionsCount, setTransactionsCount] = useState(0);
-    const [cartCount, setCartCount] = useState(0);
     const [activeLink, setActiveLink] = useState("");
 
     const router = useRouter();
@@ -60,7 +58,7 @@ const Sidebar = () => {
             activeIcon: <AiFillShop className="icon-sidebar" />,
         },
         {
-            name: "sell products",
+            name: "sell on echo",
             linkTo: "/sell-products",
             icon: <HiOutlineCash className="icon-sidebar" />,
         },
@@ -142,11 +140,6 @@ const Sidebar = () => {
     }, [notifications]);
 
     useEffect(() => {
-        // cart items count
-        setCartCount(items.length);
-    });
-
-    useEffect(() => {
         for (let link of links) {
             if (
                 router.pathname === link.activePath ||
@@ -190,6 +183,13 @@ const Sidebar = () => {
             <ThemeToggler />
 
             {links.map((link) => {
+                if (link.name === "sell on echo") {
+                    // do not show if business already verified
+                    if (authUser?.store?.business?.isVerified) {
+                        return null;
+                    }
+                }
+
                 return (
                     <SidebarItem
                         key={link.name}
@@ -197,8 +197,6 @@ const Sidebar = () => {
                         count={
                             link.name === "notifications"
                                 ? notificationsCount
-                                : link.name === "cart"
-                                ? cartCount
                                 : 0
                         }
                         active={activeLink === link.name}

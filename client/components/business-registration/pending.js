@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
+
+import { getAddress } from "../../lib/address";
 
 import InfoBanner from "../info-banner";
 import Button from "../button";
 
 const BusinessPending = ({ business, handleCancellation }) => {
-    const [fetching, setFetching] = useState(false);
-
     const router = useRouter();
 
     useEffect(() => {
@@ -17,7 +17,7 @@ const BusinessPending = ({ business, handleCancellation }) => {
 
             if (!business.address) {
                 // not verified, address not set
-                router.push("/business-registration/address");
+                router.push("/business-registration/?view=address");
             }
         }
     }, [business]);
@@ -26,14 +26,12 @@ const BusinessPending = ({ business, handleCancellation }) => {
         return (
             <div className="capitalize dark-light border-b w-fit py-2">
                 <label className="">{label} </label>
-                <span className="font-semibold">{value}</span>
+                <span className="font-semibold whitespace-pre-wrap">
+                    {value}
+                </span>
             </div>
         );
     };
-
-    if (fetching) {
-        return <p className="status">Loading business details...</p>;
-    }
 
     return (
         <section>
@@ -53,6 +51,10 @@ const BusinessPending = ({ business, handleCancellation }) => {
                 <InfoPair label="owner" value={business?.ownerName} />
                 <InfoPair label="PAN" value={business?.PAN} />
                 <InfoPair label="phone" value={business?.phone} />
+                <InfoPair
+                    label="address"
+                    value={getAddress(business?.address, true)}
+                />
                 <div className="py-2">
                     <label className="capitalize dark-light block mb-2">
                         registration certificate

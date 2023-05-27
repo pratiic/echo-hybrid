@@ -11,7 +11,6 @@ export const validateBusiness = async (request, response, next) => {
             },
             select: {
                 id: true,
-                status: true,
                 store: {
                     select: {
                         id: true,

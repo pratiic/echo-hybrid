@@ -9,7 +9,7 @@ const Button = ({
     large,
     disabled = false,
     children,
-    rounded = true,
+    rounded = false,
     textAsIs,
     onClick,
 }) => {

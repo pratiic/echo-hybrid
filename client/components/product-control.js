@@ -54,13 +54,11 @@ const ProductControl = ({
                 quantity,
             });
             dispatch(addCartItem(data.item));
-
             router.push("/cart");
         } catch (error) {
             if (error.message.includes("already exists")) {
-                return dispatch(
-                    setAlert({ type: "info", message: error.message })
-                );
+                dispatch(setAlert({ type: "info", message: error.message }));
+                return router.push("/cart");
             }
 
             dispatch(setErrorAlert(error.message));

@@ -7,6 +7,7 @@ import { HttpError } from "../models/http-error.models.js";
 import { validateUser } from "../validators/user.validators.js";
 import { getVerificationCode } from "../lib/verification.lib.js";
 import { sendEmail } from "../lib/email.lib.js";
+import { extraUserFields } from "../lib/data-source.lib.js";
 
 export const signUserUp = async (request, response, next) => {
     let { firstName, lastName, email, password } = request.body;
@@ -48,7 +49,7 @@ export const signUserUp = async (request, response, next) => {
                 lastName,
                 email,
                 password: hashedPassword,
-                avatar: `https://avatars.dicebear.com/api/initials/${firstName}${lastName}.svg`,
+                avatar: `https://avatars.dicebear.com/api/initials/${firstName[0]}${lastName[0]}.svg`,
             },
         });
 
@@ -93,21 +94,7 @@ export const signUserIn = async (request, response, next) => {
         // check if the email matches
         const user = await prisma.user.findFirst({
             where: { email },
-            include: {
-                store: {
-                    select: {
-                        id: true,
-                        storeType: true,
-                        business: {
-                            select: {
-                                id: true,
-                                isVerified: true,
-                            },
-                        },
-                    },
-                },
-                address: true,
-            },
+            include: extraUserFields,
         });
 
         if (!user) {

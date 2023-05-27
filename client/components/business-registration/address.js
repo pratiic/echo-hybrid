@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Head from "next/head";
 import { useDispatch } from "react-redux";
 
 import { provinceOptions, districtOptions } from "../../lib/address";
@@ -12,7 +11,7 @@ import Form from "../form";
 import InputGroup from "../input-group";
 import Button from "../button";
 
-const BusinessAddress = ({ address }) => {
+const BusinessAddress = ({ business, setBusiness }) => {
     const [province, setProvince] = useState("bagmati");
     const [provinceError, setProvinceError] = useState("");
     const [city, setCity] = useState("");
@@ -48,19 +47,20 @@ const BusinessAddress = ({ address }) => {
         ]);
 
         try {
-            await fetcher("addresses/business", "POST", {
+            const data = await fetcher("addresses/business", "POST", {
                 province,
                 city,
                 area,
                 description,
             });
 
+            setBusiness({ ...business, address: data.address });
             dispatch(setAlert({ message: "business address has been set" }));
             router.push("/business-registration/?view=pending");
         } catch (error) {
             displayError(
                 error.message,
-                ["province", "district", "city", "area", "description"],
+                ["province", "city", "area", "description"],
                 [
                     setProvinceError,
                     setCityError,

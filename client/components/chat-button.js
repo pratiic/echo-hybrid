@@ -9,17 +9,17 @@ import Button from "./button";
 import Icon from "./icon";
 
 const ChatButton = ({
+    userId,
     small,
     fullText = false,
     role = "seller",
     isDisabled,
 }) => {
-    // const router = useRouter();
+    const router = useRouter();
     const { theme } = useSelector((state) => state.theme);
 
     const openChat = () => {
-        // router.push(`/chats/${userId}`);
-        console.log("chat");
+        router.push(`/chats/${userId}`);
     };
 
     return small ? (

@@ -20,26 +20,20 @@ import InfoUnit from "./info-unit";
 import CountController from "./count-controller";
 import Icon from "./icon";
 import ProductControl from "./product-control";
-import DeliveryInfo from "./delivery-info";
 
 const CartItem = ({ id, product, variant, quantity }) => {
     const [maxQuantity, setMaxQuantity] = useState(0);
     const [isDelivered, setIsDelivered] = useState(false);
 
     const dispatch = useDispatch();
-    const {
-        id: productId,
-        price,
-        deliveryType,
-        deliveryCharge,
-        stock,
-    } = product;
     const router = useRouter();
     const { authUser } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        setMaxQuantity(parseInt(variant ? variant?.quantity : stock?.quantity));
-    }, [stock, variant]);
+        setMaxQuantity(
+            parseInt(variant ? variant?.quantity : product?.stock?.quantity)
+        );
+    }, [product?.stock, variant]);
 
     useEffect(() => {
         if (parseInt(quantity) === 0) {
@@ -62,8 +56,8 @@ const CartItem = ({ id, product, variant, quantity }) => {
         dispatch(showLoadingModal("updating cart item..."));
 
         try {
-            const data = await fetcher(`carts/${productId}`, "POST", {
-                productId,
+            const data = await fetcher(`carts/${product?.id}`, "POST", {
+                productId: product?.id,
                 variantId: variant?.id,
                 quantity: quantity,
             });
@@ -120,13 +114,19 @@ const CartItem = ({ id, product, variant, quantity }) => {
 
                         <InfoUnit
                             label="unit price"
-                            value={addCommas(price)}
+                            value={addCommas(product?.price)}
                             hasMoney={true}
                         />
 
                         <InfoUnit
                             label="delivery"
-                            value={isDelivered ? "available" : "not available"}
+                            value={
+                                !authUser?.address
+                                    ? "address not set"
+                                    : isDelivered
+                                    ? "available"
+                                    : "not available"
+                            }
                         />
 
                         {isDelivered && (
@@ -141,7 +141,11 @@ const CartItem = ({ id, product, variant, quantity }) => {
                     <InfoUnit
                         label="subtotal"
                         hasMoney={true}
-                        value={getSubtotal(price, quantity, deliveryCharge)}
+                        value={getSubtotal(
+                            product?.price,
+                            quantity,
+                            product?.deliveryCharge
+                        )}
                         highlight
                     />
                 </div>
@@ -173,7 +177,7 @@ const CartItem = ({ id, product, variant, quantity }) => {
                             quantity={quantity}
                             variant={variant}
                             variantId={variant?.id}
-                            productId={productId}
+                            productId={product?.id}
                             canAddToCart={false}
                             product={product}
                         />

@@ -4,6 +4,7 @@ import { InformationCircleIcon } from "@heroicons/react/outline";
 
 import { updateActiveProduct } from "../../redux/slices/products-slice";
 import { capitalizeFirstLetter, addCommas } from "../../lib/strings";
+import { setAlert } from "../../redux/slices/alerts-slice";
 
 import ChatButton from "../chat-button";
 import Rating from "../rating";
@@ -14,14 +15,12 @@ import Tag from "../tag";
 
 const PrimaryInfo = ({
     id,
-    store,
     name,
     price,
     per,
     images,
     description,
     rating,
-    brand,
     toggleSecondaryInfo,
     isMyProduct,
     isSecondHand,
@@ -29,8 +28,8 @@ const PrimaryInfo = ({
     const dispatch = useDispatch();
 
     const handleImageDeletion = (images) => {
-        dispatch(updateActiveProduct(images));
-        dispatch(setAlert({ message: "product image deleted successfully" }));
+        dispatch(updateActiveProduct({ images }));
+        dispatch(setAlert({ message: "product image has been deleted" }));
     };
 
     return (

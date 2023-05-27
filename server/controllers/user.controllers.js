@@ -121,7 +121,7 @@ export const deleteAvatar = async (request, response, next) => {
 
 export const getUserDetails = async (request, response, next) => {
     // for test purposes
-    const email = request.body.email || "";
+    const email = request.params.email;
 
     try {
         const user = await prisma.user.findUnique({
@@ -139,4 +139,10 @@ export const getUserDetails = async (request, response, next) => {
     } catch (error) {
         next(new HttpError());
     }
+};
+
+export const getSelfDetails = async (request, response, next) => {
+    const user = request.user;
+
+    response.json({ user });
 };

@@ -45,7 +45,7 @@ const OrderHead = ({ product, variant, quantity }) => {
                     <p className="black-white">x {quantity}</p>
                 )}
 
-                {product.isSecondHand && (
+                {product?.isSecondHand && (
                     <React.Fragment>
                         <Tag text="second hand" />
 

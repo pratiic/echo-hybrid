@@ -13,6 +13,8 @@ import PopupGallery from "./popup-gallery";
 import Products from "../cache/products";
 import Notification from "../real-time/notification";
 import Rating from "../real-time/rating";
+import Chat from "../real-time/chat";
+import { updateAuthUser } from "../redux/slices/auth-slice";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -50,10 +52,22 @@ const Layout = ({ children }) => {
         fetchCategories();
     }, []);
 
+    useEffect(() => {
+        fetchSelfDetails();
+    }, []);
+
     const fetchCategories = async () => {
         try {
             const data = await fetcher("categories");
             dispatch(setCategories(data.categories));
+        } catch (error) {}
+    };
+
+    const fetchSelfDetails = async () => {
+        try {
+            const data = await fetcher("users");
+
+            dispatch(updateAuthUser({ ...data.user }));
         } catch (error) {}
     };
 
@@ -69,6 +83,7 @@ const Layout = ({ children }) => {
                         {/* fake components for real time  */}
                         <Notification />
                         <Rating />
+                        <Chat />
 
                         {/* fake components to preserve cache */}
                         <Products />

@@ -6,6 +6,7 @@ import { genericUserFields } from "../lib/data-source.lib.js";
 export const startChat = async (request, response, next) => {
     const reqUser = request.user;
     const chatUserId = parseInt(request.params.userId) || 0;
+    const io = request.io;
 
     // cannot start a chat with oneself
     if (chatUserId === reqUser.id) {
@@ -84,7 +85,43 @@ export const startChat = async (request, response, next) => {
             },
         });
 
+        io.emit("new-chat", getChatData(createdChat));
+
         response.status(201).json({ chat: getChatData(createdChat) });
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
+export const getChats = async (request, response, next) => {
+    const user = request.user;
+
+    try {
+        const chats = await prisma.chat.findMany({
+            where: {
+                userIds: {
+                    has: user.id,
+                },
+            },
+            include: {
+                users: {
+                    select: {
+                        user: {
+                            select: genericUserFields,
+                        },
+                    },
+                },
+            },
+            orderBy: {
+                updatedAt: "desc",
+            },
+        });
+
+        response.json({
+            chats: chats.map((chat) => {
+                return getChatData(chat);
+            }),
+        });
     } catch (error) {
         next(new HttpError());
     }

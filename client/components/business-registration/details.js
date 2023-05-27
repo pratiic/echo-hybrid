@@ -130,10 +130,6 @@ const BusinessDetails = ({ business, handleCancellation }) => {
 
     return (
         <section>
-            <Head>
-                <title>Register business | provide details</title>
-            </Head>
-
             <Form onSubmit={handleFormSubmit}>
                 <InputGroup
                     label="name"

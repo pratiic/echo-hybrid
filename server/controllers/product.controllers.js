@@ -77,7 +77,6 @@ export const postProduct = async (request, response, next) => {
                 brand,
                 madeIn,
                 stockType: forBusiness ? stockType : null,
-                isActive: forBusiness ? false : true, // brand new products are activated only after setting the stock
                 deliveryCharge: parseInt(deliveryCharge),
                 categoryName: category,
                 subCategory,
@@ -317,24 +316,30 @@ export const deleteProduct = async (request, response, next) => {
     const product = request.product;
 
     try {
-        await prisma.product.update({
-            where: { id: product.id },
-            data: {
-                storeId: null,
-            },
+        await prisma.$transaction(async (prisma) => {
+            await prisma.product.update({
+                where: { id: product.id },
+                data: {
+                    storeId: null,
+                    isDeleted: true,
+                    categoryName: null,
+                },
+            });
+
+            await Promise.all(
+                ["review", "rating", "productVariation", "stock"].map(
+                    (model) => {
+                        return prisma[model].deleteMany({
+                            where: {
+                                productId: product.id,
+                            },
+                        });
+                    }
+                )
+            );
         });
 
-        await Promise.all(
-            ["review"].map((model) => {
-                return prisma[model].deleteMany({
-                    where: {
-                        productId: product.id,
-                    },
-                });
-            })
-        );
-
-        response.json({ message: "product deleted" });
+        response.json({ message: "the product has been deleted" });
     } catch (error) {
         next(new HttpError());
     }

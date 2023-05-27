@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
+import Head from "next/head";
 
 import { fetcher } from "../lib/fetcher";
 import { updateAuthUser } from "../redux/slices/auth-slice";
@@ -78,6 +79,10 @@ const Sell = () => {
 
     return (
         <section>
+            <Head>
+                <title>Sell on Echo</title>
+            </Head>
+
             <PageHeader
                 heading="Sell on Echo"
                 hasBackArrow={true}
