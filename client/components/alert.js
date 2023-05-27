@@ -60,7 +60,7 @@ const Alert = ({ id, message, type = "success", active }) => {
 
     return (
         <div
-            className={`flex items-center mt-2 px-5 py-[10px] rounded relative max-w-[450px] w-fit ml-auto ${classNameMap[type]}`}
+            className={`flex items-center mt-2 px-5 py-[10px] rounded relative w-fit ml-auto ${classNameMap[type]}`}
         >
             {/* alert icon */}
             {iconMap[type]}

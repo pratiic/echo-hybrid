@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
-import { provinceOptions, districtOptions } from "../../../lib/address";
-import { clearErrors, displayError } from "../../../lib/validation";
-import { fetcher } from "../../../lib/fetcher";
-import { setAlert } from "../../../redux/slices/alerts-slice";
+import { provinceOptions, districtOptions } from "../../lib/address";
+import { clearErrors, displayError } from "../../lib/validation";
+import { fetcher } from "../../lib/fetcher";
+import { setAlert } from "../../redux/slices/alerts-slice";
 
-import Form from "../../../components/form";
-import InputGroup from "../../../components/input-group";
-import Button from "../../../components/button";
+import Form from "../form";
+import InputGroup from "../input-group";
+import Button from "../button";
 
-const Address = () => {
+const BusinessAddress = ({ address }) => {
     const [province, setProvince] = useState("bagmati");
     const [provinceError, setProvinceError] = useState("");
     const [city, setCity] = useState("");
@@ -22,10 +22,6 @@ const Address = () => {
     const [description, setDescription] = useState("");
     const [descriptionError, setDescriptionError] = useState("");
     const [requesting, setRequesting] = useState(false);
-    const [address, setAddress] = useState(null);
-    const [fetching, setFetching] = useState(false);
-
-    const { authUser } = useSelector((state) => state.auth);
 
     const router = useRouter();
     const dispatch = useDispatch();
@@ -34,38 +30,10 @@ const Address = () => {
         setCity(province === "bagmati" ? "kathmandu" : "");
     }, [province]);
 
-    useEffect(() => {
-        if (authUser) {
-            fetchBusinessAddress();
-        }
-    }, [authUser]);
-
-    useEffect(() => {
-        if (address) {
-            // business has already been registered and address has already been set
-            router.push("/");
-        }
-    }, [address]);
-
-    const fetchBusinessAddress = async () => {
-        setFetching(true);
-
-        try {
-            const data = await fetcher("businesses/0");
-
-            if (data.business.address) {
-                setAddress(data.business.address);
-            }
-        } catch (error) {
-        } finally {
-            setFetching(false);
-        }
-    };
-
     const handleBackClick = (event) => {
         event.preventDefault();
 
-        router.push("/business-registration/details");
+        router.push("/business-registration/?view=details");
     };
 
     const handleFormSubmit = async (event) => {
@@ -88,8 +56,7 @@ const Address = () => {
             });
 
             dispatch(setAlert({ message: "business address has been set" }));
-
-            router.push("/set-product");
+            router.push("/business-registration/?view=pending");
         } catch (error) {
             displayError(
                 error.message,
@@ -108,11 +75,7 @@ const Address = () => {
 
     return (
         <section>
-            <Head>Register Business</Head>
-
-            {/* <PageHeader heading="Set business address" hasBackArrow={true} /> */}
-
-            <Form heading="Set business address" onSubmit={handleFormSubmit}>
+            <Form onSubmit={handleFormSubmit}>
                 <InputGroup
                     label="province"
                     view="select"
@@ -158,7 +121,7 @@ const Address = () => {
                         go back
                     </Button>
 
-                    <Button loading={requesting || fetching} rounded={false}>
+                    <Button loading={requesting} rounded={false}>
                         {requesting ? "setting" : "set"} address
                     </Button>
                 </div>
@@ -167,4 +130,4 @@ const Address = () => {
     );
 };
 
-export default Address;
+export default BusinessAddress;

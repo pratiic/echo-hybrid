@@ -51,13 +51,9 @@ const SetProduct = () => {
         }
 
         //redirect if business has not been registered and verified
-        if (store && store?.storeType === "BUS") {
-            if (!store?.business) {
-                router.push("/business-registration/details");
-            }
-
-            if (store?.business && !store?.business?.isVerified) {
-                router.push("/business-registration/details");
+        if (store?.storeType === "BUS") {
+            if (!store?.business || !store?.business?.isVerified) {
+                router.push("/business-registration");
             }
         }
     }, [authUser?.store]);

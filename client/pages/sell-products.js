@@ -5,12 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetcher } from "../lib/fetcher";
 import { updateAuthUser } from "../redux/slices/auth-slice";
 import { closeModal, showConfirmationModal } from "../redux/slices/modal-slice";
+import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 
 import PageHeader from "../components/page-header";
 import InfoBanner from "../components/info-banner";
 import SellerCard from "../components/seller-card";
 import Button from "../components/button";
-import { setErrorAlert } from "../redux/slices/alerts-slice";
 
 const Sell = () => {
     const [type, setType] = useState("individual");
@@ -24,23 +24,25 @@ const Sell = () => {
         // already registered as a seller -> redirect
         let route = "";
 
-        if (authUser && authUser?.store) {
+        if (authUser?.store) {
             if (authUser.store.storeType === "IND") {
                 route = "/set-product";
             } else {
-                route = "/business-registration/details";
+                route = "/business-registration/?view=details";
             }
 
             router.push(route);
         }
     }, [authUser]);
 
-    const handleButtonClick = () => {
+    const handleContinueClick = () => {
         //remove modal if not needed
 
         return dispatch(
             showConfirmationModal({
-                message: "Are you sure you want to continue?",
+                message: `Are you sure you want to continue as ${
+                    type === "individual" ? "an individual" : "a business"
+                } seller ?`,
                 handler: async () => {
                     setLoading(true);
 
@@ -54,10 +56,15 @@ const Sell = () => {
                         const { id, storeType } = data.store;
 
                         dispatch(updateAuthUser({ store: { id, storeType } }));
-
-                        if (type === "business") {
-                            router.push("/business-registration/details");
-                        }
+                        dispatch(
+                            setAlert({
+                                message: `you have been registered to sell as ${
+                                    type === "individual"
+                                        ? "an individual"
+                                        : "a business"
+                                }`,
+                            })
+                        );
                     } catch (error) {
                         dispatch(setErrorAlert(error.message));
                     } finally {
@@ -77,7 +84,7 @@ const Sell = () => {
                 isHeadingComponent
             />
 
-            <InfoBanner liftUp={false} className="space-y-3">
+            <InfoBanner className="space-y-3">
                 <p className="font-semibold">
                     There are two ways of selling products on Echo:
                 </p>
@@ -109,7 +116,7 @@ const Sell = () => {
                 />
             </div>
 
-            <Button loading={loading} onClick={handleButtonClick}>
+            <Button loading={loading} onClick={handleContinueClick}>
                 continue
             </Button>
         </section>
