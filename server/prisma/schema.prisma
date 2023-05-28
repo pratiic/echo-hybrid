@@ -119,7 +119,6 @@ model Product {
     per            String?
     isSecondHand   Boolean
     images         String[]
-    isActive       Boolean  @default(false)
     brand          String?
     madeIn         String?
     stockType      String?
@@ -223,7 +222,6 @@ model Reply {
 model Address {
     id          Int     @id @default(autoincrement())
     province    String
-    district    String? @default("")
     city        String
     area        String
     description String? @default("")
@@ -316,9 +314,9 @@ model Message {
     seen    Boolean @default(false)
     deleted Boolean @default(false)
 
-    chat   Chat   @relation(fields: [chatId], references: [id])
+    chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
     chatId String
-    user   User   @relation(fields: [userId], references: [id])
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId Int
 
     createdAt DateTime @default(now())

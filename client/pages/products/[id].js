@@ -14,12 +14,12 @@ import ProductInfo from "../../components/product-info";
 import Rating from "../../components/rating";
 import CommentsContainer from "../../components/comments-container";
 import StockView from "../../components/stock-view";
+import ProductMenu from "../../components/product-menu";
 
 const ProductPage = () => {
     const [loadingDetails, setLoadingDetails] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [isMyProduct, setIsMyProduct] = useState(false);
-    const [showDropdown, setShowDropdown] = useState(false);
     const [isDeleted, setIsDeleted] = useState(false);
 
     const { authUser } = useSelector((state) => state.auth);
@@ -78,6 +78,8 @@ const ProductPage = () => {
                 <div className="flex-1">
                     <ProductInfo {...activeProduct} isMyProduct={isMyProduct} />
                 </div>
+
+                <ProductMenu isMyProduct={isMyProduct} />
             </div>
 
             <div
@@ -136,11 +138,13 @@ const ProductPage = () => {
                 )}
             </div>
 
-            <CommentsContainer
-                contentId={activeProduct?.id}
-                contentOwner={activeProduct?.store?.user}
-                contentName={activeProduct?.name}
-            />
+            {!activeProduct?.isSecondHand && (
+                <CommentsContainer
+                    contentId={activeProduct?.id}
+                    contentOwner={activeProduct?.store?.user}
+                    contentName={activeProduct?.name}
+                />
+            )}
         </section>
     );
 };

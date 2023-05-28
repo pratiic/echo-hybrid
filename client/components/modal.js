@@ -73,7 +73,12 @@ const Modal = () => {
                             {capitalizeFirstLetter(message)}
                         </h3>
                         <div className="flex space-x-2">
-                            <Button small full onClick={confirmationHandler}>
+                            <Button
+                                small
+                                full
+                                rounded={false}
+                                onClick={confirmationHandler}
+                            >
                                 Yes
                             </Button>
 
@@ -81,6 +86,7 @@ const Modal = () => {
                                 type="secondary"
                                 small
                                 full
+                                rounded={false}
                                 onClick={() => dispatch(closeModal())}
                             >
                                 No

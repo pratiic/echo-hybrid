@@ -15,6 +15,7 @@ const Header = () => {
         return (
             <Button
                 type="secondary"
+                rounded={false}
                 onClick={() =>
                     router.push(
                         router.pathname.includes("signup")

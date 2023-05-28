@@ -102,6 +102,9 @@ export const setCartItem = async (request, response, next) => {
 
             const cartItem = await prisma.cartItem.create({
                 data: itemData,
+                include: {
+                    product: true,
+                },
             });
 
             response.json({ item: cartItem });
@@ -174,10 +177,16 @@ export const setCartItem = async (request, response, next) => {
                         id: existingItem.id,
                     },
                     data: itemData,
+                    include: {
+                        product: true,
+                    },
                 });
             } else {
                 finalItem = await prisma.cartItem.create({
                     data: itemData,
+                    include: {
+                        product: true,
+                    },
                 });
             }
 

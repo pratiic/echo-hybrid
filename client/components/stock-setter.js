@@ -268,6 +268,19 @@ const StockSetter = ({
                             }`}
                             key={index}
                         >
+                            {/* if updating stock, show edit icon, otherwise show delete icon */}
+                            {currentStock ? (
+                                <PencilAltIcon
+                                    className="icon-small"
+                                    onClick={() => handleUpdateClick(index)}
+                                />
+                            ) : (
+                                <XIcon
+                                    className="icon-small"
+                                    onClick={() => handleDeleteClick(index)}
+                                />
+                            )}
+
                             {variantLabels.map((variantLabel, index) => {
                                 // do not show the id of a variant
                                 if (variantLabel !== "id") {
@@ -281,21 +294,18 @@ const StockSetter = ({
                                     );
                                 }
                             })}
-                            {/* if updating stock, show edit icon, otherwise show delete icon */}
-                            {currentStock ? (
-                                <PencilAltIcon
-                                    className="icon-small"
-                                    onClick={() => handleUpdateClick(index)}
-                                />
-                            ) : (
-                                <XIcon
-                                    className="icon-small"
-                                    onClick={() => handleDeleteClick(index)}
-                                />
-                            )}
                         </div>
                     );
                 })}
+
+                <div className="flex items-center justify-between px-3 mb-3 text-blue-four text-sm font-semibold">
+                    <span>TOTAL</span>
+                    <span>
+                        {variants.reduce((prev, curr) => {
+                            return prev + parseInt(curr.quantity) || 0;
+                        }, 0)}
+                    </span>
+                </div>
             </div>
         );
     };
@@ -360,7 +370,7 @@ const StockSetter = ({
 
                 {error && <p className="error mb-3">{error}</p>}
 
-                <Button loading={settingStock} full>
+                <Button loading={settingStock} full rounded={false}>
                     {settingStock
                         ? currentStock
                             ? "updating"

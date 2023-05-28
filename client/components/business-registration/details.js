@@ -3,17 +3,18 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { useDispatch, useSelector } from "react-redux";
 
-import { fetcher } from "../../../lib/fetcher";
-import { clearErrors, displayError } from "../../../lib/validation";
-import { generateFormData } from "../../../lib/form-data";
-import { setAlert } from "../../../redux/slices/alerts-slice";
+import { clearErrors, displayError } from "../../lib/validation";
+import { generateFormData } from "../../lib/form-data";
+import { setAlert } from "../../redux/slices/alerts-slice";
+import { updateAuthUser } from "../../redux/slices/auth-slice";
+import { fetcher } from "../../lib/fetcher";
 
-import Button from "../../../components/button";
-import Form from "../../../components/form";
-import InputGroup from "../../../components/input-group";
-import FileSelector from "../../../components/file-selector";
+import Button from "../button";
+import Form from "../form";
+import InputGroup from "../input-group";
+import FileSelector from "../file-selector";
 
-const Details = () => {
+const BusinessDetails = ({ business, handleCancellation }) => {
     const [name, setName] = useState("");
     const [nameError, setNameError] = useState("");
     const [ownerName, setOwnerName] = useState("");
@@ -25,7 +26,6 @@ const Details = () => {
     const [regImage, setRegImage] = useState(null);
     const [regImageError, setRegImageError] = useState("");
     const [registering, setRegistering] = useState(false);
-    const [business, setBusiness] = useState(null);
     const [fetching, setFetching] = useState(false);
     const [fieldsDisabled, setFieldsDisabled] = useState(false);
 
@@ -36,18 +36,14 @@ const Details = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (authUser) {
-            fetchUserBusiness();
-        }
-    }, [authUser]);
-
-    useEffect(() => {
         if (business) {
             setFieldsDisabled(true);
 
-            if (business.address) {
-                // business has already been registered and address has already been set
+            if (business.isVerified) {
                 router.push("/set-product");
+            } else if (business.address) {
+                // business has already been registered and address has already been set
+                router.push("/business-registration/?view=pending");
             } else {
                 // business has been already registered
                 const { name, ownerName, PAN, phone } = business;
@@ -65,24 +61,12 @@ const Details = () => {
         }
     }, [selectedFiles]);
 
-    const fetchUserBusiness = async () => {
-        setFetching(true);
-
-        try {
-            const data = await fetcher(`businesses/0`);
-            setBusiness(data.business);
-        } catch (error) {
-        } finally {
-            setFetching(false);
-        }
-    };
-
     const handleFormSubmit = async (event) => {
         event.preventDefault();
 
         // business registered, address not set and not updating -> simply route to the address set page
         if (business) {
-            return router.push("/business-registration/address");
+            return router.push("/business-registration/?view=address");
         }
 
         clearErrors([
@@ -101,11 +85,22 @@ const Details = () => {
                 formData.append("image", regImage);
             }
 
-            await fetcher("businesses", "POST", formData);
+            const data = await fetcher("businesses", "POST", formData);
 
-            dispatch(setAlert({ message: "business details has been set" }));
+            dispatch(
+                updateAuthUser({
+                    store: {
+                        ...authUser?.store,
+                        business: {
+                            id: data.business.id,
+                            isVerified: data.business.isVerified,
+                        },
+                    },
+                })
+            );
+            dispatch(setAlert({ message: "business details have been set" }));
 
-            router.push("/business-registration/address");
+            router.push("/business-registration/?view=address");
         } catch (error) {
             if (error.message.toLowerCase() === "file too large") {
                 return setRegImageError(error.message);
@@ -133,29 +128,9 @@ const Details = () => {
         }
     };
 
-    const handleCancelClick = async (event) => {
-        event.preventDefault();
-
-        try {
-            await fetcher(`businesses/${business?.id}`, "DELETE");
-            router.push("/");
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
     return (
         <section>
-            <Head>
-                <title>Register business | provide details</title>
-            </Head>
-
-            {/* <PageHeader heading="register your business" hasBackArrow /> */}
-
-            <Form
-                heading="Provide business details"
-                onSubmit={handleFormSubmit}
-            >
+            <Form onSubmit={handleFormSubmit}>
                 <InputGroup
                     label="name"
                     value={name}
@@ -204,11 +179,19 @@ const Details = () => {
 
                 <div className="flex items-center justify-between">
                     {business && (
-                        <Button type="secondary" onClick={handleCancelClick}>
+                        <Button
+                            type="tertiary"
+                            rounded={false}
+                            onClick={handleCancellation}
+                        >
                             cancel reigstration
                         </Button>
                     )}
-                    <Button loading={registering || fetching} full={!business}>
+                    <Button
+                        loading={registering || fetching}
+                        full={!business}
+                        rounded={false}
+                    >
                         Continue
                     </Button>
                 </div>
@@ -217,4 +200,4 @@ const Details = () => {
     );
 };
 
-export default Details;
+export default BusinessDetails;

@@ -55,11 +55,15 @@ const Home = () => {
                     </div>
 
                     <div className="flex items-center space-x-5">
-                        <Button onClick={() => router.push("/signup")}>
+                        <Button
+                            rounded={false}
+                            onClick={() => router.push("/signup")}
+                        >
                             Get Started
                         </Button>
                         <Button
                             type="secondary"
+                            rounded={false}
                             onClick={() => router.push("/signin")}
                         >
                             Sign In

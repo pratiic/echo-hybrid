@@ -4,6 +4,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import { ShoppingCartIcon } from "@heroicons/react/outline";
 
 import { fetcher } from "../lib/fetcher";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
@@ -15,7 +16,7 @@ import {
 import { addCartItem } from "../redux/slices/cart-slice";
 
 import Button from "./button";
-// import OrderDetails from "./order-details";
+import OrderDetails from "./order-details";
 
 const ProductControl = ({
     quantity,
@@ -32,16 +33,16 @@ const ProductControl = ({
     const router = useRouter();
 
     const handleOrderClick = () => {
-        // dispatch(
-        //     showGenericModal(
-        //         <OrderDetails
-        //             quantity={quantity}
-        //             variant={variant}
-        //             variantId={variantId}
-        //             product={product || activeProduct}
-        //         />
-        //     )
-        // );
+        dispatch(
+            showGenericModal(
+                <OrderDetails
+                    quantity={quantity}
+                    variant={variant}
+                    variantId={variantId}
+                    product={product || activeProduct}
+                />
+            )
+        );
     };
 
     const handleCartClick = async () => {
@@ -53,13 +54,11 @@ const ProductControl = ({
                 quantity,
             });
             dispatch(addCartItem(data.item));
-
             router.push("/cart");
         } catch (error) {
             if (error.message.includes("already exists")) {
-                return dispatch(
-                    setAlert({ type: "info", message: error.message })
-                );
+                dispatch(setAlert({ type: "info", message: error.message }));
+                return router.push("/cart");
             }
 
             dispatch(setErrorAlert(error.message));

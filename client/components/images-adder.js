@@ -3,18 +3,19 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { capitalizeFirstLetter } from "../lib/strings";
-
-import FileSelector from "./file-selector";
-import Button from "./button";
 import { fetcher } from "../lib/fetcher";
-import { setActiveIndex } from "../redux/slices/gallery-slice";
-import { setActiveProduct } from "../redux/slices/products-slice";
+import {
+    setActiveProduct,
+    updateActiveProduct,
+} from "../redux/slices/products-slice";
 import { closeModal } from "../redux/slices/modal-slice";
 import { setAlert } from "../redux/slices/alerts-slice";
 
+import FileSelector from "./file-selector";
+import Button from "./button";
+
 const ImagesAdder = ({ currentCount }) => {
     const { selectedFiles } = useSelector((state) => state.files);
-    const { authUser } = useSelector((state) => state.auth);
     const { activeProduct } = useSelector((state) => state.products);
 
     const [max, setMax] = useState(5 - currentCount - selectedFiles.length);
@@ -50,11 +51,10 @@ const ImagesAdder = ({ currentCount }) => {
             );
 
             dispatch(
-                setActiveProduct({
+                updateActiveProduct({
                     images: [...activeProduct.images, ...data.images],
                 })
             );
-
             dispatch(closeModal());
             dispatch(setAlert({ message: "product images have been added" }));
         } catch (error) {

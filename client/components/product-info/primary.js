@@ -1,31 +1,26 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import {
-    CheckCircleIcon,
-    XCircleIcon,
-    InformationCircleIcon,
-} from "@heroicons/react/outline";
+import { InformationCircleIcon } from "@heroicons/react/outline";
 
 import { updateActiveProduct } from "../../redux/slices/products-slice";
 import { capitalizeFirstLetter, addCommas } from "../../lib/strings";
+import { setAlert } from "../../redux/slices/alerts-slice";
 
 import ChatButton from "../chat-button";
 import Rating from "../rating";
 import Gallery from "../gallery";
 import ProductControl from "../product-control";
-import Button from "../button";
 import Icon from "../icon";
+import Tag from "../tag";
 
 const PrimaryInfo = ({
     id,
-    store,
     name,
     price,
     per,
     images,
     description,
     rating,
-    brand,
     toggleSecondaryInfo,
     isMyProduct,
     isSecondHand,
@@ -33,8 +28,8 @@ const PrimaryInfo = ({
     const dispatch = useDispatch();
 
     const handleImageDeletion = (images) => {
-        dispatch(updateActiveProduct(images));
-        dispatch(setAlert({ message: "product image deleted successfully" }));
+        dispatch(updateActiveProduct({ images }));
+        dispatch(setAlert({ message: "product image has been deleted" }));
     };
 
     return (
@@ -59,28 +54,11 @@ const PrimaryInfo = ({
                         <Rating rating={rating} small onlyStars />
                     )}
 
-                    {/* brand info */}
-                    <div
-                        className={`flex items-center space-x-2 my-2 dark-light`}
-                    >
-                        <p className="text-xs font-semibold border-r-2 border-gray-300 dark:border-gray-700 pr-2">
-                            <span>Brand</span>
-                            <span className="black-white">
-                                {" "}
-                                {!brand
-                                    ? "no brand"
-                                    : capitalizeFirstLetter(brand)}
-                            </span>
-                        </p>
-
-                        <p className="flex items-center text-xs font-semibold">
-                            <span className="mr-1">Second hand</span>
-                            {isSecondHand ? (
-                                <CheckCircleIcon className="icon-no-bg" />
-                            ) : (
-                                <XCircleIcon className="icon-no-bg" />
-                            )}
-                        </p>
+                    {/* product state info */}
+                    <div className="mt-3 mb-2">
+                        <Tag
+                            text={isSecondHand ? "second hand" : "brand new"}
+                        />
                     </div>
 
                     {/* product price  */}

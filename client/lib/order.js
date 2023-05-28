@@ -5,13 +5,16 @@ export const getSubtotal = (
     unitPrice,
     quantity,
     deliveryCharge,
-    commas = true
+    commas = true,
+    isDelivered = true
 ) => {
-    if (!deliveryCharge) {
+    if (!deliveryCharge || !isDelivered) {
         deliveryCharge = 0;
     }
 
-    const subtotal = convertToMoney(deliveryCharge + quantity * unitPrice);
+    const subtotal = convertToMoney(
+        deliveryCharge + (quantity || 1) * unitPrice
+    );
 
     return commas ? addCommas(subtotal) : subtotal;
 };

@@ -74,7 +74,6 @@ export const registerBusiness = async (request, response, next) => {
                 ownerName,
                 PAN,
                 phone,
-                isVerified: true,
                 storeId: store.id,
             },
         });
@@ -270,11 +269,18 @@ export const deleteBusiness = async (request, response, next) => {
     }
 
     try {
-        await prisma.business.delete({
-            where: {
-                id: business.id,
-            },
-        });
+        await Promise.all([
+            prisma.business.delete({
+                where: {
+                    id: business.id,
+                },
+            }),
+            prisma.store.delete({
+                where: {
+                    userId: user.id,
+                },
+            }),
+        ]);
 
         response.json({
             message: "business has been deleted",

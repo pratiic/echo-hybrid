@@ -9,17 +9,17 @@ import Button from "./button";
 import Icon from "./icon";
 
 const ChatButton = ({
+    userId,
     small,
     fullText = false,
     role = "seller",
     isDisabled,
 }) => {
-    // const router = useRouter();
+    const router = useRouter();
     const { theme } = useSelector((state) => state.theme);
 
     const openChat = () => {
-        // router.push(`/chats/${userId}`);
-        console.log("chat");
+        router.push(`/chats/${userId}`);
     };
 
     return small ? (
@@ -37,7 +37,7 @@ const ChatButton = ({
             onClick={openChat}
         >
             <span className="flex items-center">
-                <ChatAlt2Icon className="icon-no-bg mr-1 text-blue-400" />
+                <ChatAlt2Icon className="icon-no-bg mr-2" />
                 {!fullText
                     ? "Chat Now"
                     : `Chat with ${capitalizeFirstLetter(role)}`}

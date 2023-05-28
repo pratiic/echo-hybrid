@@ -3,6 +3,9 @@ import Spinner from "./spinner";
 import Button from "./button";
 import NotificationCard from "./notification-card";
 import CartItem from "./cart-item";
+import UserCard from "./user-card";
+
+import Human from "./human";
 
 const ContentList = ({
     list = [],
@@ -23,13 +26,11 @@ const ContentList = ({
     }
 
     if (list.length === 0) {
-        // return human ? (
-        //     <Human name={human} message={emptyMsg} />
-        // ) : (
-        //     <p className="status">{emptyMsg}</p>
-        // );
-
-        return <p className="status">{emptyMsg}</p>;
+        return human ? (
+            <Human name={human} message={emptyMsg} />
+        ) : (
+            <p className="status">{emptyMsg}</p>
+        );
     }
 
     return (

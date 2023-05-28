@@ -77,7 +77,6 @@ export const postProduct = async (request, response, next) => {
                 brand,
                 madeIn,
                 stockType: forBusiness ? stockType : null,
-                isActive: forBusiness ? false : true, // brand new products are activated only after setting the stock
                 deliveryCharge: parseInt(deliveryCharge),
                 categoryName: category,
                 subCategory,
@@ -125,10 +124,14 @@ export const getProducts = async (request, response, next) => {
     user.address = user.address || {};
     const filter = request.query.filter || "all";
     const sortType = request.query.sortType || "desc";
-    const sortBy = request.query.sortBy || "createdAt";
+    let sortBy = request.query.sortBy || "createdAt";
     const category = request.query.category;
     const searchQuery = request.query.query || "";
     const storeId = parseInt(request.query.storeId);
+
+    if (sortBy === "date added") {
+        sortBy = "createdAt";
+    }
 
     const getAddressFilter = (field) => {
         return {
@@ -313,24 +316,30 @@ export const deleteProduct = async (request, response, next) => {
     const product = request.product;
 
     try {
-        await prisma.product.update({
-            where: { id: product.id },
-            data: {
-                storeId: null,
-            },
+        await prisma.$transaction(async (prisma) => {
+            await prisma.product.update({
+                where: { id: product.id },
+                data: {
+                    storeId: null,
+                    isDeleted: true,
+                    categoryName: null,
+                },
+            });
+
+            await Promise.all(
+                ["review", "rating", "productVariation", "stock"].map(
+                    (model) => {
+                        return prisma[model].deleteMany({
+                            where: {
+                                productId: product.id,
+                            },
+                        });
+                    }
+                )
+            );
         });
 
-        await Promise.all(
-            ["review"].map((model) => {
-                return prisma[model].deleteMany({
-                    where: {
-                        productId: product.id,
-                    },
-                });
-            })
-        );
-
-        response.json({ message: "product deleted" });
+        response.json({ message: "the product has been deleted" });
     } catch (error) {
         next(new HttpError());
     }

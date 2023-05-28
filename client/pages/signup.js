@@ -132,7 +132,7 @@ const SignUp = () => {
                     onChange={setrepeatedPassword}
                 />
 
-                <Button loading={signingUp} full>
+                <Button loading={signingUp} full rounded={false}>
                     {signingUp ? "signing up" : "sign up"}
                 </Button>
             </Form>
