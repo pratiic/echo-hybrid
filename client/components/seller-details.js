@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { MdOutlineContactPhone } from "react-icons/md";
+import { AiOutlineMail } from "react-icons/ai";
 import { LocationMarkerIcon, CalendarIcon } from "@heroicons/react/outline";
 
 import { getHowLongAgo, getDate } from "../lib/date-time";
@@ -23,8 +23,8 @@ const SellerDetails = ({ storeDetails, loading, errorMsg }) => {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex">
+    <div className="space-y-7 flex flex-col">
+      <div className="flex flex-1 850:mb-0">
         <Image
           className="rounded image w-full h-full"
           containerClassName="mr-3 450:mr-5 max-w-[8rem] 450:max-w-[10rem] max-h-[8rem] 450:max-h-40 550:max-w-[12rem] 550:max-h-48 550:mr-7"
@@ -35,7 +35,7 @@ const SellerDetails = ({ storeDetails, loading, errorMsg }) => {
           }
         />
 
-        <div className="">
+        <div className="mr-[6rem]">
           {/* business owner  */}
           {storeDetails?.business && (
             <div className="text-sm mt-1 dark-light">
@@ -68,7 +68,7 @@ const SellerDetails = ({ storeDetails, loading, errorMsg }) => {
 
             {/* contact details  */}
             <div className="flex items-center dark-light">
-              <MdOutlineContactPhone className="icon-no-bg" />
+              <AiOutlineMail className="icon-no-bg" />
               <span className="ml-3">{storeDetails?.user?.email}</span>
             </div>
 

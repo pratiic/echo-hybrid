@@ -98,7 +98,7 @@ const SellerPage = () => {
         hasBackArrow
       />
 
-      <div className="pb-5">
+      <div className="mb-5">
         <OptionsToggle
           options={options}
           rounded={false}
