@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { fetcher } from "../lib/fetcher";
 import { updateAuthUser } from "../redux/slices/auth-slice";
-import { showConfirmationModal } from "../redux/slices/modal-slice";
+import { closeModal, showConfirmationModal } from "../redux/slices/modal-slice";
 
 import PageHeader from "../components/page-header";
 import InfoBanner from "../components/info-banner";
@@ -22,6 +22,10 @@ const Sell = () => {
   useEffect(() => {
     // already registered as a seller -> redirect
     let route = "";
+
+    if (authUser && !authUser?.address) {
+      router.push("/profile?show=address");
+    }
 
     if (authUser && authUser?.store) {
       if (authUser.store.storeType === "IND") {
@@ -59,6 +63,7 @@ const Sell = () => {
             console.log(error);
           } finally {
             setLoading(false);
+            dispatch(closeModal());
           }
         },
       })

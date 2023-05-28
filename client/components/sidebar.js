@@ -153,8 +153,6 @@ const Sidebar = () => {
     }
   }, [router]);
 
-  console.log(activeLink);
-
   const handleLinkClick = (name, link) => {
     if (showSidebar) {
       dispatch(setSidebar(false));
