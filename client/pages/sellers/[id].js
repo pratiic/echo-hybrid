@@ -13,112 +13,116 @@ import SellerDetails from "../../components/seller-details";
 import SellerProducts from "../../components/seller-products";
 
 const SellerPage = () => {
-  const [options, setOptions] = useState([
-    {
-      name: "details",
-      icon: <IdentificationIcon className="icon-no-bg" />,
-    },
-    {
-      name: "products",
-      icon: <ShoppingCartIcon className="icon-no-bg" />,
-    },
-  ]);
-  const [activeOption, setActiveOption] = useState(options[0].name);
-  const [storeDetails, setStoreDetails] = useState("");
-  const [isMyStore, setIsMyStore] = useState(false);
-  const [loadingDetails, setLoadingDetails] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+    const [options, setOptions] = useState([
+        {
+            name: "details",
+            icon: <IdentificationIcon className="icon-no-bg" />,
+        },
+        {
+            name: "products",
+            icon: <ShoppingCartIcon className="icon-no-bg" />,
+        },
+    ]);
+    const [activeOption, setActiveOption] = useState(options[0].name);
+    const [storeDetails, setStoreDetails] = useState("");
+    const [isMyStore, setIsMyStore] = useState(false);
+    const [loadingDetails, setLoadingDetails] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
-  const { authUser } = useSelector((state) => state.auth);
+    const { authUser } = useSelector((state) => state.auth);
 
-  const router = useRouter();
+    const router = useRouter();
 
-  useEffect(() => {
-    if (router.query.id) {
-      getStoreDetails();
-    }
-  }, [router]);
-
-  // useEffect(() => {
-  //   if (router.query.show) {
-  //     setActiveOption(router.query.show);
-  //   } else {
-  //     router.push(`/sellers/${router.query.id}`);
-  //   }
-  // }, [router]);
-
-  useEffect(
-    () => {
-      if (storeDetails?.user?.id === authUser?.id) {
-        setIsMyStore(true);
-      } else {
-        setIsMyStore(false);
-      }
-    },
-    { authUser }
-  );
-
-  const getStoreDetails = async () => {
-    let storeId = router.query.id;
-
-    setLoadingDetails(true);
-
-    try {
-      const data = await fetcher(`stores/${storeId}`);
-      setStoreDetails(data.store);
-    } catch (error) {
-      setErrorMsg(error.message);
-    } finally {
-      setLoadingDetails(false);
-    }
-  };
-
-  const handleOptionClick = (option) => {
-    setActiveOption(option);
-  };
-
-  return (
-    <section>
-      <Head>
-        <title>
-          {storeDetails?.storeType === "BUS"
-            ? capitalizeFirstLetter(storeDetails?.business?.name)
-            : capitalizeFirstLetter(storeDetails?.user?.firstName) +
-              " " +
-              capitalizeFirstLetter(storeDetails?.user?.lastName)}
-        </title>
-      </Head>
-
-      <PageHeader
-        heading={
-          storeDetails?.business
-            ? storeDetails?.business?.name
-            : storeDetails?.user?.firstName + " " + storeDetails?.user?.lastName
+    useEffect(() => {
+        if (router?.query?.id) {
+            getStoreDetails();
         }
-        hasBackArrow
-      />
+    }, [router]);
 
-      <div className="mb-5">
-        <OptionsToggle
-          options={options}
-          rounded={false}
-          active={activeOption}
-          onClick={handleOptionClick}
-        />
-      </div>
+    // useEffect(() => {
+    //   if (router.query.show) {
+    //     setActiveOption(router.query.show);
+    //   } else {
+    //     router.push(`/sellers/${router.query.id}`);
+    //   }
+    // }, [router]);
 
-      <div>
-        {activeOption === "details" && (
-          <SellerDetails
-            storeDetails={storeDetails}
-            loading={loadingDetails}
-            error={errorMsg}
-          />
-        )}
-        {activeOption === "products" && <SellerProducts />}
-      </div>
-    </section>
-  );
+    useEffect(() => {
+        if (storeDetails?.user?.id === authUser?.id) {
+            setIsMyStore(true);
+        } else {
+            setIsMyStore(false);
+        }
+    }, [authUser]);
+
+    const getStoreDetails = async () => {
+        const storeId = router?.query.id;
+        setLoadingDetails(true);
+
+        try {
+            const data = await fetcher(`stores/${storeId}`);
+            setStoreDetails(data.store);
+        } catch (error) {
+            setErrorMsg(error.message);
+        } finally {
+            setLoadingDetails(false);
+        }
+    };
+
+    const handleOptionClick = (option) => {
+        setActiveOption(option);
+    };
+
+    if (loadingDetails) {
+        return <p className="status">Loading seller details...</p>;
+    }
+
+    if (errorMsg) {
+        return <p className="status">{errorMsg}</p>;
+    }
+
+    return (
+        <section>
+            <Head>
+                <title>
+                    {storeDetails?.storeType === "BUS"
+                        ? capitalizeFirstLetter(storeDetails?.business?.name)
+                        : capitalizeFirstLetter(storeDetails?.user?.firstName) +
+                          " " +
+                          capitalizeFirstLetter(storeDetails?.user?.lastName)}
+                </title>
+            </Head>
+
+            <PageHeader
+                heading={
+                    storeDetails?.business
+                        ? storeDetails?.business?.name
+                        : storeDetails?.user?.firstName +
+                          " " +
+                          storeDetails?.user?.lastName
+                }
+                hasBackArrow
+            />
+
+            <div className="mb-5 -mt-1">
+                <OptionsToggle
+                    options={options}
+                    rounded={false}
+                    active={activeOption}
+                    onClick={handleOptionClick}
+                />
+            </div>
+
+            {activeOption === "details" && (
+                <SellerDetails
+                    storeDetails={storeDetails}
+                    loading={loadingDetails}
+                    error={errorMsg}
+                />
+            )}
+            {activeOption === "products" && <SellerProducts />}
+        </section>
+    );
 };
 
 export default SellerPage;

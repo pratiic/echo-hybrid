@@ -200,7 +200,8 @@ const CommentsContainer = ({
             if (reviews.length === 0) {
                 return (
                     <p className="status-smaller mt-5">
-                        No reviews in this {contentType} yet
+                        No reviews in this{" "}
+                        {contentType === "product" ? contentType : "seller"} yet
                     </p>
                 );
             }
