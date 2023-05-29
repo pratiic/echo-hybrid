@@ -59,8 +59,13 @@ export const getStoreDetails = async (request, response, next) => {
                         address: true,
                     },
                 },
+                ratings: true,
             },
         });
+
+        if (!store) {
+            return next(new HttpError("seller not found", 404));
+        }
 
         // check if the business has been verified
         if (store.storeType === "BUS" && !store.business.isVerified) {
@@ -73,6 +78,7 @@ export const getStoreDetails = async (request, response, next) => {
 
         response.json({ store });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

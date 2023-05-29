@@ -12,8 +12,19 @@ export const getCommentNotificationData = (
     targetName,
     targetUserId,
     baseCommentId,
-    baseCommentUserId
+    baseCommentUserId,
+    isTargetBusiness
 ) => {
+    console.log(
+        commentUser,
+        targetType,
+        targetId,
+        targetName,
+        targetUserId,
+        baseCommentId,
+        baseCommentUserId
+    );
+
     const { firstName, lastName } = commentUser;
     let notificationText = `${capitalizeAll(`${firstName} ${lastName}`)} `;
 
@@ -23,7 +34,7 @@ export const getCommentNotificationData = (
     };
 
     let destinationId = null,
-        linkTo = `/${targetStrMap[targetType]}s/${targetIdMap[targetType]}`;
+        linkTo = `/${targetStrMap[targetType]}s/${targetId}`;
 
     if (baseCommentId) {
         // reply to a review
@@ -36,7 +47,9 @@ export const getCommentNotificationData = (
     } else {
         if (targetType === "store") {
             // review of a seller
-            notificationText += "provided a review of you";
+            notificationText += `provided a review of ${
+                isTargetBusiness ? "your business" : "you"
+            }`;
         } else {
             notificationText += `reviewed your product - ${capitalizeFirstLetter(
                 targetName

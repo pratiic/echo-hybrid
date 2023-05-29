@@ -12,13 +12,13 @@ import { clearErrors } from "../lib/validation";
 import { setAlert } from "../redux/slices/alerts-slice";
 import { generateFormData } from "../lib/form-data";
 import { fetcher } from "../lib/fetcher";
+import { setPreview } from "../lib/files";
+import { getCommentNotificationData } from "../lib/notification";
 
 import Image from "./image";
 import FileSelector from "./file-selector";
 import Icon from "./icon";
 import Spinner from "./spinner";
-import { setPreview } from "../lib/files";
-import { getCommentNotificationData } from "../lib/notification";
 
 const CommentAdder = ({
     contentId,
@@ -28,6 +28,7 @@ const CommentAdder = ({
     baseCommentId,
     contentOwnerId,
     baseCommentUserId,
+    isTargetBusiness,
 }) => {
     const { activeComment } = useSelector((state) => state.comments);
     const { selectedFiles } = useSelector((state) => state.files);
@@ -115,7 +116,8 @@ const CommentAdder = ({
                         contentName,
                         contentOwnerId,
                         baseCommentId,
-                        baseCommentUserId
+                        baseCommentUserId,
+                        isTargetBusiness
                     );
 
                     if (notificationData.destinationId !== authUser?.id) {

@@ -122,6 +122,7 @@ const SellerDetails = ({ storeDetails }) => {
             <CommentsContainer
                 contentId={storeDetails?.id}
                 contentOwner={storeDetails?.user}
+                isTargetBusiness={storeDetails?.storeType === "BUS"}
             />
         </div>
     );

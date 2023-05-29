@@ -29,6 +29,7 @@ const CommentsContainer = ({
     commentType = "review",
     baseCommentId,
     baseCommentUserId,
+    isTargetBusiness,
 }) => {
     const [loadingComments, setLoadingComments] = useState(false);
     const [disabledMsg, setDisabledMsg] = useState("");
@@ -149,6 +150,7 @@ const CommentsContainer = ({
                     baseCommentId={baseCommentId}
                     contentOwnerId={contentOwner?.id}
                     baseCommentUserId={baseCommentUserId}
+                    isTargetBusiness={isTargetBusiness}
                 />
             </div>
         );
