@@ -83,6 +83,90 @@ export const getStoreDetails = async (request, response, next) => {
     }
 };
 
+export const getStores = async (request, response, next) => {
+    const user = request.user;
+    user.address = user.address || {};
+    const filter = request.query.filter || "all";
+    const searchQuery = request.query.query || "";
+    const page = parseInt(request.query.page) || 1;
+    const PAGE_SIZE = 15;
+
+    const getAddressFilter = (field) => {
+        return {
+            OR: [
+                {
+                    storeType: "IND",
+                    user: {
+                        address: {
+                            [field]: user.address[field],
+                        },
+                    },
+                },
+                {
+                    storeType: "BUS",
+                    business: {
+                        address: {
+                            [field]: user.address[field],
+                        },
+                    },
+                },
+            ],
+        };
+    };
+
+    const filterMap = {
+        all: {},
+        province: getAddressFilter("province"),
+        city: getAddressFilter("city"),
+        area: getAddressFilter("area"),
+    };
+
+    const whereObj = {
+        ...filterMap[filter],
+        isDeleted: false,
+        NOT: {
+            // do not get the requesting user's own store
+            user: {
+                id: request.user.id,
+            },
+        },
+    };
+
+    try {
+        const [stores, totalCount] = await Promise.all([
+            prisma.store.findMany({
+                where: whereObj,
+                orderBy: {
+                    rating: "desc",
+                },
+                include: {
+                    user: {
+                        select: {
+                            ...genericUserFields,
+                            address: true,
+                        },
+                    },
+                    business: {
+                        include: {
+                            address: true,
+                        },
+                    },
+                },
+                take: PAGE_SIZE,
+                skip: (page - 1) * PAGE_SIZE,
+            }),
+            prisma.store.count({
+                where: whereObj,
+            }),
+        ]);
+
+        response.json({ stores, totalCount });
+    } catch (error) {
+        console.log(error);
+        return next(new HttpError());
+    }
+};
+
 export const deleteStore = async (request, response, next) => {
     const user = request.user;
 

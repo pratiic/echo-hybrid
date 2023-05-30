@@ -81,6 +81,7 @@ model Store {
     id        Int       @id @default(autoincrement())
     storeType StoreType
     rating    Float     @default(0)
+    isDeleted Boolean   @default(false)
 
     user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId   Int       @unique
