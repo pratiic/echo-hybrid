@@ -5,6 +5,7 @@ import { trimValues } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import { validateProduct } from "../validators/product.validators.js";
 import { genericUserFields } from "../lib/data-source.lib.js";
+import { checkDelivery, checkDeliverySingle } from "../lib/delivery.lib.js";
 
 const MAX_IMAGES = 5;
 
@@ -168,8 +169,51 @@ export const getProducts = async (request, response, next) => {
         province: getAddressFilter("province"),
         city: getAddressFilter("city"),
         area: getAddressFilter("area"),
-        delivered: {
-            AND: [],
+        delivered: () => {
+            if (!checkDeliverySingle(user.address)) {
+                return {
+                    id: -1,
+                };
+            }
+
+            return {
+                OR: [
+                    {
+                        isSecondHand: true,
+                        store: {
+                            user: {
+                                address: {
+                                    province: "bagmati",
+                                    city: {
+                                        in: [
+                                            "kathmandu",
+                                            "bhaktapur",
+                                            "lalitpur",
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    {
+                        isSecondHand: false,
+                        store: {
+                            business: {
+                                address: {
+                                    province: "bagmati",
+                                    city: {
+                                        in: [
+                                            "kathmandu",
+                                            "bhaktapur",
+                                            "lalitpur",
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                ],
+            };
         },
     };
 
@@ -193,7 +237,9 @@ export const getProducts = async (request, response, next) => {
     try {
         const products = await prisma.product.findMany({
             where: {
-                ...filterMap[filter],
+                ...(filter === "delivered"
+                    ? filterMap[filter]()
+                    : filterMap[filter]),
                 ...primaryFilter,
             },
             include: {

@@ -13,6 +13,7 @@ export const placeOrder = async (request, response, next) => {
     const user = request.user;
     const productId = parseInt(request.params.productId) || 0;
     const orderInfo = request.body;
+    let errorMsg = "";
 
     try {
         // check to see if the product with the given id exists
@@ -55,30 +56,35 @@ export const placeOrder = async (request, response, next) => {
             );
         }
 
-        // validate order address
-        if (!orderInfo.address) {
-            return next(new HttpError("address is required", 400));
-        }
-
-        let errorMsg = validateAddress(orderInfo.address);
-
-        if (errorMsg) {
-            return next(new HttpError(errorMsg, 400));
-        }
-
-        const { stockType, stock, isSecondHand } = product;
+        // check if the product is delivered for handling address
         const isDelivered = checkDelivery(
             orderInfo.address,
-            isSecondHand
+            product.isSecondHand
                 ? product.store.user.address
                 : product.store.business.address
         );
+
+        if (isDelivered) {
+            // validate order address
+            if (!orderInfo.address) {
+                return next(new HttpError("address is required", 400));
+            }
+
+            errorMsg = validateAddress(orderInfo.address);
+
+            if (errorMsg) {
+                return next(new HttpError(errorMsg, 400));
+            }
+        }
+
+        const { stockType, stock, isSecondHand } = product;
+
         let orderData = {
             productId: product.id,
             originId: user.id,
             storeId: product.store.id,
             unitPrice: product.price,
-            consumerAddress: orderInfo.address,
+            consumerAddress: isDelivered ? orderInfo.address : undefined,
             isDelivered,
             deliveryCharge: isDelivered ? product.deliveryCharge : null,
         };
