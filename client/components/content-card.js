@@ -3,27 +3,57 @@ import { useRouter } from "next/router";
 import { BsImage } from "react-icons/bs";
 import { useSelector } from "react-redux";
 
-import { addCommas, capitalizeFirstLetter } from "../lib/strings";
+import {
+    addCommas,
+    capitalizeAll,
+    capitalizeFirstLetter,
+} from "../lib/strings";
 import { getAddress } from "../lib/address";
 
 import Rating from "./rating";
 import CustomLink from "./custom-link";
 
 const ContentCard = ({
-    id,
-    name,
-    rating,
-    user,
-    image,
-    images,
-    price,
     type,
+    id, // c -> both product and seller
+    rating, // c
+    name, // p -> product
+    images, // p
+    price, // p
+    user, // s -> seller
+    business, // s
+    storeType, // s
 }) => {
     const router = useRouter();
     const { theme } = useSelector((state) => state.theme);
 
     const handleContentClick = () => {
         router.push(`/${type === "product" ? "products" : "sellers"}/${id}`);
+    };
+
+    const getContentName = () => {
+        if (type === "product") {
+            return name;
+        }
+
+        // type -> seller
+        return storeType === "IND"
+            ? `${user?.firstName} ${user?.lastName}`
+            : business?.name;
+    };
+
+    const getSellerAddress = () => {
+        return getAddress(
+            storeType === "IND" ? user?.address : business?.address
+        );
+    };
+
+    const getImageSrc = () => {
+        if (type === "product") {
+            return images[0];
+        }
+
+        return storeType === "IND" ? user?.avatar : `/images/shop-${theme}.png`;
     };
 
     return (
@@ -40,11 +70,7 @@ const ContentCard = ({
                     {/* show icon until the image is loaded */}
                     <BsImage className="image-placeholder" />
                     <img
-                        src={
-                            type === "seller"
-                                ? image || `/images/shop-${theme}.png`
-                                : images[0]
-                        }
+                        src={getImageSrc()}
                         alt={name}
                         className="rounded-t min-h-[9rem] max-h-[12rem] w-full image relative"
                     />
@@ -58,11 +84,11 @@ const ContentCard = ({
                             type === "shop" ? "mb-2" : "mb-1"
                         } `}
                     >
-                        {capitalizeFirstLetter(name)}
+                        {capitalizeAll(getContentName())}
                     </h2>
 
                     {/* product price */}
-                    {price && (
+                    {type === "product" && (
                         <p className="mb-1 black-white font-semibold text-sm">
                             Rs. {addCommas(price)}
                         </p>
@@ -74,6 +100,7 @@ const ContentCard = ({
                     </div>
 
                     {type === "seller" && (
+                        // seller address
                         <div className="space-y-1 mt-2">
                             {user?.address && (
                                 <h3 className="flex items-center">
@@ -81,7 +108,7 @@ const ContentCard = ({
                                         <LocationMarkerIcon className="icon-no-bg-small 500:icon-no-bg mr-1" />
                                     </span>
                                     <span className="text-xs 500:text-sm">
-                                        {getAddress(user.address)}
+                                        {getSellerAddress()}
                                     </span>
                                 </h3>
                             )}

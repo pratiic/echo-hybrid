@@ -22,6 +22,7 @@ const OrderDetails = ({ quantity, variant, variantId, product }) => {
     const [deliveryAddress, setDeliveryAddress] = useState(null);
     const [isUserAddress, setIsUserAddress] = useState(true);
     const [sellerAddr, setSellerAddr] = useState("");
+    const [isDelivered, setIsDelivered] = useState(false);
 
     const { authUser } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
@@ -35,19 +36,36 @@ const OrderDetails = ({ quantity, variant, variantId, product }) => {
         );
     }, [product]);
 
-    const placeOrder = async (address) => {
-        console.log(address);
-        return;
+    useEffect(() => {
+        setIsDelivered(
+            checkDelivery(
+                isUserAddress ? authUser?.address : deliveryAddress,
+                sellerAddr
+            )
+        );
+    }, [isUserAddress, authUser, deliveryAddress, sellerAddr]);
 
+    const placeOrder = async (address) => {
         try {
             setPlacingOrder(true);
             setError("");
 
-            const data = await fetcher(`orders/${product.id}`, "POST", {
+            const orderData = {
                 quantity,
                 variantId,
-                address,
-            });
+            };
+
+            if (isDelivered) {
+                orderData.address = address;
+            }
+
+            const data = await fetcher(
+                `orders/${product.id}`,
+                "POST",
+                orderData
+            );
+
+            console.log(data);
 
             // dispatch(addUserOrder(data.order));
             dispatch(
@@ -58,9 +76,9 @@ const OrderDetails = ({ quantity, variant, variantId, product }) => {
             );
             dispatch(closeModal());
 
-            if (data.cartItemId) {
-                dispatch(deleteCartItem(data.cartItemId));
-            }
+            // if (data.cartItemId) {
+            //     dispatch(deleteCartItem(data.cartItemId));
+            // }
 
             // router.push("/orders/?show=user");
         } catch (error) {
@@ -173,12 +191,7 @@ const OrderDetails = ({ quantity, variant, variantId, product }) => {
                             quantity,
                             product?.deliveryCharge,
                             true,
-                            checkDelivery(
-                                isUserAddress
-                                    ? authUser?.address
-                                    : deliveryAddress,
-                                sellerAddr
-                            )
+                            isDelivered
                         )}
                     </span>
                 </div>

@@ -301,3 +301,15 @@ textarea {
 .border-faint {
   @apply border-gray-four dark:border-gray-800;
 }
+
+.filter-info-container {
+    @apply -mt-3 mb-4 ml-1;
+}
+
+.filter-info-text {
+    @apply dark-light text-sm;
+}
+
+.filter-info-highlight {
+    @apply font-semibold text-blue-three;
+}

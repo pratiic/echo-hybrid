@@ -15,6 +15,7 @@ import commentsReducer from "./slices/comments-slice";
 import cartReducer from "./slices/cart-slice";
 import notificationsReducer from "./slices/notifications-slice";
 import chatReducer from "./slices/chat-slice";
+import sellersReducer from "./slices/sellers-slice";
 
 export const store = configureStore({
     reducer: {
@@ -32,6 +33,7 @@ export const store = configureStore({
         cart: cartReducer,
         notifications: notificationsReducer,
         chat: chatReducer,
+        sellers: sellersReducer,
     },
     middleware: [logger],
 });

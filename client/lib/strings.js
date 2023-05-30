@@ -13,6 +13,14 @@ export const singularOrPlural = (list = [], strOne, strTwo) => {
     return strOne;
 };
 
+export const singularOrPluralCount = (count, strOne, strTwo) => {
+    if (count === 0 || count > 1) {
+        return strTwo;
+    }
+
+    return strOne;
+};
+
 export const addCommas = (num = 0) => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };

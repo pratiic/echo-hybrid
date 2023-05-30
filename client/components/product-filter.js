@@ -67,6 +67,7 @@ const ProductFilter = ({ isGlobal }) => {
         {
             name: "delivered",
             icon: <MdDeliveryDining className="icon-no-bg" />,
+            disabled: !authUser?.address,
         },
         {
             name: "second hand",
