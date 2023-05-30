@@ -10,122 +10,100 @@ import Avatar from "../components/avatar";
 import Rating from "../components/rating";
 import CommentsContainer from "../components/comments-container";
 
-const SellerDetails = ({ storeDetails }) => {
-    const { authUser } = useSelector((state) => state.auth);
-    const { theme } = useSelector((state) => state.theme);
+const SellerDetails = ({
+  id,
+  storeType,
+  business,
+  user,
+  createdAt,
+  rating,
+}) => {
+  const { authUser } = useSelector((state) => state.auth);
+  const { theme } = useSelector((state) => state.theme);
 
-    return (
-        <div className="space-y-7 flex flex-col">
-            <div className="flex flex-1 850:mb-0">
-                {/* seller image -> individual -> avatar, business -> generic image */}
-                <Image
-                    className="rounded image w-full h-full"
-                    containerClassName="mr-3 450:mr-5 max-w-[8rem] 450:max-w-[10rem] max-h-[8rem] 450:max-h-40 550:max-w-[12rem] 550:max-h-48 550:mr-7"
-                    src={
-                        storeDetails?.storeType === "BUS"
-                            ? `/images/shop-${theme}.png`
-                            : `${storeDetails?.user?.avatar}`
-                    }
-                />
+  let sellerAddress = storeType === "IND" ? user?.address : business?.address;
 
-                <div className="mr-[6rem]">
-                    {/* business owner  */}
-                    {storeDetails?.business && (
-                        <div className="text-sm mt-1 dark-light">
-                            <span>Owned by</span>
+  return (
+    <div className="space-y-7 flex flex-col">
+      <div className="flex flex-1 850:mb-0">
+        {/* seller image -> individual -> avatar, business -> generic image */}
+        <Image
+          className="rounded image w-full h-full"
+          containerClassName="mr-3 450:mr-5 max-w-[8rem] 450:max-w-[10rem] max-h-[8rem] 450:max-h-40 550:max-w-[12rem] 550:max-h-48 550:mr-7"
+          src={
+            storeType === "BUS"
+              ? `/images/shop-${theme}.png`
+              : `${user?.avatar}`
+          }
+        />
 
-                            <div className="flex items-center mt-2 mb-3">
-                                <Avatar
-                                    avatar={storeDetails?.user?.avatar}
-                                    smaller
-                                />
-                                <div className="ml-3">
-                                    <span className="highlight block">
-                                        {authUser?.id === storeDetails?.user?.id
-                                            ? "me"
-                                            : storeDetails?.user?.firstName +
-                                              " " +
-                                              storeDetails?.user?.lastName}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+        <div className="mr-[6rem]">
+          {/* business owner  */}
+          {business && (
+            <div className="text-sm mt-1 dark-light">
+              <span>Owned by</span>
 
-                    <div className="text-sm flex flex-col space-y-2">
-                        {/* how long the seller has been selling  */}
-                        <div className="flex items-center dark-light">
-                            <CalendarIcon className="icon-no-bg" />
-
-                            <span className="ml-3">
-                                Started selling{" "}
-                                {getHowLongAgo(storeDetails?.createdAt, true)}{" "}
-                                ago on {getDate(storeDetails?.createdAt)}
-                            </span>
-                        </div>
-
-                        {/* seller email  */}
-                        <div className="flex items-center dark-light">
-                            <AiOutlineMail className="icon-no-bg" />
-
-                            <span className="ml-3">
-                                {storeDetails?.user?.email}
-                            </span>
-                        </div>
-
-                        {/* address details  */}
-                        <div className="flex dark-light">
-                            <LocationMarkerIcon className="icon-no-bg" />
-
-                            {storeDetails?.storeType === "BUS" && (
-                                <div className="ml-3">
-                                    <p>
-                                        {storeDetails?.business?.address?.area},{" "}
-                                        {storeDetails?.business?.address?.city}
-                                    </p>
-                                    <p className="-mt-1">
-                                        {
-                                            storeDetails?.business?.address
-                                                ?.description
-                                        }
-                                    </p>
-                                </div>
-                            )}
-
-                            {storeDetails?.storeType === "IND" && (
-                                <div className="ml-3">
-                                    <p>
-                                        {storeDetails?.user?.address?.area},{" "}
-                                        {storeDetails?.user?.address?.city}
-                                    </p>
-                                    <p className="-mt-1">
-                                        {
-                                            storeDetails?.user?.address
-                                                ?.description
-                                        }
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+              <div className="flex items-center mt-2 mb-3">
+                <Avatar avatar={user?.avatar} smaller />
+                <div className="ml-3">
+                  <span className="highlight block">
+                    {authUser?.id === user?.id
+                      ? "me"
+                      : user?.firstName + " " + user?.lastName}
+                  </span>
                 </div>
+              </div>
+            </div>
+          )}
 
-                <Rating
-                    rating={storeDetails?.rating}
-                    //  ratings={ratings}
-                    //   userCanRate={!isMyShop}
-                    //  content={{ id, name }}
-                    //  onRate={updateShopInfo}
-                />
+          <div className="text-sm flex flex-col space-y-2">
+            {/* how long the seller has been selling  */}
+            <div className="flex items-center dark-light">
+              <CalendarIcon className="icon-no-bg" />
+
+              <span className="ml-3">
+                Started selling {getHowLongAgo(createdAt, true)} ago on{" "}
+                {getDate(createdAt)}
+              </span>
             </div>
 
-            <CommentsContainer
-                contentId={storeDetails?.id}
-                contentOwner={storeDetails?.user}
-                isTargetBusiness={storeDetails?.storeType === "BUS"}
-            />
+            {/* seller email  */}
+            <div className="flex items-center dark-light">
+              <AiOutlineMail className="icon-no-bg" />
+
+              <span className="ml-3">{user?.email}</span>
+            </div>
+
+            {/* address details  */}
+            <div className="flex dark-light">
+              <LocationMarkerIcon className="icon-no-bg" />
+
+              <div className="ml-3">
+                <p>
+                  {sellerAddress?.area}, {sellerAddress?.city}
+                </p>
+                <p className="-mt-1">{sellerAddress?.description}</p>
+              </div>
+            </div>
+          </div>
         </div>
-    );
+
+        <Rating
+          rating={rating}
+          //  ratings={ratings}
+          //   userCanRate={!isMyShop}
+          //  content={{ id, name }}
+          //  onRate={updateShopInfo}
+        />
+      </div>
+
+      <CommentsContainer
+        contentId={id}
+        contentOwner={user}
+        isTargetBusiness={storeType === "BUS"}
+      />
+    </div>
+  );
 };
 
 export default SellerDetails;
