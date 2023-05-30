@@ -23,20 +23,18 @@ const Chat = () => {
     }, [authUser]);
 
     useEffect(() => {
-        socket.on("new-message", (message) => {
-            if (authUser) {
-                if (
-                    message.userId !== authUser?.id &&
-                    message.destinationId === authUser?.id
-                ) {
-                    dispatch(
-                        setUnseenMsgsCount({
-                            chatId: message.chatId,
-                            userId: message.destinationId,
-                            unseenCount: message.unseenCount,
-                        })
-                    );
-                }
+        socket.on("new-message", (msgInfo) => {
+            if (
+                msgInfo.userId !== authUser?.id &&
+                msgInfo.destinationId === authUser?.id
+            ) {
+                dispatch(
+                    setUnseenMsgsCount({
+                        chatId: msgInfo.chatId,
+                        userId: msgInfo.destinationId,
+                        unseenCount: msgInfo.unseenCount,
+                    })
+                );
             }
         });
     }, [authUser]);

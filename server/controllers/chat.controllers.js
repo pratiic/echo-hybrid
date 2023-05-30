@@ -126,3 +126,51 @@ export const getChats = async (request, response, next) => {
         next(new HttpError());
     }
 };
+
+export const resetUnseenMsgsCount = async (request, response, next) => {
+    const user = request.user;
+    const chatId = parseInt(request.params.chatId) || 0;
+
+    try {
+        const chat = await prisma.chat.findUnique({
+            where: {
+                id: chatId,
+            },
+            select: {
+                id: true,
+                unseenMsgsCounts: true,
+                userIds: true,
+            },
+        });
+
+        if (!chat) {
+            return next(new HttpError("chat not found", 404));
+        }
+
+        // check if the requesting user is a part of the chat
+        if (!chat.userIds.find((userId) => userId === user.id)) {
+            return next(
+                new HttpError(
+                    "you are unauthorized to perform this action",
+                    401
+                )
+            );
+        }
+
+        await prisma.chat.update({
+            where: {
+                id: chatId,
+            },
+            data: {
+                unseenMsgsCounts: {
+                    ...chat.unseenMsgsCounts,
+                    [user.id]: 0,
+                },
+            },
+        });
+
+        response.json({ message: "reset" });
+    } catch (error) {
+        next(new HttpError());
+    }
+};

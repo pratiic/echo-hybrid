@@ -21,7 +21,7 @@ import { router as productVariationRouter } from "./routes/product-variation.rou
 import { router as stockRouter } from "./routes/stock.routes.js";
 import { router as orderRouter } from "./routes/order.routes.js";
 import { chatRouter } from "./routes/chat.routes.js";
-import { router as messageRouter } from "./routes/message.routes.js";
+import { messageRouter } from "./routes/message.routes.js";
 import { router as cartRouter } from "./routes/cart.routes.js";
 import { router as receiptRouter } from "./routes/receipt.routes.js";
 import { notificationRouter } from "./routes/notification.routes.js";
@@ -51,7 +51,7 @@ app.use("/api/product-variations", productVariationRouter);
 app.use("/api/stocks", stockRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/chats", chatRouter(io));
-app.use("/api/messages", messageRouter);
+app.use("/api/messages", messageRouter(io));
 app.use("/api/carts", cartRouter);
 app.use("/receipts", receiptRouter);
 

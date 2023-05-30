@@ -23,6 +23,7 @@ const FileSelector = ({
     deletionHandler,
     isRequired = false,
     disabled = false,
+    iconClassName, // className for when type is icon
 }) => {
     const [previewSrcs, setPreviewSrcs] = useState([]);
 
@@ -134,7 +135,7 @@ const FileSelector = ({
                     onClick={handleButtonClick}
                     toolName={`select ${multiple ? "images" : "image"}`}
                 >
-                    <PhotographIcon className="icon" />
+                    <PhotographIcon className={`icon ${iconClassName}`} />
                 </Icon>
                 {renderFileInput()}
             </React.Fragment>

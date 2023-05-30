@@ -1,7 +1,11 @@
 import express from "express";
 
 import auth from "../middleware/auth.middleware.js";
-import { getChats, startChat } from "../controllers/chat.controllers.js";
+import {
+    getChats,
+    resetUnseenMsgsCount,
+    startChat,
+} from "../controllers/chat.controllers.js";
 
 export const chatRouter = (io) => {
     const router = express.Router();
@@ -15,6 +19,8 @@ export const chatRouter = (io) => {
         request.io = io;
         getChats(request, ...op);
     });
+
+    router.patch("/unseen/:chatId", auth, resetUnseenMsgsCount);
 
     return router;
 };

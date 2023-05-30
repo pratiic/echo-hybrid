@@ -7,7 +7,9 @@ export const sendMessage = async (request, response, next) => {
     const user = request.user;
     const chat = request.chat;
     const messageInfo = request.body;
-    let finalMessage = null;
+    const io = request.io;
+    let finalMessage = null,
+        updatedChat = null;
 
     try {
         const errorMsg = validateMessage(
@@ -22,7 +24,7 @@ export const sendMessage = async (request, response, next) => {
         const chatUserId = chat.userIds.find((userId) => userId !== user.id);
 
         await prisma.$transaction(async (prisma) => {
-            const [createdMessage] = await Promise.all([
+            const [createdMessage, uc] = await Promise.all([
                 prisma.message.create({
                     data: {
                         text: messageInfo.text?.trim(),
@@ -45,6 +47,7 @@ export const sendMessage = async (request, response, next) => {
             ]);
 
             finalMessage = createdMessage;
+            updatedChat = uc;
 
             if (request.file) {
                 // handle message image
@@ -72,10 +75,24 @@ export const sendMessage = async (request, response, next) => {
             }
         });
 
+        io.emit("new-message", {
+            chatId: finalMessage.chatId,
+            userId: finalMessage.userId,
+            destinationId: chatUserId,
+            unseenCount: updatedChat.unseenMsgsCounts[chatUserId],
+        });
+
+        io.emit("chat-message", {
+            ...finalMessage,
+            destinationId: chatUserId,
+        });
+
         response.status(201).json({
             message: finalMessage,
         });
     } catch (error) {
+        console.log(error);
+
         next(new HttpError());
     }
 };
@@ -101,25 +118,55 @@ export const getMessages = async (request, response, next) => {
     }
 };
 
-export const deleteMessage = async (request, response, next) => {
+export const setMessageSeen = async (request, response, next) => {
     const user = request.user;
-    const messageId = parseInt(request.params.messageId) || 0;
+    const message = request.message;
+    const chat = message.chat;
+    const io = request.io;
 
     try {
-        const message = await prisma.message.findUnique({
-            where: {
-                id: messageId,
-            },
-            select: {
-                id: true,
-                userId: true,
-            },
+        const [updatedMessage] = await Promise.all([
+            prisma.message.update({
+                where: {
+                    id: message.id,
+                },
+                data: {
+                    seen: true,
+                },
+            }),
+            prisma.chat.update({
+                where: {
+                    id: message.chatId,
+                },
+                data: {
+                    unseenMsgsCounts: {
+                        ...chat.unseenMsgsCounts,
+                        [user.id]: chat.unseenMsgsCounts[user.id]
+                            ? --chat.unseenMsgsCounts[user.id]
+                            : 0,
+                    },
+                },
+            }),
+        ]);
+
+        io.emit("message-update", {
+            id: message.id,
+            chatId: message.chatId,
+            updateInfo: { seen: true },
         });
 
-        if (!message) {
-            return next(new HttpError("message not found", 404));
-        }
+        response.json({ message: updatedMessage });
+    } catch (error) {
+        next(new HttpError());
+    }
+};
 
+export const deleteMessage = async (request, response, next) => {
+    const user = request.user;
+    const message = request.message;
+    const io = request.io;
+
+    try {
         if (message.userId !== user.id) {
             return next(
                 new HttpError(
@@ -129,11 +176,32 @@ export const deleteMessage = async (request, response, next) => {
             );
         }
 
-        await prisma.message.delete({
-            where: {
-                id: messageId,
-            },
-        });
+        const operations = [
+            prisma.message.update({
+                where: {
+                    id: message.id,
+                },
+                data: {
+                    deleted: true,
+                    text: "",
+                    image: "",
+                },
+            }),
+        ];
+
+        if (message.image) {
+            operations.push(
+                prisma.image.delete({
+                    where: {
+                        messageId: message.id,
+                    },
+                })
+            );
+        }
+
+        await Promise.all(operations);
+
+        io.emit("message-delete", message.id);
 
         response.json({
             message: "the message has been deleted",

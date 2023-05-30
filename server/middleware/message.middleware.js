@@ -39,3 +39,30 @@ export const validateChat = async (request, response, next) => {
         next(new HttpError());
     }
 };
+
+export const validateMessage = async (request, response, next) => {
+    const user = request.user;
+    const select = request.select;
+    const messageId = parseInt(request.params.messageId) || 0;
+
+    try {
+        const message = await prisma.message.findUnique({
+            where: {
+                id: messageId,
+            },
+            select: {
+                id: true,
+                ...select,
+            },
+        });
+
+        if (!message) {
+            return next(new HttpError("message not found", 404));
+        }
+
+        request.message = message;
+        next();
+    } catch (error) {
+        next(new HttpError());
+    }
+};
