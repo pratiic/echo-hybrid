@@ -8,21 +8,46 @@ import {
     registerStore,
 } from "../controllers/store.controllers.js";
 
-export const router = express.Router();
+export const storeRouter = (io) => {
+    const router = express.Router();
 
-router.post("/", auth, registerStore);
+    router.post("/", auth, registerStore);
 
-router.get("/:storeId", auth, getStoreDetails);
+    router.get("/:storeId", auth, getStoreDetails);
 
-router.get(
-    "/",
-    (request, ...op) => {
-        request.select = {
-            address: true,
-        };
-        auth(request, ...op);
-    },
-    getStores
-);
+    router.get(
+        "/",
+        (request, ...op) => {
+            request.select = {
+                address: true,
+            };
+            auth(request, ...op);
+        },
+        getStores
+    );
 
-router.delete("/", auth, deleteStore);
+    router.delete(
+        "/",
+        (request, ...op) => {
+            request.select = {
+                store: {
+                    select: {
+                        id: true,
+                        business: {
+                            select: {
+                                id: true,
+                            },
+                        },
+                    },
+                },
+            };
+            auth(request, ...op);
+        },
+        (request, ...op) => {
+            request.io = io;
+            deleteStore(request, ...op);
+        }
+    );
+
+    return router;
+};

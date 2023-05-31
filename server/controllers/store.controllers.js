@@ -1,4 +1,7 @@
-import { genericUserFields } from "../lib/data-source.lib.js";
+import {
+    genericUserFields,
+    productDeletionFields,
+} from "../lib/data-source.lib.js";
 import { notFoundHandler } from "../lib/errors.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
@@ -65,6 +68,10 @@ export const getStoreDetails = async (request, response, next) => {
 
         if (!store) {
             return next(new HttpError("seller not found", 404));
+        }
+
+        if (store.isDeleted) {
+            return next(new HttpError("the seller has been deleted", 404));
         }
 
         // check if the business has been verified
@@ -169,13 +176,58 @@ export const getStores = async (request, response, next) => {
 
 export const deleteStore = async (request, response, next) => {
     const user = request.user;
+    const store = user.store;
+    const io = request.io;
+
+    if (!store) {
+        return next(new HttpError("you are not registered as a seller", 400));
+    }
+
+    const operations = [
+        prisma.store.update({
+            where: {
+                id: store.id,
+            },
+            data: {
+                isDeleted: true,
+                userId: null,
+            },
+        }),
+        prisma.product.updateMany({
+            where: {
+                storeId: store.id,
+            },
+            data: productDeletionFields,
+        }),
+        ...["review", "rating"].map((model) => {
+            return prisma[model].deleteMany({
+                where: {
+                    storeId: store.id,
+                },
+            });
+        }),
+    ];
+
+    if (store.business) {
+        operations.push(
+            prisma.business.delete({
+                where: {
+                    storeId: store.id,
+                },
+            })
+        );
+    }
 
     try {
-        await prisma.store.delete({ where: { userId: user.id } });
+        await prisma.$transaction(async () => {
+            await Promise.all(operations);
+        });
+
+        io.emit("seller-delete", store.id);
 
         response.json({ message: "the store has been deleted" });
     } catch (error) {
-        notFoundHandler(error.message, "store", next);
+        console.log(error);
         next(new HttpError());
     }
 };

@@ -17,6 +17,8 @@ export const fetcher = async (url, method = "GET", data) => {
         return res.data;
     } catch (error) {
         const errMsg = error.response?.data?.error;
-        throw new Error(errMsg || "something went wrong, try again");
+        const errorObj = new Error(errMsg || "something went wrong, try again");
+        errorObj.statusCode = error.response?.status;
+        throw errorObj;
     }
 };

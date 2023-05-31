@@ -21,3 +21,9 @@ export const extraUserFields = {
     },
     address: true,
 };
+
+export const productDeletionFields = {
+    storeId: null,
+    isDeleted: true,
+    categoryName: null,
+};

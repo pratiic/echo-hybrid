@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Store" ALTER COLUMN "userId" DROP NOT NULL;

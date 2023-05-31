@@ -9,24 +9,26 @@ import {
     updateActiveProduct,
 } from "../../redux/slices/products-slice";
 import { fetcher } from "../../lib/fetcher";
+import useSocket from "../../hooks/use-socket";
 
 import ProductInfo from "../../components/product-info";
 import Rating from "../../components/rating";
 import CommentsContainer from "../../components/comments-container";
 import StockView from "../../components/stock-view";
 import ProductMenu from "../../components/product-menu";
+import Human from "../../components/human";
 
 const ProductPage = () => {
     const [loadingDetails, setLoadingDetails] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [isMyProduct, setIsMyProduct] = useState(false);
-    const [isDeleted, setIsDeleted] = useState(false);
+    const [notFound, setNotFound] = useState(false);
 
     const { authUser } = useSelector((state) => state.auth);
     const { activeProduct } = useSelector((state) => state.products);
-
     const router = useRouter();
     const dispatch = useDispatch();
+    const socket = useSocket();
 
     useEffect(() => {
         if (activeProduct && activeProduct?.store?.userId === authUser.id) {
@@ -42,6 +44,15 @@ const ProductPage = () => {
         }
     }, [router]);
 
+    useEffect(() => {
+        socket.on("product-delete", (id) => {
+            if (activeProduct?.id === id) {
+                setNotFound(true);
+                setErrorMsg("deleted");
+            }
+        });
+    }, [activeProduct]);
+
     const getProductInfo = async () => {
         setLoadingDetails(true);
         dispatch(setActiveProduct(null));
@@ -51,6 +62,10 @@ const ProductPage = () => {
 
             dispatch(setActiveProduct(data.product));
         } catch (error) {
+            if (error.statusCode === 404) {
+                setNotFound(true);
+            }
+
             setErrorMsg(error.message);
         } finally {
             setLoadingDetails(false);
@@ -61,10 +76,13 @@ const ProductPage = () => {
         return <p className="status">Loading product details... </p>;
     }
 
+    if (notFound) {
+        return (
+            <Human name="not-found" message={errorMsg} contentType="product" />
+        );
+    }
+
     if (errorMsg) {
-        // return (
-        //     <Human name="not-found" message={errorMsg} contentType="product" />
-        // );
         return <p className="status">Product not found</p>;
     }
 

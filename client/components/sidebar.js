@@ -95,7 +95,6 @@ const Sidebar = () => {
         // },
         {
             name: "seller profile",
-            linkTo: `sellers/${authUser?.store?.id}`,
             icon: <UserCircleIcon className="icon-sidebar" />,
         },
         {
@@ -182,10 +181,28 @@ const Sidebar = () => {
 
             {links.map((link) => {
                 if (link.name === "sell on echo") {
-                    // do not show if business already verified
-                    if (authUser?.store?.business?.isVerified) {
+                    // do not show if store type is IND or business is already verified
+                    if (
+                        authUser?.store?.storeType === "IND" ||
+                        authUser?.store?.business?.isVerified
+                    ) {
                         return null;
                     }
+                }
+
+                if (link.name === "seller profile") {
+                    // do not show if the user is not registered as a seller or business is not verified
+                    if (
+                        !authUser?.store ||
+                        (authUser?.store?.storeType === "IND" &&
+                            !authUser?.store) ||
+                        (authUser?.store?.storeType === "BUS" &&
+                            !authUser?.store?.business?.isVerified)
+                    ) {
+                        return null;
+                    }
+
+                    link.linkTo = `/sellers/${authUser?.store?.id}`;
                 }
 
                 return (

@@ -4,13 +4,13 @@ import { AiOutlineMail } from "react-icons/ai";
 import { LocationMarkerIcon, CalendarIcon } from "@heroicons/react/outline";
 
 import { getHowLongAgo, getDate } from "../lib/date-time";
+import { getAddress } from "../lib/address";
 
 import Image from "../components/image";
 import Avatar from "../components/avatar";
 import Rating from "../components/rating";
 import CommentsContainer from "../components/comments-container";
 import Tag from "../components/tag";
-import { getAddress } from "../lib/address";
 
 const SellerDetails = ({
     id,
@@ -19,6 +19,7 @@ const SellerDetails = ({
     user,
     createdAt,
     rating,
+    isMyStore,
 }) => {
     const { authUser } = useSelector((state) => state.auth);
     const { theme } = useSelector((state) => state.theme);
@@ -93,13 +94,17 @@ const SellerDetails = ({
                         </div>
 
                         {/* seller type */}
-                        <Tag
-                            text={
-                                storeType === "IND"
-                                    ? "individual seller"
-                                    : "registered business"
-                            }
-                        />
+                        <div className="flex items-center space-x-3">
+                            <Tag
+                                text={
+                                    storeType === "IND"
+                                        ? "individual seller"
+                                        : "registered business"
+                                }
+                            />
+
+                            {isMyStore && <Tag text="my seller profile" />}
+                        </div>
                     </div>
                 </div>
 

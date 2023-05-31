@@ -34,7 +34,9 @@ const ProductMenu = ({ isMyProduct }) => {
 
         dispatch(
             showConfirmationModal({
-                message: "Are you sure you want to delete this product?",
+                title: "product deletion",
+                message:
+                    "You will not be able to revert this action, however product details will remain in existing orders and transactions. Continue ?",
                 handler: async () => {
                     dispatch(showLoadingModal("deleting your product..."));
                     try {

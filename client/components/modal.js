@@ -11,6 +11,7 @@ const Modal = () => {
     const {
         showModal,
         type,
+        title, // only for confirmation modal
         message,
         confirmationHandler,
         children,
@@ -69,9 +70,22 @@ const Modal = () => {
 
                 {type === "confirmation" && (
                     <div className="black-white">
-                        <h3 className="text-2xl text-center mb-5 leading-tight">
+                        {title && (
+                            <h3 className="text-2xl font-semibold mb-1">
+                                {capitalizeFirstLetter(title)}
+                            </h3>
+                        )}
+
+                        <h3
+                            className={`${
+                                title
+                                    ? "dark-light mb-3"
+                                    : "text-2xl text-center leading-tight mb-5"
+                            } `}
+                        >
                             {capitalizeFirstLetter(message)}
                         </h3>
+
                         <div className="flex space-x-2">
                             <Button
                                 small

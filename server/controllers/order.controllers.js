@@ -257,7 +257,7 @@ export const getOrders = async (request, response, next) => {
         };
     } else {
         filter = {
-            storeId: user.store.id,
+            storeId: user.store?.id || -1,
             status: {
                 not: "REJECTED",
             },
@@ -441,7 +441,7 @@ export const acknowledgeOrders = async (request, response, next) => {
     try {
         await prisma.order.updateMany({
             where: {
-                storeId: user.store.id,
+                storeId: user.store?.id || -1,
             },
             data: {
                 isAcknowledged: true,

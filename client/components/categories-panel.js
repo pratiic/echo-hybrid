@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { PlusIcon } from "@heroicons/react/outline";
+import { useDispatch } from "react-redux";
 
 import { capitalizeFirstLetter } from "../lib/strings";
 import { fetcher } from "../lib/fetcher";
+import { showGenericModal } from "../redux/slices/modal-slice";
 
 import CustomLink from "./custom-link";
+import Icon from "./icon";
+import CategoryRequest from "./category-request";
 
 const CategoriesPanel = ({
     show,
@@ -17,6 +22,7 @@ const CategoriesPanel = ({
 
     const categoryStyle = `flex items-center rounded-2xl px-3 py-1 cursor-pointer transition-all duration-200`;
     const countStyle = `text-sm ml-[0.15rem] font-semibold`;
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (show) {
@@ -50,6 +56,10 @@ const CategoriesPanel = ({
     const handleClick = (categoryName) => {
         setActiveCategory(categoryName);
         togglePanel();
+    };
+
+    const handleCategoryRequest = () => {
+        dispatch(showGenericModal(<CategoryRequest />));
     };
 
     return (
@@ -95,6 +105,13 @@ const CategoriesPanel = ({
                         </CustomLink>
                     );
                 })}
+
+                <Icon
+                    toolName="request category"
+                    onClick={handleCategoryRequest}
+                >
+                    <PlusIcon className="icon-small" />
+                </Icon>
             </div>
         </div>
     );

@@ -3,7 +3,7 @@ import Joi from "joi";
 import { validate } from "./base.validators.js";
 
 const categorySchema = Joi.object({
-    name: Joi.string().required(),
+    name: Joi.string().required().trim(),
 });
 const categoriesSchema = Joi.object({
     categories: Joi.array().items(categorySchema).required(),

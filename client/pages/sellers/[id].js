@@ -6,11 +6,14 @@ import { IdentificationIcon, ShoppingCartIcon } from "@heroicons/react/outline";
 
 import { capitalizeAll, capitalizeFirstLetter } from "../../lib/strings";
 import { fetcher } from "../../lib/fetcher";
+import useSocket from "../../hooks/use-socket";
 
 import OptionsToggle from "../../components/options-toggle";
 import PageHeader from "../../components/page-header";
 import SellerDetails from "../../components/seller-details";
 import SellerProducts from "../../components/seller-products";
+import SellerMenu from "../../components/seller-menu";
+import Human from "../../components/human";
 
 const SellerPage = () => {
     const [options, setOptions] = useState([
@@ -29,10 +32,11 @@ const SellerPage = () => {
     const [loadingDetails, setLoadingDetails] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [sellerName, setSellerName] = useState(""); // IND -> seller's name, BUS -> business' name
+    const [notFound, setNotFound] = useState(false);
 
     const { authUser } = useSelector((state) => state.auth);
-
     const router = useRouter();
+    const socket = useSocket();
 
     useEffect(() => {
         if (router?.query?.id) {
@@ -52,21 +56,22 @@ const SellerPage = () => {
         );
     }, [storeDetails]);
 
-    // useEffect(() => {
-    //   if (router.query.show) {
-    //     setActiveOption(router.query.show);
-    //   } else {
-    //     router.push(`/sellers/${router.query.id}`);
-    //   }
-    // }, [router]);
-
     useEffect(() => {
         if (storeDetails?.user?.id === authUser?.id) {
             setIsMyStore(true);
         } else {
             setIsMyStore(false);
         }
-    }, [authUser]);
+    }, [authUser, storeDetails]);
+
+    useEffect(() => {
+        socket.on("seller-delete", (id) => {
+            if (storeDetails?.id === id) {
+                setNotFound(true);
+                setErrorMsg("deleted");
+            }
+        });
+    }, [storeDetails]);
 
     const getStoreDetails = async () => {
         const storeId = router?.query.id;
@@ -76,6 +81,10 @@ const SellerPage = () => {
             const data = await fetcher(`stores/${storeId}`);
             setStoreDetails(data.store);
         } catch (error) {
+            if (error.statusCode === 404) {
+                setNotFound(true);
+            }
+
             setErrorMsg(error.message);
         } finally {
             setLoadingDetails(false);
@@ -90,6 +99,12 @@ const SellerPage = () => {
         return <p className="status">Loading seller details...</p>;
     }
 
+    if (notFound) {
+        return (
+            <Human name="not-found" message={errorMsg} contentType="seller" />
+        );
+    }
+
     if (errorMsg) {
         return <p className="status">{errorMsg}</p>;
     }
@@ -100,7 +115,14 @@ const SellerPage = () => {
                 <title>{sellerName}</title>
             </Head>
 
-            <PageHeader heading={sellerName} hasBackArrow />
+            <PageHeader heading={sellerName} hasBackArrow>
+                {isMyStore && (
+                    <SellerMenu
+                        storeId={storeDetails?.id}
+                        storeType={storeDetails?.storeType}
+                    />
+                )}
+            </PageHeader>
 
             <div className="mb-5 -mt-1">
                 <OptionsToggle
@@ -111,7 +133,9 @@ const SellerPage = () => {
                 />
             </div>
 
-            {activeOption === "details" && <SellerDetails {...storeDetails} />}
+            {activeOption === "details" && (
+                <SellerDetails {...{ ...storeDetails, isMyStore }} />
+            )}
             {activeOption === "products" && <SellerProducts />}
         </section>
     );

@@ -4,7 +4,10 @@ import prisma from "../lib/prisma.lib.js";
 import { trimValues } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import { validateProduct } from "../validators/product.validators.js";
-import { genericUserFields } from "../lib/data-source.lib.js";
+import {
+    genericUserFields,
+    productDeletionFields,
+} from "../lib/data-source.lib.js";
 import { checkDelivery, checkDeliverySingle } from "../lib/delivery.lib.js";
 
 const MAX_IMAGES = 5;
@@ -305,6 +308,10 @@ export const getProductDetails = async (request, response, next) => {
             return next(new HttpError("product not found", 404));
         }
 
+        if (product.isDeleted) {
+            return next(new HttpError("the product has been deleted", 404));
+        }
+
         response.json({ product });
     } catch (error) {
         next(new HttpError());
@@ -360,16 +367,13 @@ export const updateProduct = async (request, response, next) => {
 
 export const deleteProduct = async (request, response, next) => {
     const product = request.product;
+    const io = request.io;
 
     try {
         await prisma.$transaction(async (prisma) => {
             await prisma.product.update({
                 where: { id: product.id },
-                data: {
-                    storeId: null,
-                    isDeleted: true,
-                    categoryName: null,
-                },
+                data: productDeletionFields,
             });
 
             await Promise.all(
@@ -384,6 +388,8 @@ export const deleteProduct = async (request, response, next) => {
                 )
             );
         });
+
+        io.emit("product-delete", product.id);
 
         response.json({ message: "the product has been deleted" });
     } catch (error) {

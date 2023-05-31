@@ -83,8 +83,8 @@ model Store {
     rating    Float     @default(0)
     isDeleted Boolean   @default(false)
 
-    user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId   Int       @unique
+    user     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId   Int?      @unique
     business Business?
     product  Product[]
     reviews  Review[]
@@ -229,7 +229,7 @@ model Address {
 
     user       User?     @relation(fields: [userId], references: [id])
     userId     Int?      @unique
-    business   Business? @relation(fields: [businessId], references: [id])
+    business   Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int?      @unique
 
     createdAt DateTime @default(now())

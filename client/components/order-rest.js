@@ -55,13 +55,19 @@ const OrderRest = ({
                         <IconInfo
                             icon={<ShoppingBagIcon className="icon-no-bg" />}
                         >
-                            <span className="text-blue-three cursor-pointer text-sm">
-                                {capitalizeAll(
-                                    store?.storeType === "IND"
-                                        ? `${store?.user?.firstName} ${store?.user?.lastName}`
-                                        : store?.business?.name
-                                )}
-                            </span>
+                            {!store?.userId ? (
+                                <span className="dark-light italic text-sm">
+                                    seller deleted
+                                </span>
+                            ) : (
+                                <span className="text-blue-three cursor-pointer text-sm">
+                                    {capitalizeAll(
+                                        store?.storeType === "IND"
+                                            ? `${store?.user?.firstName} ${store?.user?.lastName}`
+                                            : store?.business?.name
+                                    )}
+                                </span>
+                            )}
                         </IconInfo>
                     )}
 
