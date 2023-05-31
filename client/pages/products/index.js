@@ -46,7 +46,7 @@ const Products = () => {
     return (
         <section>
             <Head>
-                <title>Explore Products</title>
+                <title>Explore products</title>
             </Head>
 
             <div className="flex items-center">

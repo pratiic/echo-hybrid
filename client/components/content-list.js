@@ -4,6 +4,7 @@ import Button from "./button";
 import NotificationCard from "./notification-card";
 import CartItem from "./cart-item";
 import UserCard from "./user-card";
+import OrderCard from "./order-card";
 
 import Human from "./human";
 

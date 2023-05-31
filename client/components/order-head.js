@@ -4,7 +4,7 @@ import { capitalizeFirstLetter } from "../lib/strings";
 import ProductControl from "./product-control";
 import Tag from "./tag";
 
-const OrderHead = ({ product, variant, quantity }) => {
+const OrderHead = ({ product, variant, quantity, allowProductControl }) => {
     return (
         <div className="flex">
             <div>
@@ -49,12 +49,14 @@ const OrderHead = ({ product, variant, quantity }) => {
                     <React.Fragment>
                         <Tag text="second hand" />
 
-                        <ProductControl
-                            productId={product?.id}
-                            canAddToCart={false}
-                            product={product}
-                            className="mt-5"
-                        />
+                        {allowProductControl && (
+                            <ProductControl
+                                productId={product?.id}
+                                canAddToCart={false}
+                                product={product}
+                                className="mt-5"
+                            />
+                        )}
                     </React.Fragment>
                 )}
             </div>

@@ -9,16 +9,8 @@ import {
     BellIcon,
     ShoppingBagIcon,
     ClipboardListIcon,
+    UserCircleIcon,
 } from "@heroicons/react/outline";
-import {
-    ShoppingBagIcon as ShoppingBagSolidIcon,
-    ChatAlt2Icon as ChatAlt2SolidIcon,
-    BellIcon as BellSolidIcon,
-    ShoppingCartIcon as ShoppingCartSolidIcon,
-    ClipboardListIcon as ClipboardListSolidIcon,
-    UserIcon as UserSolidIcon,
-    LogoutIcon as LogoutSolidIcon,
-} from "@heroicons/react/solid";
 import { MdOutlineExplore, MdExplore, MdOutlineHistory } from "react-icons/md";
 import { AiOutlineShop, AiFillShop } from "react-icons/ai";
 import { HiOutlineCash } from "react-icons/hi";
@@ -34,6 +26,7 @@ const Sidebar = () => {
     const { authUser } = useSelector((state) => state.auth);
     const { showSidebar } = useSelector((state) => state.sidebar);
     const { notifications } = useSelector((state) => state.notifications);
+    const { sellerOrders } = useSelector((state) => state.orders);
 
     const [counts, setCounts] = useState({});
     const [notificationsCount, setNotificationsCount] = useState(0);
@@ -55,27 +48,19 @@ const Sidebar = () => {
             name: "sellers",
             linkTo: "/sellers",
             icon: <AiOutlineShop className="icon-sidebar" />,
-            activeIcon: <AiFillShop className="icon-sidebar" />,
         },
         {
             name: "sell on echo",
             linkTo: "/sell-products",
             icon: <HiOutlineCash className="icon-sidebar" />,
         },
-        {
-            name: "my sales",
-            linkTo: "/my-sales",
-            icon: <ShoppingBagIcon className="icon-sidebar" />,
-            activeIcon: (
-                <ShoppingBagSolidIcon className="icon-sidebar-active" />
-            ),
-        },
+
         {
             name: "chats",
             linkTo: "/chats",
             count: 0,
             icon: <ChatAlt2Icon className="icon-sidebar" />,
-            activeIcon: <ChatAlt2SolidIcon className="icon-sidebar" />,
+
             countFlat: true,
         },
         {
@@ -83,14 +68,12 @@ const Sidebar = () => {
             linkTo: "/notifications",
             count: 0,
             icon: <BellIcon className="icon-sidebar" />,
-            activeIcon: <BellSolidIcon className="icon-sidebar" />,
         },
         {
             name: "cart",
             linkTo: "/cart",
             count: 0,
             icon: <ShoppingCartIcon className="icon-sidebar" />,
-            activeIcon: <ShoppingCartSolidIcon className="icon-sidebar" />,
             countFlat: true,
         },
         {
@@ -98,7 +81,6 @@ const Sidebar = () => {
             linkTo: "/orders",
             // linkTo: "/orders/?show=shop",
             icon: <ClipboardListIcon className="icon-sidebar" />,
-            activeIcon: <ClipboardListSolidIcon className="icon-sidebar" />,
             count: 0,
             activePath: "/orders",
         },
@@ -112,11 +94,15 @@ const Sidebar = () => {
         //     activePath: "/transactions",
         // },
         {
+            name: "seller profile",
+            linkTo: `sellers/${authUser?.store?.id}`,
+            icon: <UserCircleIcon className="icon-sidebar" />,
+        },
+        {
             name: "profile",
             // linkTo: "/profile/?show=details",
             linkTo: "/profile",
             icon: <UserIcon className="icon-sidebar" />,
-            activeIcon: <UserSolidIcon className="icon-sidebar" />,
             activePath: "/profile",
         },
         {
@@ -138,6 +124,18 @@ const Sidebar = () => {
 
         setNotificationsCount(unseenCount);
     }, [notifications]);
+
+    useEffect(() => {
+        // orders count
+        let unacknowledgedCount = 0;
+        sellerOrders.forEach((sellerOrder) => {
+            if (!sellerOrder.isAcknowledged) {
+                unacknowledgedCount++;
+            }
+        });
+
+        setOrdersCount(unacknowledgedCount);
+    }, [sellerOrders]);
 
     useEffect(() => {
         for (let link of links) {
@@ -197,6 +195,8 @@ const Sidebar = () => {
                         count={
                             link.name === "notifications"
                                 ? notificationsCount
+                                : link.name === "orders"
+                                ? ordersCount
                                 : 0
                         }
                         active={activeLink === link.name}

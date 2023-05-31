@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 
 import { fetcher } from "../lib/fetcher";
 import { setCategories } from "../redux/slices/categories-slice";
+import { updateAuthUser } from "../redux/slices/auth-slice";
 
 import Header from "./header";
 import Sidebar from "./sidebar";
@@ -14,7 +15,7 @@ import Products from "../cache/products";
 import Notification from "../real-time/notification";
 import Rating from "../real-time/rating";
 import Chat from "../real-time/chat";
-import { updateAuthUser } from "../redux/slices/auth-slice";
+import Order from "../real-time/order";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -84,6 +85,7 @@ const Layout = ({ children }) => {
                         <Notification />
                         <Rating />
                         <Chat />
+                        <Order />
 
                         {/* fake components to preserve cache */}
                         <Products />

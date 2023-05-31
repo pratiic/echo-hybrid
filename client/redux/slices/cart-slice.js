@@ -33,8 +33,6 @@ export const cartSlice = createSlice({
             state.items = state.items.filter(
                 (item) => parseInt(item.id) !== parseInt(action.payload)
             );
-            state.PAGE_SIZE -= 1;
-            state.totalCount -= 1;
         },
         setLoading: (state, action) => {
             state.loading = action.payload;

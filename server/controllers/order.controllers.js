@@ -1,3 +1,4 @@
+import { genericUserFields } from "../lib/data-source.lib.js";
 import { checkDelivery } from "../lib/delivery.lib.js";
 import { sendEmail } from "../lib/email.lib.js";
 import prisma from "../lib/prisma.lib.js";
@@ -13,6 +14,7 @@ export const placeOrder = async (request, response, next) => {
     const user = request.user;
     const productId = parseInt(request.params.productId) || 0;
     const orderInfo = request.body;
+    const io = request.io;
     let errorMsg = "";
 
     try {
@@ -157,10 +159,69 @@ export const placeOrder = async (request, response, next) => {
 
         const createdOrder = await prisma.order.create({
             data: orderData,
+            include: {
+                origin: {
+                    select: genericUserFields,
+                },
+                store: {
+                    include: {
+                        user: {
+                            select: {
+                                ...genericUserFields,
+                                address: true,
+                            },
+                        },
+                        business: {
+                            include: {
+                                address: true,
+                            },
+                        },
+                    },
+                },
+                product: true,
+            },
         });
+
+        // delete cart item in the requesting user's cart related to the orderd product
+        let cartItemId = null;
+        if (user.cart) {
+            const cartItems = await prisma.cartItem.findMany({
+                where: {
+                    cartId: user.cart.id,
+                    productId: product.id,
+                },
+                select: {
+                    id: true,
+                    variant: true,
+                },
+            });
+
+            if (cartItems.length > 0) {
+                let cartItem = cartItems[0];
+
+                if (stockType === "varied") {
+                    cartItem = cartItems.find(
+                        (cartItem) =>
+                            cartItem.variant.id === orderInfo.variantId
+                    );
+                }
+
+                if (cartItem) {
+                    await prisma.cartItem.delete({
+                        where: {
+                            id: cartItem.id,
+                        },
+                    });
+                    cartItemId = cartItem.id;
+                }
+            }
+        }
+
+        io.emit("order", createdOrder);
 
         response.json({
             order: createdOrder,
+            cartItemId,
         });
     } catch (error) {
         console.log(error);
@@ -170,22 +231,24 @@ export const placeOrder = async (request, response, next) => {
 
 export const getOrders = async (request, response, next) => {
     const user = request.user;
-    const target = request.query.target; // consumer or seller
+    const type = request.query.type; // user or seller
+    const page = parseInt(request.query.page) || 1;
+    let skip = parseInt(request.query.skip) || 0;
+    const searchQuery = request.query.query || "";
+    const PAGE_SIZE = 10;
 
-    if (target !== "consumer" && target !== "seller") {
+    if (type !== "user" && type !== "seller") {
         return next(
-            new HttpError(
-                "invalid target, valid target is 'consumer' or 'seller'"
-            )
+            new HttpError("invalid type, valid type is 'user' or 'seller'")
         );
     }
 
-    // consumer -> do not show cancelled orders
+    // user -> do not show cancelled orders
     // seller -> do not show rejected orders
     // both -> do not show "deleted" or completed orders
     let filter = {};
 
-    if (target === "consumer") {
+    if (type === "user") {
         filter = {
             originId: user.id,
             status: {
@@ -208,12 +271,56 @@ export const getOrders = async (request, response, next) => {
         },
     };
 
-    try {
-        const orders = await prisma.order.findMany({
-            where: filter,
-        });
+    let searchFilter = {};
 
-        response.json({ orders });
+    if (searchQuery) {
+        searchFilter = {
+            product: {
+                name: {
+                    contains: searchQuery,
+                    mode: "insensitive",
+                },
+            },
+        };
+    }
+
+    filter = { ...filter, ...searchFilter };
+
+    try {
+        const [orders, totalCount] = await Promise.all([
+            prisma.order.findMany({
+                where: filter,
+                include: {
+                    origin: {
+                        select: genericUserFields,
+                    },
+                    product: true,
+                    store: {
+                        include: {
+                            user: {
+                                select: { ...genericUserFields, address: true },
+                            },
+                            business: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                },
+                            },
+                        },
+                    },
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
+                take: PAGE_SIZE,
+                skip: (page - 1) * PAGE_SIZE + skip,
+            }),
+            prisma.order.count({
+                where: filter,
+            }),
+        ]);
+
+        response.json({ orders, totalCount });
     } catch (error) {
         console.log(error);
         next(new HttpError());
@@ -224,6 +331,7 @@ export const controlOrder = async (request, response, next) => {
     const user = request.user;
     const action = request.query.action;
     const order = request.order;
+    const io = request.io;
 
     const errorMsg = validateOrderAction(action);
 
@@ -313,9 +421,35 @@ export const controlOrder = async (request, response, next) => {
             );
         }
 
+        io.emit(`order-${action}`, {
+            id: order.id,
+            status: updatedOrder.status,
+            originId: order.origin.id,
+            sellerId: order.store.userId,
+        });
+
         response.json({ order: updatedOrder });
     } catch (error) {
         console.log(error);
+        next(new HttpError());
+    }
+};
+
+export const acknowledgeOrders = async (request, response, next) => {
+    const user = request.user;
+
+    try {
+        await prisma.order.updateMany({
+            where: {
+                storeId: user.store.id,
+            },
+            data: {
+                isAcknowledged: true,
+            },
+        });
+
+        response.json({});
+    } catch (error) {
         next(new HttpError());
     }
 };

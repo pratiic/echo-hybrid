@@ -272,6 +272,7 @@ model Order {
     quantity        Int?
     consumerAddress Json?
     isDeleted       Boolean     @default(false)
+    isAcknowledged  Boolean     @default(false)
 
     product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
     productId Int

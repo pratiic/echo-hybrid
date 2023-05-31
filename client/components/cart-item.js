@@ -105,7 +105,14 @@ const CartItem = ({ id, product, variant, quantity }) => {
         <div className="flex flex-col 600:flex-row mb-7 relative w-fit border-b border-faint pb-1">
             <div className="flex flex-col">
                 <div className="cursor-pointer" onClick={handleItemClick}>
-                    <OrderHead {...{ product, variant, quantity }} />
+                    <OrderHead
+                        {...{
+                            product,
+                            variant,
+                            quantity,
+                            allowProductControl: true,
+                        }}
+                    />
                 </div>
 
                 <div className="mt-3">

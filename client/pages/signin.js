@@ -68,7 +68,6 @@ const SignIn = () => {
 
                 <InputGroup
                     label="email"
-                    placeholder="email to your account"
                     value={email}
                     error={emailError}
                     onChange={setEmail}
@@ -77,7 +76,6 @@ const SignIn = () => {
 
                 <InputGroup
                     label="password"
-                    placeholder="password to your account"
                     value={password}
                     error={passwordError}
                     type="password"
