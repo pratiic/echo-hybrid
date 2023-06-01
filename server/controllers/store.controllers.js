@@ -63,6 +63,11 @@ export const getStoreDetails = async (request, response, next) => {
                     },
                 },
                 ratings: true,
+                suspension: {
+                    select: {
+                        id: true,
+                    },
+                },
             },
         });
 
@@ -72,6 +77,10 @@ export const getStoreDetails = async (request, response, next) => {
 
         if (store.isDeleted) {
             return next(new HttpError("the seller has been deleted", 404));
+        }
+
+        if (store.suspension) {
+            return next(new HttpError("the seller has been suspended", 400));
         }
 
         // check if the business has been verified
@@ -137,6 +146,7 @@ export const getStores = async (request, response, next) => {
                 id: request.user.id,
             },
         },
+        suspension: null,
     };
 
     try {

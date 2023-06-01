@@ -11,6 +11,7 @@ import Avatar from "../components/avatar";
 import Rating from "../components/rating";
 import CommentsContainer from "../components/comments-container";
 import Tag from "../components/tag";
+import { capitalizeAll } from "../lib/strings";
 
 const SellerDetails = ({
     id,
@@ -19,7 +20,9 @@ const SellerDetails = ({
     user,
     createdAt,
     rating,
+    ratings,
     isMyStore,
+    updateStore,
 }) => {
     const { authUser } = useSelector((state) => state.auth);
     const { theme } = useSelector((state) => state.theme);
@@ -110,10 +113,18 @@ const SellerDetails = ({
 
                 <Rating
                     rating={rating}
-                    //  ratings={ratings}
-                    //   userCanRate={!isMyShop}
-                    //  content={{ id, name }}
-                    //  onRate={updateShopInfo}
+                    ratings={ratings}
+                    userCanRate={!isMyStore}
+                    target={{
+                        id,
+                        name: capitalizeAll(
+                            storeType === "IND"
+                                ? `${user?.firstName} ${user?.lastName}`
+                                : business?.name
+                        ),
+                    }}
+                    isTargetBusiness={storeType === "BUS"}
+                    onRate={updateStore}
                 />
             </div>
 

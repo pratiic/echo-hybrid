@@ -12,6 +12,7 @@ import Form from "../components/form";
 import InputGroup from "../components/input-group";
 import Button from "../components/button";
 import FileSelector from "../components/file-selector";
+import { updateProduct } from "../redux/slices/products-slice";
 
 const SetProduct = () => {
     const [name, setName] = useState("");
@@ -34,10 +35,12 @@ const SetProduct = () => {
     const [deliveryChargeError, setDeliveryChargeError] = useState("");
     const [imagesError, setImagesError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [mode, setMode] = useState("");
 
     const { categories } = useSelector((state) => state.categories);
     const { authUser } = useSelector((state) => state.auth);
     const { selectedFiles } = useSelector((state) => state.files);
+    const { activeProduct } = useSelector((state) => state.products);
 
     const router = useRouter();
     const dispatch = useDispatch();
@@ -45,18 +48,60 @@ const SetProduct = () => {
     useEffect(() => {
         const store = authUser?.store;
 
-        //redirect if user has not registered as a seller
+        // redirect if user has not registered as a seller
         if (!store) {
             router.push("/sell-products");
         }
 
-        //redirect if business has not been registered and verified
+        if (store?.storeType === "IND" && !authUser?.address) {
+            dispatch(
+                setAlert({
+                    type: "info",
+                    message: "you need to set your address first",
+                })
+            );
+            router.push("/profile/?show=address&redirect=set-product");
+        }
+
+        // redirect if business has not been registered and verified
         if (store?.storeType === "BUS") {
             if (!store?.business || !store?.business?.isVerified) {
                 router.push("/business-registration");
             }
         }
-    }, [authUser?.store]);
+
+        // redirect if user address is not set
+    }, [authUser]);
+
+    useEffect(() => {
+        setMode(router.query?.mode || "create");
+    }, [router]);
+
+    useEffect(() => {
+        if (mode === "update" && !activeProduct) {
+            router.push("/set-product/?mode=create");
+        }
+
+        if (mode === "update" && activeProduct) {
+            const {
+                name,
+                description,
+                price,
+                per,
+                deliveryCharge,
+                brand,
+                madeIn,
+            } = activeProduct;
+
+            setName(name);
+            setDescription(description);
+            setPrice(price);
+            setPer(per);
+            setDeliveryCharge(deliveryCharge);
+            setBrand(brand);
+            setMadeIn(madeIn);
+        }
+    }, [mode, activeProduct]);
 
     const stockTypeOptions = [
         { label: "flat", value: "flat" },
@@ -83,30 +128,62 @@ const SetProduct = () => {
         ]);
 
         try {
-            const formData = generateFormData({
-                name,
-                description,
-                price,
-                per,
-                stockType,
-                category,
-                subCategory,
-                deliveryCharge,
-                brand,
-                madeIn,
-            });
+            let dataToSend = null;
+            const url =
+                mode === "create"
+                    ? "products"
+                    : `products/${activeProduct?.id}`;
 
-            selectedFiles.forEach((selectedFile) => {
-                formData.append("images", selectedFile);
-            });
+            if (mode === "create") {
+                const formData = generateFormData({
+                    name,
+                    description,
+                    price,
+                    per,
+                    stockType,
+                    category,
+                    subCategory,
+                    deliveryCharge,
+                    brand,
+                    madeIn,
+                });
 
-            const data = await fetcher("products", "POST", formData);
+                selectedFiles.forEach((selectedFile) => {
+                    formData.append("images", selectedFile);
+                });
 
+                dataToSend = formData;
+            } else {
+                dataToSend = {
+                    name,
+                    description,
+                    price,
+                    per,
+                    deliveryCharge,
+                    brand,
+                    madeIn,
+                };
+            }
+
+            const data = await fetcher(
+                url,
+                mode === "create" ? "POST" : "PATCH",
+                dataToSend
+            );
+
+            if (mode === "update") {
+                dispatch(updateProduct(data.product));
+            }
+
+            dispatch(
+                setAlert({
+                    message: `product ${
+                        mode === "create" ? "added" : "updated"
+                    } successfully`,
+                })
+            );
             router.push(`/products/${data.product.id}`);
-
-            dispatch(setAlert({ message: "product added successfully" }));
         } catch (error) {
-            console.log(error.message);
             if (
                 error.message.includes("image") ||
                 error.message.includes("File")
@@ -144,7 +221,10 @@ const SetProduct = () => {
 
     return (
         <section>
-            <Form heading="Add a product" onSubmit={handleFormSubmit}>
+            <Form
+                heading={mode === "create" ? "Add a product" : "Update product"}
+                onSubmit={handleFormSubmit}
+            >
                 <InputGroup
                     label="product name"
                     placeholder="min 5 chars, max 50 chars"
@@ -197,42 +277,47 @@ const SetProduct = () => {
                     onChange={setDeliveryCharge}
                 />
 
-                {authUser?.store?.storeType === "BUS" && (
-                    <InputGroup
-                        label="stock type"
-                        view="select"
-                        options={stockTypeOptions}
-                        value={stockType}
-                        info={<StockTypeInfo />}
-                        showRequired={false}
-                        onChange={setStockType}
-                    />
+                {mode === "create" && (
+                    // cannot update these fields
+                    <React.Fragment>
+                        {authUser?.store?.storeType === "BUS" && (
+                            <InputGroup
+                                label="stock type"
+                                view="select"
+                                options={stockTypeOptions}
+                                value={stockType}
+                                info={<StockTypeInfo />}
+                                showRequired={false}
+                                onChange={setStockType}
+                            />
+                        )}
+
+                        <InputGroup
+                            label="product category"
+                            view="select"
+                            options={categoryOptions}
+                            showRequired={false}
+                            value={category}
+                            onChange={setCategory}
+                        />
+
+                        <InputGroup
+                            label="Subcategory"
+                            placeholder="e.g. phone for electronics"
+                            value={subCategory}
+                            error={subcategoryError}
+                            onChange={setSubcategory}
+                        />
+
+                        <FileSelector
+                            label="product images (up to 5 images, 3 mb each)"
+                            multiple
+                            max={5}
+                            isRequired={true}
+                            error={imagesError}
+                        />
+                    </React.Fragment>
                 )}
-
-                <InputGroup
-                    label="product category"
-                    view="select"
-                    options={categoryOptions}
-                    showRequired={false}
-                    value={category}
-                    onChange={setCategory}
-                />
-
-                <InputGroup
-                    label="Subcategory"
-                    placeholder="e.g. phone for electronics"
-                    value={subCategory}
-                    error={subcategoryError}
-                    onChange={setSubcategory}
-                />
-
-                <FileSelector
-                    label="product images (up to 5 images, 3 mb each)"
-                    multiple
-                    max={5}
-                    isRequired={true}
-                    error={imagesError}
-                />
 
                 <InputGroup
                     label="product brand"
@@ -253,7 +338,14 @@ const SetProduct = () => {
                 />
 
                 <Button full loading={loading} rounded={false}>
-                    {loading ? "setting" : "set"} product
+                    {loading
+                        ? mode === "create"
+                            ? "setting"
+                            : "updating"
+                        : mode === "create"
+                        ? "set"
+                        : "update"}{" "}
+                    product
                 </Button>
             </Form>
         </section>

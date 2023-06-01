@@ -16,7 +16,7 @@ import Dropdown from "./dropdown";
 import DropdownItem from "./dropdown-item";
 import { updateAuthUser } from "../redux/slices/auth-slice";
 
-const SellerMenu = ({ storeId, storeType }) => {
+const SellerMenu = ({ storeId, storeType, isMyStore }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [deletionTitle, setDeletionTitle] = useState("");
 
@@ -78,12 +78,13 @@ const SellerMenu = ({ storeId, storeType }) => {
             </Icon>
 
             <Dropdown show={showDropdown} toggleDropdown={toggleDropdown}>
-                {/* <DropdownItem action="update" onClick={onUpdateClick}>
-                    update shop
-                </DropdownItem> */}
-                <DropdownItem action="delete" onClick={onDeleteClick}>
-                    delete seller profile
-                </DropdownItem>
+                {isMyStore ? (
+                    <DropdownItem action="delete" onClick={onDeleteClick}>
+                        delete seller profile
+                    </DropdownItem>
+                ) : (
+                    <DropdownItem action="report">report seller</DropdownItem>
+                )}
             </Dropdown>
         </div>
     );

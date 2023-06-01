@@ -83,7 +83,7 @@ const ProductPage = () => {
     }
 
     if (errorMsg) {
-        return <p className="status">Product not found</p>;
+        return <p className="status">{errorMsg}</p>;
     }
 
     return (

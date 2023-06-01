@@ -68,6 +68,17 @@ export const productsSlice = createSlice({
         setError: (state, action) => {
             state.error = action.payload;
         },
+        updateProduct: (state, action) => {
+            const { id, updateInfo } = action.payload;
+
+            state.products = state.products.map((product) => {
+                if (product.id === id) {
+                    return { ...product, ...updateInfo };
+                }
+
+                return product;
+            });
+        },
         deleteProduct: (state, action) => {
             state.products = state.products.filter(
                 (product) => product.id !== action.payload
@@ -90,6 +101,7 @@ export const {
     setNoMoreData,
     setTotalCount,
     setError,
+    updateProduct,
     deleteProduct,
 } = productsSlice.actions;
 

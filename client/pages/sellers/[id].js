@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { IdentificationIcon, ShoppingCartIcon } from "@heroicons/react/outline";
 
-import { capitalizeAll, capitalizeFirstLetter } from "../../lib/strings";
+import { capitalizeAll } from "../../lib/strings";
 import { fetcher } from "../../lib/fetcher";
 import useSocket from "../../hooks/use-socket";
+import { resetSellerFilterOptions } from "../../redux/slices/filter-slice";
 
 import OptionsToggle from "../../components/options-toggle";
 import PageHeader from "../../components/page-header";
@@ -29,7 +30,7 @@ const SellerPage = () => {
     const [activeOption, setActiveOption] = useState(options[0].name);
     const [storeDetails, setStoreDetails] = useState("");
     const [isMyStore, setIsMyStore] = useState(false);
-    const [loadingDetails, setLoadingDetails] = useState(false);
+    const [loadingDetails, setLoadingDetails] = useState(true);
     const [errorMsg, setErrorMsg] = useState("");
     const [sellerName, setSellerName] = useState(""); // IND -> seller's name, BUS -> business' name
     const [notFound, setNotFound] = useState(false);
@@ -37,6 +38,7 @@ const SellerPage = () => {
     const { authUser } = useSelector((state) => state.auth);
     const router = useRouter();
     const socket = useSocket();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (router?.query?.id) {
@@ -73,6 +75,38 @@ const SellerPage = () => {
         });
     }, [storeDetails]);
 
+    useEffect(() => {
+        socket.on("rating", (ratingInfo) => {
+            const { rating, ratingNum } = ratingInfo;
+
+            if (rating.storeId === storeDetails?.id) {
+                updateStore({
+                    rating: ratingNum,
+                    ratings: [...storeDetails?.ratings, rating],
+                });
+            }
+        });
+
+        socket.on("rating-delete", (ratingInfo) => {
+            const { id, ratingNum, targetId } = ratingInfo;
+
+            if (targetId === storeDetails?.id) {
+                updateStore({
+                    rating: ratingNum,
+                    ratings: storeDetails?.ratings?.filter(
+                        (rating) => rating.id !== id
+                    ),
+                });
+            }
+        });
+    }, [storeDetails]);
+
+    useEffect(() => {
+        return () => {
+            dispatch(resetSellerFilterOptions());
+        };
+    }, []);
+
     const getStoreDetails = async () => {
         const storeId = router?.query.id;
         setLoadingDetails(true);
@@ -93,6 +127,10 @@ const SellerPage = () => {
 
     const handleOptionClick = (option) => {
         setActiveOption(option);
+    };
+
+    const updateStore = (updateInfo) => {
+        setStoreDetails({ ...storeDetails, ...updateInfo });
     };
 
     if (loadingDetails) {
@@ -116,12 +154,11 @@ const SellerPage = () => {
             </Head>
 
             <PageHeader heading={sellerName} hasBackArrow>
-                {isMyStore && (
-                    <SellerMenu
-                        storeId={storeDetails?.id}
-                        storeType={storeDetails?.storeType}
-                    />
-                )}
+                <SellerMenu
+                    isMyStore={isMyStore}
+                    storeId={storeDetails?.id}
+                    storeType={storeDetails?.storeType}
+                />
             </PageHeader>
 
             <div className="mb-5 -mt-1">
@@ -134,9 +171,13 @@ const SellerPage = () => {
             </div>
 
             {activeOption === "details" && (
-                <SellerDetails {...{ ...storeDetails, isMyStore }} />
+                <SellerDetails
+                    {...{ ...storeDetails, isMyStore, updateStore }}
+                />
             )}
-            {activeOption === "products" && <SellerProducts />}
+            {activeOption === "products" && (
+                <SellerProducts sellerId={storeDetails?.user?.id} />
+            )}
         </section>
     );
 };

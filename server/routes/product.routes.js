@@ -44,6 +44,11 @@ export const productRouter = (io) => {
         (request, response, next) => {
             request.select = {
                 address: true,
+                store: {
+                    select: {
+                        id: true,
+                    },
+                },
             };
             auth(request, response, next);
         },

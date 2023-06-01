@@ -33,6 +33,9 @@ model User {
     chats               UserChat[]
     messages            Message[]
     cart                Cart?
+    createdReports      Report[]             @relation(name: "report_creator")
+    reports             Report[]             @relation(name: "reported_user")
+    suspension          Suspension?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -83,13 +86,15 @@ model Store {
     rating    Float     @default(0)
     isDeleted Boolean   @default(false)
 
-    user     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId   Int?      @unique
-    business Business?
-    product  Product[]
-    reviews  Review[]
-    ratings  Rating[]
-    orders   Order[]
+    user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId     Int?        @unique
+    business   Business?
+    product    Product[]
+    reviews    Review[]
+    ratings    Rating[]
+    orders     Order[]
+    reports    Report[]
+    suspension Suspension?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -138,6 +143,8 @@ model Product {
     variations   ProductVariation[]
     orders       Order[]
     cartItems    CartItem[]
+    reports      Report[]
+    suspension   Suspension?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -337,8 +344,7 @@ model Cart {
 }
 
 model CartItem {
-    id Int @id @default(autoincrement())
-
+    id       Int   @id @default(autoincrement())
     quantity Int?
     variant  Json?
 
@@ -346,6 +352,41 @@ model CartItem {
     cartId    Int
     product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
     productId Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Report {
+    id    Int    @id @default(autoincrement())
+    cause String
+
+    product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+    productId Int?
+    store     Store?   @relation(fields: [storeId], references: [id])
+    storeId   Int?
+    user      User?    @relation(fields: [userId], references: [id], name: "reported_user")
+    userId    Int?
+    creator   User     @relation(fields: [creatorId], references: [id], onDelete: Cascade, name: "report_creator")
+    creatorId Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique(fields: [creatorId, productId], name: "creator_product")
+    @@unique(fields: [creatorId, storeId], name: "creator_store")
+}
+
+model Suspension {
+    id    Int    @id @default(autoincrement())
+    cause String
+
+    product   Product? @relation(fields: [productId], references: [id])
+    productId Int?     @unique
+    store     Store?   @relation(fields: [storeId], references: [id])
+    storeId   Int?     @unique
+    user      User?    @relation(fields: [userId], references: [id])
+    userId    Int?     @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

@@ -7,6 +7,7 @@ import { BsReplyFill } from "react-icons/bs";
 import { getHowLongAgo } from "../lib/date-time";
 import { capitalizeFirstLetter } from "../lib/strings";
 import { setActiveComment } from "../redux/slices/comments-slice";
+import { openGallery } from "../redux/slices/gallery-slice";
 
 import Avatar from "./avatar";
 import ChatButton from "./chat-button";
@@ -51,6 +52,10 @@ const Comment = ({
         }, 50);
     };
 
+    const handleImageClick = () => {
+        dispatch(openGallery({ images: [image] }));
+    };
+
     return (
         <div
             className={`px-4 pt-5 w-full ${
@@ -86,7 +91,7 @@ const Comment = ({
 
             {/* image of the comment */}
             {image && (
-                <div className="mt-2">
+                <div className="mt-2 cursor-pointer" onClick={handleImageClick}>
                     <img
                         src={image}
                         alt="review-image"

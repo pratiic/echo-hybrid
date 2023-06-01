@@ -1,9 +1,11 @@
+import { sendEmail } from "../lib/email.lib.js";
 import { prepareImageData } from "../lib/image.lib.js";
 import prisma from "../lib/prisma.lib.js";
-import { trimValues } from "../lib/strings.lib.js";
+import { capitalizeFirstLetter, trimValues } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import {
     validateBusiness,
+    validateBusinessRegistrationControl,
     validateStatus,
 } from "../validators/business.validators.js";
 
@@ -139,6 +141,83 @@ export const getBusinessDetails = async (request, response, next) => {
 
         response.json({ business });
     } catch (error) {
+        next(new HttpError());
+    }
+};
+
+// accept or reject a business
+export const controlBusinessRegistration = async (request, response, next) => {
+    const business = request.business;
+    const action = request.query.action;
+    const { cause } = request.body;
+
+    const errorMsg = validateBusinessRegistrationControl({ action, cause });
+
+    if (errorMsg) {
+        return next(new HttpError(errorMsg), 400);
+    }
+
+    if (business.isVerified) {
+        return next(
+            new HttpError("the business has already been verified", 400)
+        );
+    }
+
+    if (!business.address) {
+        return next(
+            new HttpError(
+                "the address of the business has not been set yet",
+                400
+            )
+        );
+    }
+
+    let operation = null;
+
+    if (action === "accept") {
+        operation = prisma.business.update({
+            where: {
+                id: business.id,
+            },
+            data: {
+                isVerified: true,
+            },
+        });
+    } else {
+        // if store is deleted, business is automatically deleted
+        operation = prisma.store.deleteMany({
+            // delete would not work
+            where: {
+                business: {
+                    id: business.id,
+                },
+            },
+        });
+    }
+
+    // send email to business owner
+    const recipientEmail = business.store.user.email;
+    const subject = "business registration";
+    const text =
+        action === "accept"
+            ? "Congratulations, the business you had registered on Echo has been verified. You can start selling products on Echo now."
+            : `We are sorry to inform that the business you had registered on Echo has been rejected. The reason for rejection: \n${capitalizeFirstLetter(
+                  cause
+              )}.`;
+
+    sendEmail(recipientEmail, subject, text);
+
+    try {
+        await operation;
+
+        response.json({
+            message: `the business has been ${
+                action === "accept" ? "verified" : "rejected and thus deleted"
+            }`,
+        });
+    } catch (error) {
+        console.log(error);
+
         next(new HttpError());
     }
 };

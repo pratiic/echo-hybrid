@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { MenuAlt4Icon } from "@heroicons/react/outline";
@@ -60,11 +60,6 @@ const ProductMenu = ({ isMyProduct }) => {
         );
     };
 
-    if (!isMyProduct) {
-        // show menu only to owner
-        return null;
-    }
-
     return (
         <div className="w-fit">
             <Icon
@@ -76,15 +71,25 @@ const ProductMenu = ({ isMyProduct }) => {
             </Icon>
 
             <Dropdown show={showDropdown} toggleDropdown={toggleDropdown}>
-                <DropdownItem
-                    action="update"
-                    onClick={() => router.push("/set-product/?mode=update")}
-                >
-                    update product
-                </DropdownItem>
-                <DropdownItem action="delete" onClick={handleDeletion}>
-                    delete product
-                </DropdownItem>
+                {isMyProduct && (
+                    <React.Fragment>
+                        <DropdownItem
+                            action="update"
+                            onClick={() =>
+                                router.push("/set-product/?mode=update")
+                            }
+                        >
+                            update product
+                        </DropdownItem>
+                        <DropdownItem action="delete" onClick={handleDeletion}>
+                            delete product
+                        </DropdownItem>
+                    </React.Fragment>
+                )}
+
+                {!isMyProduct && (
+                    <DropdownItem action="report">report product</DropdownItem>
+                )}
             </Dropdown>
         </div>
     );

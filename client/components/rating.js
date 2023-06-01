@@ -27,6 +27,7 @@ const Rating = ({
     target,
     userCanRate,
     minRating = 0,
+    isTargetBusiness,
     onRate,
 }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -116,6 +117,7 @@ const Rating = ({
             showGenericModal(
                 <TargetRater
                     target={{ ...target, type: targetType }}
+                    isTargetBusiness={isTargetBusiness}
                     onRate={onRate}
                 />
             )
@@ -239,7 +241,10 @@ const Rating = ({
                                 // auth user has not rated
                                 <React.Fragment>
                                     <span className="block mb-2">
-                                        You have not rated this {targetType}
+                                        You have not rated this{" "}
+                                        {targetType === "product"
+                                            ? targetType
+                                            : "seller"}
                                     </span>
                                     <Button onClick={handleRateClick}>
                                         rate it

@@ -3,6 +3,7 @@ import {
     PencilAltIcon,
     TrashIcon,
     InformationCircleIcon,
+    FlagIcon,
 } from "@heroicons/react/outline";
 
 const DropdownItem = ({
@@ -20,6 +21,7 @@ const DropdownItem = ({
         update: <PencilAltIcon className="icon-no-bg" />,
         delete: <TrashIcon className="icon-no-bg" />,
         info: <InformationCircleIcon className="icon-no-bg" />,
+        report: <FlagIcon className="icon-no-bg" />,
     };
 
     const handleClick = (event) => {

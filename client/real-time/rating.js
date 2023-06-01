@@ -3,9 +3,9 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
+import { updateActiveProduct } from "../redux/slices/products-slice";
 
 import useSocket from "../hooks/use-socket";
-import { updateActiveProduct } from "../redux/slices/products-slice";
 
 const Rating = () => {
     const { activeProduct } = useSelector((state) => state.products);
@@ -35,7 +35,7 @@ const Rating = () => {
                     dispatch(
                         updateActiveProduct({
                             rating: ratingNum,
-                            ratings: activeProduct?.ratings.filter(
+                            ratings: activeProduct?.ratings?.filter(
                                 (rating) => rating.id !== id
                             ),
                         })

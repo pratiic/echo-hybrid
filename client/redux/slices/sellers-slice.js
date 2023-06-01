@@ -12,6 +12,7 @@ export const sellersSlice = createSlice({
         needToFetch: true,
         totalCount: 0,
         fetchCounter: 0,
+        query: "",
         page: 1,
         noMoreData: false,
         PAGE_SIZE: 15,
@@ -48,6 +49,9 @@ export const sellersSlice = createSlice({
         setFetchCounter: (state, action) => {
             state.fetchCounter = action.payload;
         },
+        setQuery: (state, action) => {
+            state.query = action.payload;
+        },
         setNoMoreData: (state, action) => {
             state.noMoreData = action.payload;
         },
@@ -77,6 +81,7 @@ export const {
     setTotalCount,
     setPage,
     setFetchCounter,
+    setQuery,
     setNoMoreData,
     updateShop,
 } = sellersSlice.actions;

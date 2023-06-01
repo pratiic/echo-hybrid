@@ -23,7 +23,7 @@ import Button from "./button";
 const ProductFilter = ({ isGlobal }) => {
     let options = {};
     options = useSelector((state) =>
-        isGlobal ? state.filter : state.filter.storeFilter
+        isGlobal ? state.filter : state.filter.sellerFilter
     );
     const {
         activeFilter: af,

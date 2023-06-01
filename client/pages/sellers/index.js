@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     DotsHorizontalIcon,
@@ -7,6 +7,7 @@ import {
 } from "@heroicons/react/outline";
 import { FaCity } from "react-icons/fa";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 import {
     setActiveFilter,
@@ -18,6 +19,7 @@ import {
     setNeedToFetch,
     setNoMoreData,
     setPage,
+    setQuery,
     setSellers,
     setTotalCount,
 } from "../../redux/slices/sellers-slice";
@@ -27,8 +29,10 @@ import PageHeader from "../../components/page-header";
 import ContentList from "../../components/content-list";
 import OptionsToggle from "../../components/options-toggle";
 import SellerFilterInfo from "../../components/filter-info/seller";
+import SearchBar from "../../components/search-bar";
 
 const Sellers = () => {
+    const [showSearchBar, setShowSearchBar] = useState(false);
     const dispatch = useDispatch();
     const {
         sellers,
@@ -40,10 +44,13 @@ const Sellers = () => {
         error,
         page,
         fetchCounter,
+        query,
         noMoreData,
+        totalCount,
         PAGE_SIZE,
     } = useSelector((state) => state.sellers);
     const { authUser } = useSelector((state) => state.auth);
+    const router = useRouter();
 
     const filterOptions = [
         { name: "all", icon: <DotsHorizontalIcon className="icon-no-bg" /> },
@@ -62,7 +69,7 @@ const Sellers = () => {
     useEffect(() => {
         dispatch(setPage(1));
         dispatch(setFetchCounter(fetchCounter + 1));
-    }, [activeFilter, activeLocationType]);
+    }, [activeFilter, activeLocationType, query]);
 
     useEffect(() => {
         dispatch(setNeedToFetch(true));
@@ -73,6 +80,14 @@ const Sellers = () => {
             fetchSellers();
         }
     }, [needToFetch]);
+
+    useEffect(() => {
+        dispatch(setQuery(router.query.query || ""));
+
+        if (router.query.query) {
+            setShowSearchBar(true);
+        }
+    }, [router]);
 
     const fetchSellers = async () => {
         if (loading || loadingMore) {
@@ -93,7 +108,7 @@ const Sellers = () => {
                     activeFilter === "location"
                         ? activeLocationType
                         : activeFilter
-                }&page=${page}`
+                }&page=${page}&query=${query}`
             );
 
             if (page === 1) {
@@ -120,13 +135,24 @@ const Sellers = () => {
         dispatch(setPage(page + 1));
     };
 
+    const toggleSearchBar = () => {
+        setShowSearchBar(!showSearchBar);
+        router.query.query = "";
+        router.push(router);
+    };
+
     return (
         <section>
             <Head>
                 <title>Explore sellers</title>
             </Head>
 
-            <PageHeader heading="explore sellers" hasBackArrow>
+            <PageHeader
+                heading="explore sellers"
+                hasBackArrow
+                onSearchClick={toggleSearchBar}
+                activeSearch={showSearchBar}
+            >
                 <div className="flex flex-col 450:flex-row items-end justify-end">
                     <OptionsToggle
                         options={filterOptions}
@@ -152,7 +178,15 @@ const Sellers = () => {
                 </div>
             </PageHeader>
 
-            <SellerFilterInfo />
+            {!showSearchBar && <SellerFilterInfo />}
+
+            <SearchBar
+                show={showSearchBar}
+                placeholder="Search sellers..."
+                resultsCount={totalCount}
+                value={query}
+                className="mb-5 -mt-2"
+            />
 
             <ContentList
                 list={sellers}

@@ -15,16 +15,6 @@ export const getCommentNotificationData = (
     baseCommentUserId,
     isTargetBusiness
 ) => {
-    console.log(
-        commentUser,
-        targetType,
-        targetId,
-        targetName,
-        targetUserId,
-        baseCommentId,
-        baseCommentUserId
-    );
-
     const { firstName, lastName } = commentUser;
     let notificationText = `${capitalizeAll(`${firstName} ${lastName}`)} `;
 
@@ -72,23 +62,19 @@ export const getRatingNotificationData = (
     targetType,
     targetId,
     targetName,
-    targetUserId
+    targetUserId,
+    isTargetBusiness
 ) => {
     const { firstName, lastName } = ratingUser;
     let notificationText = `${capitalizeAll(
         `${firstName} ${lastName}`
     )} gave a rating of ${rating} to `;
     notificationText +=
-        targetType === "product" ? `your product - ${targetName}` : "you";
-
-    const targetIdMap = {
-        product: targetId,
-        store: targetUserId,
-    };
-
+        targetType === "product"
+            ? `your product - ${targetName}`
+            : `${isTargetBusiness ? "your business" : "you"}`;
     const destinationId = targetUserId;
-
-    const linkTo = `/${targetStrMap[targetType]}s/${targetIdMap[targetType]}`;
+    const linkTo = `/${targetStrMap[targetType]}s/${targetId}`;
 
     return {
         text: notificationText,

@@ -5,25 +5,23 @@ import {
     capitalizeFirstLetter,
     singularOrPluralCount,
 } from "../../lib/strings";
+import { getFilterMap } from "../../lib/filter";
 
 const ProductFilterInfo = ({ activeCategory, showingShopProducts, count }) => {
-    const { activeFilter, locationFilter, shopFilter } = useSelector(
+    const { activeFilter, locationFilter, sellerFilter } = useSelector(
         (state) => state.filter
     );
 
-    const filterMap = {
-        all: "all products",
-        location: `products of your ${
-            !showingShopProducts ? locationFilter : shopFilter.locationFilter
-        }`,
-        delivered: "products that are delivered",
-        "second hand": "second hand products",
-    };
+    const filterMap = getFilterMap(
+        locationFilter,
+        sellerFilter,
+        showingShopProducts
+    );
 
     const renderTotalCount = () => {
         const filter =
             filterMap[
-                !showingShopProducts ? activeFilter : shopFilter.activeFilter
+                !showingShopProducts ? activeFilter : sellerFilter.activeFilter
             ];
 
         if (filter === "all products" || count === 0) {
@@ -48,7 +46,7 @@ const ProductFilterInfo = ({ activeCategory, showingShopProducts, count }) => {
                         filterMap[
                             !showingShopProducts
                                 ? activeFilter
-                                : shopFilter.activeFilter
+                                : sellerFilter.activeFilter
                         ]
                     )}
                 </span>{" "}

@@ -8,7 +8,7 @@ import {
     genericUserFields,
     productDeletionFields,
 } from "../lib/data-source.lib.js";
-import { checkDelivery, checkDeliverySingle } from "../lib/delivery.lib.js";
+import { checkDeliverySingle } from "../lib/delivery.lib.js";
 
 const MAX_IMAGES = 5;
 
@@ -222,14 +222,30 @@ export const getProducts = async (request, response, next) => {
 
     let primaryFilter = {
         isDeleted: false,
-        // NOT: {
-        //     stock: null,
-        // },
+        suspension: null,
     };
 
     if (storeId) {
         // products belongining to a store
         primaryFilter.storeId = storeId;
+    }
+
+    if (!storeId || (storeId && storeId !== user.store?.id)) {
+        // if stock not set -> only show inside the store of the requesting user
+        primaryFilter = {
+            ...primaryFilter,
+            OR: [
+                {
+                    isSecondHand: true,
+                },
+                {
+                    isSecondHand: false,
+                    NOT: {
+                        stock: null,
+                    },
+                },
+            ],
+        };
     }
 
     if (category) {
@@ -301,6 +317,11 @@ export const getProductDetails = async (request, response, next) => {
                 },
                 variations: true,
                 ratings: true,
+                suspension: {
+                    select: {
+                        id: true,
+                    },
+                },
             },
         });
 
@@ -310,6 +331,10 @@ export const getProductDetails = async (request, response, next) => {
 
         if (product.isDeleted) {
             return next(new HttpError("the product has been deleted", 404));
+        }
+
+        if (product.suspension) {
+            return next(new HttpError("the product has been suspended", 400));
         }
 
         response.json({ product });

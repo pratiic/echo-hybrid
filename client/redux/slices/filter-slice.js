@@ -11,6 +11,9 @@ const productFilterSlice = createSlice({
     name: "filter",
     initialState: {
         ...options,
+        sellerFilter: {
+            ...options,
+        },
     },
     reducers: {
         setFilterOptions: (state, action) => {
@@ -22,8 +25,8 @@ const productFilterSlice = createSlice({
             } = action.payload.options;
 
             if (!action.payload.isGlobal) {
-                // filter for stores
-                // state.shopFilter = { ...action.payload.options };
+                // filter for seller products
+                state.sellerFilter = { ...action.payload.options };
             } else {
                 state.activeFilter = activeFilter;
                 state.locationFilter = locationFilter;
@@ -31,8 +34,14 @@ const productFilterSlice = createSlice({
                 state.orderType = orderType;
             }
         },
+        resetSellerFilterOptions: (state, action) => {
+            state.sellerFilter = options;
+        },
     },
 });
 
-export const { setFilterOptions } = productFilterSlice.actions;
+export const {
+    setFilterOptions,
+    resetSellerFilterOptions,
+} = productFilterSlice.actions;
 export default productFilterSlice.reducer;

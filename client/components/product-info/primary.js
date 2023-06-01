@@ -51,14 +51,20 @@ const PrimaryInfo = ({
 
                     {/* product rating */}
                     {!isSecondHand && (
-                        <Rating rating={rating} small onlyStars />
+                        <div className="mb-1">
+                            <Rating rating={rating} small onlyStars />
+                        </div>
                     )}
 
                     {/* product state info */}
-                    <div className="mt-3 mb-2">
+                    <div
+                        className={`flex items-center space-x-3 mb-2 ${isSecondHand &&
+                            "-mt-1"}`}
+                    >
                         <Tag
                             text={isSecondHand ? "second hand" : "brand new"}
                         />
+                        {isMyProduct && <Tag text="my product" />}
                     </div>
 
                     {/* product price  */}

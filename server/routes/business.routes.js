@@ -2,9 +2,9 @@ import express from "express";
 
 import auth from "../middleware/auth.middleware.js";
 import {
+    controlBusinessRegistration,
     deleteBusiness,
     getBusinessDetails,
-    modifyBusinessStatus,
     registerBusiness,
     updateBusiness,
 } from "../controllers/business.controllers.js";
@@ -52,19 +52,30 @@ router.patch(
 );
 
 router.patch(
-    "/:businessId/status",
-    auth,
-    (request, response, next) => {
+    "/registration/:businessId",
+    (request, ...op) => {
+        request.validateAdmin = true;
+        auth(request, ...op);
+    },
+    (request, ...op) => {
         request.selectionFilter = {
-            address: {
+            isVerified: true,
+            address: true,
+            store: {
                 select: {
                     id: true,
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                        },
+                    },
                 },
             },
         };
-        validateBusiness(request, response, next);
+        validateBusiness(request, ...op);
     },
-    modifyBusinessStatus
+    controlBusinessRegistration
 );
 
 router.delete("/:businessId", auth, validateBusiness, deleteBusiness);

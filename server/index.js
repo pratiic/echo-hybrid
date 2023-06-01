@@ -25,6 +25,9 @@ import { messageRouter } from "./routes/message.routes.js";
 import { router as cartRouter } from "./routes/cart.routes.js";
 import { router as receiptRouter } from "./routes/receipt.routes.js";
 import { notificationRouter } from "./routes/notification.routes.js";
+import { statRouter } from "./routes/stat.routes.js";
+import { reportRouter } from "./routes/report.routes.js";
+import { suspensionRouter } from "./routes/suspension.routes.js";
 
 dotenv.config();
 
@@ -53,6 +56,9 @@ app.use("/api/orders", orderRouter(io));
 app.use("/api/chats", chatRouter(io));
 app.use("/api/messages", messageRouter(io));
 app.use("/api/carts", cartRouter);
+app.use("/api/stats", statRouter());
+app.use("/api/reports", reportRouter());
+app.use("/api/suspensions", suspensionRouter());
 app.use("/receipts", receiptRouter);
 
 // error handler middleware

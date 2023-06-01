@@ -4,14 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetcher } from "../lib/fetcher";
 import { closeModal, showLoadingModal } from "../redux/slices/modal-slice";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
+import { getRatingNotificationData } from "../lib/notification";
 
 import Rating from "./rating";
 import Button from "./button";
 import InputGroup from "./input-group";
-import { capitalizeFirstLetter } from "../lib/strings";
-import { getRatingNotificationData } from "../lib/notification";
 
-const TargetRater = ({ target: { id, name, type }, onRate }) => {
+const TargetRater = ({
+    target: { id, name, type },
+    onRate,
+    isTargetBusiness,
+}) => {
     const [rating, setRating] = useState(1);
 
     const dispatch = useDispatch();
@@ -40,7 +43,8 @@ const TargetRater = ({ target: { id, name, type }, onRate }) => {
                 type,
                 id,
                 name,
-                data.targetUserId
+                data.targetUserId,
+                isTargetBusiness
             );
 
             fetcher("notifications", "POST", notificationData);
