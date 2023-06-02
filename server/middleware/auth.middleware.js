@@ -34,6 +34,7 @@ const auth = async (request, response, next) => {
                     id: true,
                     isVerified: true,
                     isAdmin: true,
+                    isDeliveryPersonnel: true,
                     ...(request.select || {}), // fields within user to select
                 },
             });
@@ -47,6 +48,19 @@ const auth = async (request, response, next) => {
                 return next(
                     new HttpError(
                         "you need to be an admin to perform this action",
+                        401
+                    )
+                );
+            }
+
+            if (
+                request.validateDeliveryPersonnel &&
+                !requestingUser.isDeliveryPersonnel
+            ) {
+                // need to be a delivery personnel
+                return next(
+                    new HttpError(
+                        "you need to be a delivery personnel to perform this action",
                         401
                     )
                 );

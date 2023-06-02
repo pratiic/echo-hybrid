@@ -1,4 +1,7 @@
-import { genericUserFields } from "../lib/data-source.lib.js";
+import {
+    genericUserFields,
+    transactionSelectionFields,
+} from "../lib/data-source.lib.js";
 import { checkDelivery } from "../lib/delivery.lib.js";
 import { sendEmail } from "../lib/email.lib.js";
 import prisma from "../lib/prisma.lib.js";
@@ -308,6 +311,7 @@ export const getOrders = async (request, response, next) => {
                             },
                         },
                     },
+                    orderCompletion: true,
                 },
                 orderBy: {
                     createdAt: "desc",
@@ -569,6 +573,159 @@ export const deleteOrder = async (request, response, next) => {
         });
 
         response.json({ message: "order has been deleted" });
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
+export const requestCompletion = async (request, response, next) => {
+    // claim that an order has been completed or delivered
+    // delivery available -> delivery personnel
+    // delivery not availabel -> seller
+
+    const user = request.user;
+    const order = request.order;
+    const io = request.io;
+
+    if (
+        (order.isDelivered && !user.isDeliveryPersonnel) ||
+        (!order.isDelivered && order.store.userId !== user.id)
+    ) {
+        return next(
+            new HttpError(
+                "you are unauthorized to request the completion of this order",
+                401
+            )
+        );
+    }
+
+    if (order.status !== "PACKAGED") {
+        return next(new HttpError("the order needs to be packaged first", 400));
+    }
+
+    if (order.orderCompletion) {
+        return next(
+            new HttpError("a completion request has already been made", 400)
+        );
+    }
+
+    try {
+        const completionRequest = await prisma.orderCompletion.create({
+            data: {
+                orderId: order.id,
+                madeBy: user.isDeliveryPersonnel
+                    ? "DELIVERY_PERSONNEL"
+                    : "SELLER",
+            },
+        });
+
+        io.emit("order-completion-request", {
+            id: order.id,
+            updateInfo: {
+                orderCompletion: completionRequest,
+            },
+            originId: order.originId,
+        });
+
+        response.json({
+            request: completionRequest,
+        });
+    } catch (error) {
+        console.log(error);
+
+        next(new HttpError());
+    }
+};
+
+export const handleCompletionRequest = async (request, response, next) => {
+    const user = request.user;
+    const order = request.order;
+    const action = request.query.action;
+    const io = request.io;
+
+    if (action !== "accept" && action !== "reject") {
+        return next(new HttpError("invalid action", 400));
+    }
+
+    if (!order.orderCompletion) {
+        return next(
+            new HttpError("a request to complete the order does not exist", 400)
+        );
+    }
+
+    if (order.originId !== user.id) {
+        return next(
+            new HttpError(
+                "you are unauthorized to handle the completion request of this order",
+                400
+            )
+        );
+    }
+
+    let createdTransaction;
+
+    if (action === "accept") {
+        // update the status of the order and create a transaction
+        await prisma.$transaction(async (prisma) => {
+            const [, transaction] = await Promise.all([
+                prisma.order.update({
+                    where: {
+                        id: order.id,
+                    },
+                    data: {
+                        status: "COMPLETED",
+                        isDeleted: true,
+                    },
+                }),
+                prisma.transaction.create({
+                    data: {
+                        orderId: order.id,
+                        createdMonth: new Date().getMonth(),
+                        createdYear: new Date().getFullYear(),
+                    },
+                    select: transactionSelectionFields,
+                }),
+            ]);
+
+            createdTransaction = transaction;
+        });
+    }
+
+    try {
+        // delete order completion request
+        await prisma.orderCompletion.delete({
+            where: {
+                id: order.orderCompletion.id,
+            },
+        });
+
+        io.emit(`order-completion-${action}`, {
+            id: order.id,
+            originId: order.originId,
+            updateInfo:
+                action === "accept"
+                    ? {
+                          status: "completed",
+                          orderCompletion: null,
+                      }
+                    : {
+                          orderCompletion: null,
+                      },
+        });
+
+        if (createdTransaction) {
+            io.emit("new-transaction", {
+                ...createdTransaction,
+            });
+        }
+
+        response.json(
+            action === "accept"
+                ? {
+                      transaction: createdTransaction,
+                  }
+                : {}
+        );
     } catch (error) {
         next(new HttpError());
     }

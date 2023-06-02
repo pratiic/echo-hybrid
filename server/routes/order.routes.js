@@ -6,7 +6,9 @@ import {
     controlOrder,
     deleteOrder,
     getOrders,
+    handleCompletionRequest,
     placeOrder,
+    requestCompletion,
 } from "../controllers/order.controllers.js";
 import { validateOrder } from "../middleware/order.middleware.js";
 
@@ -118,6 +120,54 @@ export const orderRouter = (io) => {
             validateOrder(request, response, next);
         },
         deleteOrder
+    );
+
+    router.post(
+        "/:orderId/completion",
+        auth,
+        (request, ...op) => {
+            request.select = {
+                id: true,
+                isDelivered: true,
+                store: {
+                    select: {
+                        id: true,
+                        userId: true,
+                    },
+                },
+                status: true,
+                orderCompletion: {
+                    select: {
+                        id: true,
+                    },
+                },
+                originId: true,
+            };
+            validateOrder(request, ...op);
+        },
+        (request, ...op) => {
+            request.io = io;
+            requestCompletion(request, ...op);
+        }
+    );
+
+    router.patch(
+        "/:orderId/completion",
+        auth,
+        (request, ...op) => {
+            request.io = io;
+            request.select = {
+                id: true,
+                orderCompletion: {
+                    select: {
+                        id: true,
+                    },
+                },
+                originId: true,
+            };
+            validateOrder(request, ...op);
+        },
+        handleCompletionRequest
     );
 
     return router;
