@@ -50,8 +50,10 @@ export const placeOrder = async (request, response, next) => {
             },
         });
 
-        if (!product) {
-            return next(new HttpError("product not found", 404));
+        if (!product || product.isDeleted) {
+            return next(
+                new HttpError("product not found, may have been deleted", 404)
+            );
         }
 
         // cannot order one's own product

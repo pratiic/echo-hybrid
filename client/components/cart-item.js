@@ -46,7 +46,7 @@ const CartItem = ({ id, product, variant, quantity }) => {
             checkDelivery(
                 authUser?.address,
                 product?.isSecondHand
-                    ? product?.user?.address
+                    ? product?.store?.user?.address
                     : product?.store?.business?.address
             )
         );
@@ -62,7 +62,13 @@ const CartItem = ({ id, product, variant, quantity }) => {
                 quantity: quantity,
             });
 
-            dispatch(updateCartItem({ id, updateInfo: data.item }));
+            dispatch(
+                updateCartItem({
+                    id,
+                    stock: data.item.product.stock,
+                    quantity: data.item.quantity,
+                })
+            );
         } catch (error) {
             dispatch(setErrorAlert(error.message));
         } finally {

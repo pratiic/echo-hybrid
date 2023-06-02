@@ -19,11 +19,15 @@ export const cartSlice = createSlice({
             }
         },
         updateCartItem: (state, action) => {
-            const { id, updateInfo } = action.payload;
+            const { id, stock, quantity } = action.payload;
 
             state.items = state.items.map((item) => {
                 if (item.id === id) {
-                    return { ...item, ...updateInfo };
+                    return {
+                        ...item,
+                        product: { ...item.product, stock },
+                        quantity,
+                    };
                 }
 
                 return item;

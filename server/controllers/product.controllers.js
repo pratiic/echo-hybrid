@@ -273,8 +273,8 @@ export const getProducts = async (request, response, next) => {
     }
 
     const whereObj = {
-        ...(filter === "delivered" ? filterMap[filter]() : filterMap[filter]),
         ...primaryFilter,
+        ...(filter === "delivered" ? filterMap[filter]() : filterMap[filter]),
     };
 
     try {

@@ -9,7 +9,7 @@ import { checkDelivery } from "../lib/delivery";
 import PageHeader from "../components/page-header";
 import ContentList from "../components/content-list";
 import InfoUnit from "../components/info-unit";
-// import OrderAll from "../components/order-all";
+import OrderAll from "../components/order-all";
 
 const Cart = () => {
     const [totalUnitPrice, setTotalUnitPrice] = useState(0);
@@ -39,7 +39,7 @@ const Cart = () => {
                 const currDeliveryCharge = checkDelivery(
                     authUser?.address,
                     curr?.product?.isSecondHand
-                        ? curr?.product?.user?.address
+                        ? curr?.product?.store?.user?.address
                         : curr?.product?.store?.business?.address
                 )
                     ? curr?.product?.deliveryCharge
@@ -76,7 +76,7 @@ const Cart = () => {
             />
 
             {items.length > 0 && (
-                <div className="mb-7">
+                <div className="mb-5">
                     <div className="mb-5 -mt-2 400:max-w-[300px]">
                         <InfoUnit
                             label="Total items"
@@ -121,9 +121,7 @@ const Cart = () => {
                         />
                     </div>
 
-                    {/* <div className="mt-5">
-                        <OrderAll items={items} />
-                    </div> */}
+                    <OrderAll items={items} />
                 </div>
             )}
 

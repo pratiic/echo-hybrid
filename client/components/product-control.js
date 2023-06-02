@@ -13,7 +13,7 @@ import {
     showGenericModal,
     showLoadingModal,
 } from "../redux/slices/modal-slice";
-import { addCartItem } from "../redux/slices/cart-slice";
+import { addCartItem, updateCartItem } from "../redux/slices/cart-slice";
 
 import Button from "./button";
 import OrderDetails from "./order-details";
@@ -32,7 +32,9 @@ const ProductControl = ({
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const handleOrderClick = () => {
+    const handleOrderClick = (event) => {
+        event.stopPropagation();
+
         dispatch(
             showGenericModal(
                 <OrderDetails
@@ -54,6 +56,13 @@ const ProductControl = ({
                 quantity,
             });
             dispatch(addCartItem(data.item));
+            dispatch(
+                updateCartItem({
+                    id: data.item.id,
+                    stock: data.item.product.stock,
+                    quantity: data.item.quantity,
+                })
+            );
             router.push("/cart");
         } catch (error) {
             if (error.message.includes("already exists")) {

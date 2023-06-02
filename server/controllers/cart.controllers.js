@@ -178,7 +178,11 @@ export const setCartItem = async (request, response, next) => {
                     },
                     data: itemData,
                     include: {
-                        product: true,
+                        product: {
+                            include: {
+                                stock: true,
+                            },
+                        },
                     },
                 });
             } else {
@@ -248,7 +252,7 @@ export const getCartItems = async (request, response, next) => {
                 },
             },
             orderBy: {
-                updatedAt: "desc",
+                createdAt: "desc",
             },
         });
 
@@ -307,6 +311,7 @@ export const checkOrderAbility = async (request, response, next) => {
                 // product has been sold or deleted
                 itemInfo = {
                     maxQuantity: -1,
+                    isSecondHand: true,
                 };
             }
         } else {
