@@ -3,6 +3,10 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { useSelector } from "react-redux";
 import { BsArrowDownLeftCircle, BsArrowUpRightCircle } from "react-icons/bs";
+import {
+    ArrowCircleLeftIcon,
+    ArrowCircleRightIcon,
+} from "@heroicons/react/outline";
 
 import { capitalizeFirstLetter } from "../lib/strings";
 
@@ -14,11 +18,11 @@ const Orders = () => {
     const [options, setOptions] = useState([
         {
             name: "order requests",
-            icon: <BsArrowDownLeftCircle className="icon-no-bg" />,
+            icon: <ArrowCircleLeftIcon className="icon-no-bg" />,
         },
         {
             name: "my orders",
-            icon: <BsArrowUpRightCircle className="icon-no-bg" />,
+            icon: <ArrowCircleRightIcon className="icon-no-bg" />,
         },
     ]);
     const [activeOption, setActiveOption] = useState("");

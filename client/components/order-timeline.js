@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const OrderTimeline = ({ status }) => {
+const OrderTimeline = ({ status, isDelivered }) => {
     const states =
         status === "REJECTED"
             ? [
@@ -31,7 +31,7 @@ const OrderTimeline = ({ status }) => {
                       label: "PACKAGED",
                   },
                   {
-                      label: "COMPLETED",
+                      label: isDelivered ? "DELIVERED" : "COMPLETED",
                   },
               ];
 

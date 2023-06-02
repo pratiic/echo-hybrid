@@ -1,7 +1,7 @@
-import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { DotsHorizontalIcon } from "@heroicons/react/outline";
+import { DotsHorizontalIcon, FlagIcon } from "@heroicons/react/outline";
 import { BsReplyFill } from "react-icons/bs";
 
 import { getHowLongAgo } from "../lib/date-time";
@@ -102,11 +102,6 @@ const Comment = ({
 
             {/* footer of the comment  */}
             <div className="flex items-center justify-end space-x-3">
-                {/* icon to chat with a comment user */}
-                {user?.id !== authUser?.id && (
-                    <ChatButton small userId={user?.id} />
-                )}
-
                 {commentType === "review" && (
                     // icon to reply to a review
                     <Icon toolName="reply" onClick={handleReplyClick}>
@@ -118,36 +113,49 @@ const Comment = ({
                     </Icon>
                 )}
 
-                {/* only allow creator of the review to perform certain actions  */}
-                {user?.id === authUser?.id && (
-                    <div className="relative">
-                        <Icon onClick={toggleDropdown} toolName="options">
-                            <DotsHorizontalIcon className="icon" />
-                        </Icon>
-
-                        <Dropdown
-                            show={showDropdown}
-                            position="top"
-                            toggleDropdown={toggleDropdown}
-                        >
-                            {commentType === "review" && (
-                                <DropdownItem
-                                    action="update"
-                                    onClick={handleUpdateClick}
-                                >
-                                    update {commentType}
-                                </DropdownItem>
-                            )}
-
-                            <DropdownItem
-                                action="delete"
-                                onClick={() => handleCommentDeletion(id)}
-                            >
-                                delete {commentType}
-                            </DropdownItem>
-                        </Dropdown>
-                    </div>
+                {/* icon to chat with a comment user */}
+                {user?.id !== authUser?.id && (
+                    <ChatButton small userId={user?.id} />
                 )}
+
+                {/* only allow creator of the review to perform certain actions  */}
+                <div className="relative">
+                    <Icon onClick={toggleDropdown} toolName="options">
+                        <DotsHorizontalIcon className="icon" />
+                    </Icon>
+
+                    <Dropdown
+                        show={showDropdown}
+                        position="top"
+                        toggleDropdown={toggleDropdown}
+                    >
+                        {user?.id === authUser?.id ? (
+                            <React.Fragment>
+                                {commentType === "review" && (
+                                    <DropdownItem
+                                        action="update"
+                                        onClick={handleUpdateClick}
+                                    >
+                                        update {commentType}
+                                    </DropdownItem>
+                                )}
+
+                                <DropdownItem
+                                    action="delete"
+                                    onClick={() => handleCommentDeletion(id)}
+                                >
+                                    delete {commentType}
+                                </DropdownItem>
+                            </React.Fragment>
+                        ) : (
+                            <React.Fragment>
+                                <DropdownItem action="report">
+                                    report user
+                                </DropdownItem>
+                            </React.Fragment>
+                        )}
+                    </Dropdown>
+                </div>
             </div>
 
             {/* replies of the comment  */}

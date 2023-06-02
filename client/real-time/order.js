@@ -67,6 +67,7 @@ const Order = () => {
         });
 
         socket.on("order-completion-request", (orderInfo) => {
+            console.log(orderInfo);
             handleOrderCompletion(orderInfo);
         });
 

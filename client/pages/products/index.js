@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { BiCategory, BiSearch } from "react-icons/bi";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 
-import { setCategory } from "../../redux/slices/products-slice";
+import {
+    setCategory,
+    setPage,
+    setQuery,
+} from "../../redux/slices/products-slice";
 
 import Icon from "../../components/icon";
 import PageHeader from "../../components/page-header";
@@ -12,6 +16,7 @@ import CategoriesPanel from "../../components/categories-panel";
 import FilterTrigger from "../../components/filter-trigger";
 import ContentList from "../../components/content-list";
 import ProductFilterInfo from "../../components/filter-info/product";
+import SearchBar from "../../components/search-bar";
 
 const Products = () => {
     const [showCategories, setShowCategories] = useState(false);
@@ -30,10 +35,18 @@ const Products = () => {
         PAGE_SIZE,
     } = useSelector((state) => state.products);
 
-    console.log(totalCount);
-
     const router = useRouter();
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(setQuery(router.query.query || ""));
+    }, [router]);
+
+    useEffect(() => {
+        if (router.query?.query) {
+            setShowSearchBar(true);
+        }
+    }, [router]);
 
     const toggleCategoriesPanel = () => {
         setShowCategories(!showCategories);
@@ -41,6 +54,12 @@ const Products = () => {
 
     const toggleSearchBar = () => {
         setShowSearchBar(!showSearchBar);
+        router.query.query = "";
+        router.push(router);
+    };
+
+    const incrementPageNumber = () => {
+        dispatch(setPage(page + 1));
     };
 
     return (
@@ -92,6 +111,15 @@ const Products = () => {
                 </div>
             </div>
 
+            <SearchBar
+                show={showSearchBar}
+                placeholder="Search products"
+                resultsCount={totalCount}
+                contentType="product"
+                value={query}
+                className="mb-5 -mt-2"
+            />
+
             <CategoriesPanel
                 show={showCategories}
                 activeCategory={category}
@@ -102,10 +130,12 @@ const Products = () => {
                 togglePanel={toggleCategoriesPanel}
             />
 
-            <ProductFilterInfo
-                activeCategory={category}
-                count={products.length}
-            />
+            {!showSearchBar && (
+                <ProductFilterInfo
+                    activeCategory={category}
+                    count={totalCount}
+                />
+            )}
 
             <ContentList
                 list={products}
@@ -118,7 +148,7 @@ const Products = () => {
                 incrementPageNumber={
                     products.length >= PAGE_SIZE &&
                     !noMoreData &&
-                    controlPageNumber
+                    incrementPageNumber
                 }
                 loadingMore={loadingMore}
             />

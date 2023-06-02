@@ -71,7 +71,7 @@ const Modal = () => {
                 {type === "confirmation" && (
                     <div className="black-white">
                         {title && (
-                            <h3 className="text-2xl font-semibold mb-1">
+                            <h3 className="text-2xl font-semibold mb-1 leading-tight">
                                 {capitalizeFirstLetter(title)}
                             </h3>
                         )}

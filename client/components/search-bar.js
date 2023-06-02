@@ -105,10 +105,10 @@ const SearchBar = ({
             {router.query.query && (
                 <p className="mt-2 text-sm ml-3 dark-light">
                     Showing results for{" "}
-                    <span className="font-semibold black-white">
+                    <span className="font-semibold text-blue-400">
                         {router.query.query}
                     </span>{" "}
-                    <span className="black-white">
+                    <span className="dark-light">
                         ({resultsCount}{" "}
                         {resultsCount === 0 || resultsCount > 1
                             ? pluralMap[contentType]

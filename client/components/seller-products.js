@@ -40,7 +40,11 @@ const SellerProducts = ({ sellerId }) => {
 
     useEffect(() => {
         getShopProducts();
-    }, [activeFilter, locationFilter, sortBy, sortType, query, page]);
+    }, [page]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [activeFilter, locationFilter, sortBy, sortType, query]);
 
     const getShopProducts = async () => {
         if (loading || loadingMore) {
@@ -62,8 +66,7 @@ const SellerProducts = ({ sellerId }) => {
                 }&sortBy=${sortBy}&sortType=${sortType}&query=${query}&page=${page}`
             );
 
-            // setTotalCount(data.totalCount);
-            setTotalCount(data.products.length);
+            setTotalCount(data.totalCount);
 
             if (page === 1) {
                 setProducts(data.products);

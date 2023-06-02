@@ -34,7 +34,7 @@ const OrderCard = ({
     unitPrice,
     isDelivered,
     deliveryCharge,
-    // orderCompletion,
+    orderCompletion,
     createdAt,
 }) => {
     const [showDropdown, setShowDropdown] = useState(false);
@@ -201,20 +201,19 @@ const OrderCard = ({
                 <OrderHead {...{ product, variant, quantity }} />
 
                 {/* order control */}
-                {(isSellerOrder || status === "packaged") && (
-                    <OrderControl
-                        orderId={id}
-                        status={status}
-                        origin={origin}
-                        product={product}
-                        // orderCompletion={orderCompletion}
-                        orderType={isUserOrder ? "user" : "seller"}
-                        store={store}
-                    />
-                )}
+                <OrderControl
+                    orderId={id}
+                    status={status}
+                    origin={origin}
+                    product={product}
+                    orderCompletion={orderCompletion}
+                    orderType={isUserOrder ? "user" : "seller"}
+                    store={store}
+                    isDelivered={isDelivered}
+                />
 
                 {/* order timeline */}
-                <OrderTimeline status={status} />
+                <OrderTimeline status={status} isDelivered={isDelivered} />
             </div>
 
             <OrderRest
