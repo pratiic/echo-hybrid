@@ -69,6 +69,8 @@ export const orderRouter = (io) => {
             request.select = {
                 id: true,
                 status: true,
+                quantity: true,
+                variant: true,
                 store: {
                     select: {
                         id: true,
@@ -79,6 +81,8 @@ export const orderRouter = (io) => {
                     select: {
                         id: true,
                         name: true,
+                        isSecondHand: true,
+                        stock: true,
                     },
                 },
                 origin: {

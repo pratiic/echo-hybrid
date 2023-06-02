@@ -131,7 +131,9 @@ export const getProducts = async (request, response, next) => {
     let sortBy = request.query.sortBy || "createdAt";
     const category = request.query.category;
     const searchQuery = request.query.query || "";
+    const page = parseInt(request.query.page) || 1;
     const storeId = parseInt(request.query.storeId);
+    const PAGE_SIZE = 15;
 
     if (sortBy === "date added") {
         sortBy = "createdAt";
@@ -253,36 +255,60 @@ export const getProducts = async (request, response, next) => {
         primaryFilter.categoryName = category;
     }
 
+    if (searchQuery) {
+        const fields = ["name", "brand", "subCategory"];
+
+        const searchFilter = {
+            OR: fields.map((field) => {
+                return {
+                    [field]: {
+                        contains: searchQuery.trim(),
+                        mode: "insensitive",
+                    },
+                };
+            }),
+        };
+
+        primaryFilter = { ...primaryFilter, ...searchFilter };
+    }
+
+    const whereObj = {
+        ...(filter === "delivered" ? filterMap[filter]() : filterMap[filter]),
+        ...primaryFilter,
+    };
+
     try {
-        const products = await prisma.product.findMany({
-            where: {
-                ...(filter === "delivered"
-                    ? filterMap[filter]()
-                    : filterMap[filter]),
-                ...primaryFilter,
-            },
-            include: {
-                store: {
-                    include: {
-                        user: {
-                            include: {
-                                address: true,
+        const [products, totalCount] = await Promise.all([
+            prisma.product.findMany({
+                where: whereObj,
+                include: {
+                    store: {
+                        include: {
+                            user: {
+                                include: {
+                                    address: true,
+                                },
                             },
                         },
                     },
                 },
-            },
-            orderBy: [
-                {
-                    [sortBy]: sortType,
-                },
-                {
-                    createdAt: "asc",
-                },
-            ],
-        });
+                orderBy: [
+                    {
+                        [sortBy]: sortType,
+                    },
+                    {
+                        createdAt: "asc",
+                    },
+                ],
+                take: PAGE_SIZE,
+                skip: (page - 1) * PAGE_SIZE,
+            }),
+            prisma.product.count({
+                where: whereObj,
+            }),
+        ]);
 
-        response.json({ products });
+        response.json({ products, totalCount });
     } catch (error) {
         next(new HttpError());
     }

@@ -137,8 +137,35 @@ export const getStores = async (request, response, next) => {
         area: getAddressFilter("area"),
     };
 
+    let searchFilter = {};
+
+    if (searchQuery) {
+        const genericObj = {
+            contains: searchQuery.trim(),
+            mode: "insensitive",
+        };
+
+        searchFilter = {
+            OR: [
+                {
+                    storeType: "IND",
+                    user: {
+                        fullName: genericObj,
+                    },
+                },
+                {
+                    storeType: "BUS",
+                    business: {
+                        name: genericObj,
+                    },
+                },
+            ],
+        };
+    }
+
     const whereObj = {
         ...filterMap[filter],
+        ...searchFilter,
         isDeleted: false,
         NOT: {
             // do not get the requesting user's own store

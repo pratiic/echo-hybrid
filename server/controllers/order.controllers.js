@@ -277,7 +277,7 @@ export const getOrders = async (request, response, next) => {
         searchFilter = {
             product: {
                 name: {
-                    contains: searchQuery,
+                    contains: searchQuery.trim(),
                     mode: "insensitive",
                 },
             },
@@ -332,6 +332,7 @@ export const controlOrder = async (request, response, next) => {
     const action = request.query.action;
     const order = request.order;
     const io = request.io;
+    let operations = [];
 
     const errorMsg = validateOrderAction(action);
 
@@ -376,6 +377,86 @@ export const controlOrder = async (request, response, next) => {
             );
         }
 
+        // can confirm only if remaining quantity >= requested quantity or if order not already confirmed (second hand)
+        if (action === "confirm") {
+            if (order.product.isSecondHand) {
+                // check if an order of this product has already been confirmed
+                const orders = await prisma.order.findMany({
+                    where: {
+                        productId: order.product.id,
+                        status: "CONFIRMED",
+                    },
+                });
+
+                if (orders.length > 0) {
+                    return next(
+                        new HttpError(
+                            `another order of this product has already been confirmed`,
+                            400
+                        )
+                    );
+                }
+            } else {
+                const { quantity: orderedQuantity, variant: orderedVariant } =
+                    order;
+
+                let remainingQuantity;
+
+                if (orderedVariant) {
+                    // stock type -> varied
+                    remainingQuantity = order.product.stock.variants.find(
+                        (variant) => variant.id === orderedVariant.id
+                    ).quantity;
+                } else {
+                    // stock type -> flat
+                    remainingQuantity = order.product.stock.quantity;
+                }
+
+                if (remainingQuantity < orderedQuantity) {
+                    return next(
+                        new HttpError(
+                            `the ordered quantity is greater than available - ${remainingQuantity}`,
+                            400
+                        )
+                    );
+                }
+
+                // update the stock of the ordererd product
+                let updateData = {};
+
+                if (orderedVariant) {
+                    updateData = {
+                        variants: order.product.stock.variants.map(
+                            (variant) => {
+                                if (variant.id === orderedVariant.id) {
+                                    return {
+                                        ...variant,
+                                        quantity:
+                                            variant.quantity - orderedQuantity,
+                                    };
+                                }
+
+                                return variant;
+                            }
+                        ),
+                    };
+                } else {
+                    updateData = {
+                        quantity: remainingQuantity - orderedQuantity,
+                    };
+                }
+
+                operations.push(
+                    prisma.stock.update({
+                        where: {
+                            productId: order.product.id,
+                        },
+                        data: updateData,
+                    })
+                );
+            }
+        }
+
         // update order status
         const actionStatusMap = {
             cancel: "CANCELLED",
@@ -383,14 +464,18 @@ export const controlOrder = async (request, response, next) => {
             reject: "REJECTED",
             package: "PACKAGED",
         };
-        const updatedOrder = await prisma.order.update({
-            where: {
-                id: order.id,
-            },
-            data: {
-                status: actionStatusMap[action],
-            },
-        });
+        operations.unshift(
+            prisma.order.update({
+                where: {
+                    id: order.id,
+                },
+                data: {
+                    status: actionStatusMap[action],
+                },
+            })
+        );
+
+        const [updatedOrder] = await Promise.all(operations);
 
         // send email
         if (

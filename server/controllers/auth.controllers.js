@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import prisma from "../lib/prisma.lib.js";
-import { capitalizeFirstLetter, trimValues } from "../lib/strings.lib.js";
+import { capitalizeAll, trimValues } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import { validateUser } from "../validators/user.validators.js";
 import { getVerificationCode } from "../lib/verification.lib.js";
@@ -11,6 +11,7 @@ import { extraUserFields } from "../lib/data-source.lib.js";
 
 export const signUserUp = async (request, response, next) => {
     let { firstName, lastName, email, password } = request.body;
+    const isDeliveryPersonnel = request.isDeliveryPersonnel;
 
     let errorMsg = validateUser(
         { firstName, lastName, email, password },
@@ -50,6 +51,8 @@ export const signUserUp = async (request, response, next) => {
                 email,
                 password: hashedPassword,
                 avatar: `https://avatars.dicebear.com/api/initials/${firstName[0]}${lastName[0]}.svg`,
+                isDeliveryPersonnel,
+                fullName: `${firstName} ${lastName}`,
             },
         });
 
@@ -60,23 +63,21 @@ export const signUserUp = async (request, response, next) => {
                 userId: createdUser.id,
             },
         });
-        sendEmail(
-            createdUser.email,
-            "Account verification",
-            `Hello ${capitalizeFirstLetter(
-                createdUser.firstName
-            )} ${capitalizeFirstLetter(
-                createdUser.lastName
-            )}, Welcome to Echo. The code to verify your account is ${
-                verification.code
-            }`
-        );
+
+        // send email to the created user
+        let text = `Hello ${capitalizeAll(createdUser.fullName)}, Welcome to ${
+            !isDeliveryPersonnel ? "Echo" : "the Echo delivery team"
+        }. The code to verify your account is ${verification.code}`;
+
+        sendEmail(createdUser.email, "Account verification", text);
 
         // create a JSON web token
         const token = generateToken(createdUser.id);
 
         response.status(201).json({ user: { ...createdUser, token } });
     } catch (error) {
+        console.log(error);
+
         next(new HttpError());
     }
 };

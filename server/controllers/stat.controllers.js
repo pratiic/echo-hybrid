@@ -25,6 +25,7 @@ export const getAppStats = async (request, response, next) => {
             verifiedBusSellerCount,
             userCount,
             verifiedUserCount,
+            deliveryPersonnelCount,
             orderCount,
             placedOrderCount,
             cancelledOrderCount,
@@ -82,6 +83,11 @@ export const getAppStats = async (request, response, next) => {
                     isVerified: true,
                 },
             }),
+            prisma.user.count({
+                where: {
+                    isDeliveryPersonnel: true,
+                },
+            }),
             prisma.order.count({
                 where: {},
             }),
@@ -114,6 +120,7 @@ export const getAppStats = async (request, response, next) => {
                 total: userCount,
                 verified: verifiedUserCount,
                 unverified: userCount - verifiedUserCount,
+                deliveryPersonnel: deliveryPersonnelCount,
             },
             order: {
                 total: orderCount,
