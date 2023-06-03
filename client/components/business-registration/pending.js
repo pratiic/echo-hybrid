@@ -48,7 +48,6 @@ const BusinessPending = ({ business, handleCancellation }) => {
 
             <div className="-mt-2">
                 <InfoPair label="legal name" value={business?.name} />
-                <InfoPair label="owner" value={business?.ownerName} />
                 <InfoPair label="PAN" value={business?.PAN} />
                 <InfoPair label="phone" value={business?.phone} />
                 <InfoPair

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Head from "next/head";
 import { useDispatch, useSelector } from "react-redux";
 
 import { clearErrors, displayError } from "../../lib/validation";
@@ -17,8 +16,6 @@ import FileSelector from "../file-selector";
 const BusinessDetails = ({ business, handleCancellation }) => {
     const [name, setName] = useState("");
     const [nameError, setNameError] = useState("");
-    const [ownerName, setOwnerName] = useState("");
-    const [ownerNameError, setOwnerNameError] = useState("");
     const [PAN, setPAN] = useState("");
     const [PANError, setPANError] = useState("");
     const [phone, setPhone] = useState("");
@@ -46,9 +43,8 @@ const BusinessDetails = ({ business, handleCancellation }) => {
                 router.push("/business-registration/?view=pending");
             } else {
                 // business has been already registered
-                const { name, ownerName, PAN, phone } = business;
+                const { name, PAN, phone } = business;
                 setName(name);
-                setOwnerName(ownerName);
                 setPAN(PAN);
                 setPhone(phone);
             }
@@ -71,7 +67,6 @@ const BusinessDetails = ({ business, handleCancellation }) => {
 
         clearErrors([
             setNameError,
-            setOwnerNameError,
             setPANError,
             setPhoneError,
             setRegImageError,
@@ -79,7 +74,7 @@ const BusinessDetails = ({ business, handleCancellation }) => {
         setRegistering(true);
 
         try {
-            const formData = generateFormData({ name, ownerName, PAN, phone });
+            const formData = generateFormData({ name, PAN, phone });
 
             if (regImage) {
                 formData.append("image", regImage);
@@ -108,20 +103,8 @@ const BusinessDetails = ({ business, handleCancellation }) => {
 
             displayError(
                 error.message,
-                [
-                    "name",
-                    "ownerName",
-                    "PAN",
-                    "phone",
-                    "business registration certificate",
-                ],
-                [
-                    setNameError,
-                    setOwnerNameError,
-                    setPANError,
-                    setPhoneError,
-                    setRegImageError,
-                ]
+                ["name", "PAN", "phone", "business registration certificate"],
+                [setNameError, setPANError, setPhoneError, setRegImageError]
             );
         } finally {
             setRegistering(false);
@@ -138,15 +121,6 @@ const BusinessDetails = ({ business, handleCancellation }) => {
                     placeholder="legal business name"
                     disabled={fieldsDisabled}
                     onChange={setName}
-                />
-
-                <InputGroup
-                    label="owner name"
-                    value={ownerName}
-                    error={ownerNameError}
-                    placeholder="legal business owner"
-                    disabled={fieldsDisabled}
-                    onChange={setOwnerName}
                 />
 
                 <InputGroup

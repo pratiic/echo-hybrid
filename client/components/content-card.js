@@ -20,6 +20,7 @@ const ContentCard = ({
     name, // p -> product
     images, // p
     price, // p
+    isSecondHand, //p
     user, // s -> seller
     business, // s
     storeType, // s
@@ -94,24 +95,26 @@ const ContentCard = ({
                         </p>
                     )}
 
-                    <div className="flex items-center">
-                        <Rating rating={rating} onlyStars small />
-                        <span className="text-xs ml-1">{rating}/5</span>
-                    </div>
+                    {/* second hand products do not have a rating */}
+                    {type === "seller" ||
+                        (type === "product" && !isSecondHand && (
+                            <div className="flex items-center">
+                                <Rating rating={rating} onlyStars small />
+                                <span className="text-xs ml-1">{rating}/5</span>
+                            </div>
+                        ))}
 
                     {type === "seller" && (
                         // seller address
                         <div className="space-y-1 mt-2">
-                            {user?.address && (
-                                <h3 className="flex items-center">
-                                    <span>
-                                        <LocationMarkerIcon className="icon-no-bg-small 500:icon-no-bg mr-1" />
-                                    </span>
-                                    <span className="text-xs 500:text-sm">
-                                        {getSellerAddress()}
-                                    </span>
-                                </h3>
-                            )}
+                            <h3 className="flex items-center">
+                                <span>
+                                    <LocationMarkerIcon className="icon-no-bg-small 500:icon-no-bg mr-1" />
+                                </span>
+                                <span className="text-xs 500:text-sm">
+                                    {getSellerAddress()}
+                                </span>
+                            </h3>
                         </div>
                     )}
                 </div>

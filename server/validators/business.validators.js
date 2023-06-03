@@ -4,7 +4,6 @@ import { causeSchema } from "./report.validators.js";
 
 const businessSchema = Joi.object({
     name: Joi.string().min(5).max(50).required().trim(),
-    ownerName: Joi.string().min(5).max(25).required().trim(),
     PAN: Joi.string().length(9).required().trim(),
     phone: Joi.string()
         .pattern(/^\d{9,10}$/)

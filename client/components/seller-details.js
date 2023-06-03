@@ -53,11 +53,11 @@ const SellerDetails = ({
                                 <Avatar avatar={user?.avatar} smaller />
                                 <div className="ml-3">
                                     <span className="highlight block">
-                                        {authUser?.id === user?.id
-                                            ? "me"
-                                            : user?.firstName +
-                                              " " +
-                                              user?.lastName}
+                                        {capitalizeAll(
+                                            authUser?.id === user?.id
+                                                ? "me"
+                                                : user?.fullName
+                                        )}
                                     </span>
                                 </div>
                             </div>

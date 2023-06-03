@@ -67,13 +67,12 @@ export const registerBusiness = async (request, response, next) => {
             );
         }
 
-        let { name, ownerName, PAN, phone } = businessInfo;
-        [name, ownerName, PAN, phone] = trimValues(name, ownerName, PAN, phone);
+        let { name, PAN, phone } = businessInfo;
+        [name, PAN, phone] = trimValues(name, PAN, phone);
 
         const createdBusiness = await prisma.business.create({
             data: {
                 name,
-                ownerName,
                 PAN,
                 phone,
                 storeId: store.id,
@@ -317,7 +316,7 @@ export const updateBusiness = async (request, response, next) => {
     }
 
     try {
-        const { name, ownerName, PAN, phone } = updateInfo;
+        const { name, PAN, phone } = updateInfo;
 
         const updatedBusiness = await prisma.business.update({
             where: {
@@ -325,7 +324,6 @@ export const updateBusiness = async (request, response, next) => {
             },
             data: {
                 name: name || business.name,
-                ownerName: ownerName || business.ownerName,
                 PAN: PAN || business.PAN,
                 phone: phone || business.phone,
             },

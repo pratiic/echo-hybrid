@@ -51,9 +51,7 @@ const SellerPage = () => {
             capitalizeAll(
                 storeDetails?.storeType === "BUS"
                     ? storeDetails?.business?.name
-                    : capitalizeAll(
-                          `${storeDetails?.user?.firstName} ${storeDetails?.user?.lastName}`
-                      )
+                    : capitalizeAll(storeDetails?.user?.fullName)
             )
         );
     }, [storeDetails]);
@@ -176,7 +174,7 @@ const SellerPage = () => {
                 />
             )}
             {activeOption === "products" && (
-                <SellerProducts sellerId={storeDetails?.user?.id} />
+                <SellerProducts sellerId={storeDetails?.id} />
             )}
         </section>
     );

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { TrashIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 
-import { addCommas } from "../lib/strings";
+import { addCommas, singularOrPluralCount } from "../lib/strings";
 import { getSubtotal } from "../lib/order";
 import {
     closeModal,
@@ -179,7 +179,11 @@ const CartItem = ({ id, product, variant, quantity }) => {
 
                         <span className="text-sm dark-light block my-3">
                             {maxQuantity > 0
-                                ? `${maxQuantity} items remaining`
+                                ? `${maxQuantity} ${singularOrPluralCount(
+                                      maxQuantity,
+                                      "item",
+                                      "items"
+                                  )} remaining`
                                 : "Out of stock"}
                         </span>
                     </div>
