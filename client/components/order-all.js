@@ -17,7 +17,7 @@ import { checkDelivery } from "../lib/delivery";
 
 import Button from "./button";
 
-const GenericChild = ({ placeOrders, cannotOrder, items }) => {
+const GenericChild = ({ removeCartItems, cannotOrder, items }) => {
     const dispatch = useDispatch();
 
     return (
@@ -33,7 +33,7 @@ const GenericChild = ({ placeOrders, cannotOrder, items }) => {
                 {cannotOrder.map((orderInfo) => {
                     return (
                         <div className="flex items-center" key={orderInfo.id}>
-                            <span className="black-white mr-7">
+                            <span className="black-white w-[50px]">
                                 # {orderInfo.id}
                             </span>
                             <span className="dark-light">
@@ -61,11 +61,22 @@ const GenericChild = ({ placeOrders, cannotOrder, items }) => {
             {items.length > cannotOrder.length && (
                 <div className="mt-3">
                     <span className="black-white">
-                        Would you like to order the rest of the items ?
+                        Would you like to remove{" "}
+                        {cannotOrder.length > 1
+                            ? "these cart items"
+                            : "this cart item"}{" "}
+                        ?
                     </span>
 
                     <div className="flex items-center space-x-3 mt-3">
-                        <Button small onClick={() => placeOrders(cannotOrder)}>
+                        <Button
+                            small
+                            onClick={() =>
+                                removeCartItems(
+                                    cannotOrder.map((item) => item.id)
+                                )
+                            }
+                        >
                             Yes
                         </Button>
                         <Button
@@ -83,9 +94,6 @@ const GenericChild = ({ placeOrders, cannotOrder, items }) => {
 };
 
 const OrderAll = ({ items }) => {
-    const [address, setAddress] = useState(null);
-    const [isUserAddress, setIsUserAddress] = useState(true);
-
     const { authUser } = useSelector((state) => state.auth);
     const router = useRouter();
     const dispatch = useDispatch();
@@ -149,7 +157,7 @@ const OrderAll = ({ items }) => {
     };
 
     const handleOrderAllClick = () => {
-        if (isUserAddress && !authUser?.address) {
+        if (!authUser?.address) {
             dispatch(
                 setAlert({
                     message: "you need to set your address first",
@@ -181,7 +189,7 @@ const OrderAll = ({ items }) => {
                             dispatch(
                                 showGenericModal(
                                     <GenericChild
-                                        placeOrders={placeOrders}
+                                        removeCartItems={removeCartItems}
                                         cannotOrder={data.cannotOrder}
                                         items={items}
                                     />
@@ -197,6 +205,27 @@ const OrderAll = ({ items }) => {
                 },
             })
         );
+    };
+
+    const removeCartItems = async (itemIds) => {
+        try {
+            dispatch(showLoadingModal("removing cart items..."));
+
+            await Promise.all(
+                itemIds.map((itemId) => {
+                    return fetcher(`carts/${itemId}`, "DELETE");
+                })
+            );
+
+            itemIds.forEach((itemId) => {
+                dispatch(deleteCartItem(itemId));
+            });
+            dispatch(setAlert({ message: "cart items have been removed" }));
+        } catch (error) {
+            dispatch(setErrorAlert(error.message));
+        } finally {
+            dispatch(closeModal());
+        }
     };
 
     return (

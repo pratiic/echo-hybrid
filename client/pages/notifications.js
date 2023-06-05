@@ -28,6 +28,7 @@ const Notifications = () => {
         page,
         PAGE_SIZE,
     } = useSelector((state) => state.notifications);
+    const { authUser } = useSelector((state) => state.auth);
 
     const dispatch = useDispatch();
 
@@ -82,13 +83,25 @@ const Notifications = () => {
         }
     };
 
+    const getPageTitle = () => {
+        return authUser?.isDeliveryPersonnel
+            ? "Delivery notifications"
+            : "Your notifications";
+    };
+
+    const getEmptyMsg = () => {
+        return authUser?.isDeliveryPersonnel
+            ? "there are no delivery notifications"
+            : "you don't have any notifications";
+    };
+
     return (
         <section>
             <Head>
-                <title>Your Notifications</title>
+                <title> {getPageTitle()} </title>
             </Head>
 
-            <PageHeader heading="your notifications" hasBackArrow>
+            <PageHeader heading={getPageTitle()} hasBackArrow>
                 <p
                     className="text-red-500 underline-offset-4 font-semibold hover:underline hover:cursor-pointer active:text-red-400 transition-all duration-200"
                     onClick={handleAllDeletion}
@@ -109,7 +122,7 @@ const Notifications = () => {
                     type="notification"
                     loadingMsg={loading && "loading notifications..."}
                     error={error}
-                    emptyMsg="you don't have any notifications"
+                    emptyMsg={getEmptyMsg()}
                     human="no-notifications"
                     incrementPageNumber={
                         !noMoreData &&

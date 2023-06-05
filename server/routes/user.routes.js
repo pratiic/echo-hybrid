@@ -15,7 +15,16 @@ export const router = express.Router();
 
 router.patch("/", auth, getUpload().single("avatar"), updateUser);
 
-router.patch("/password", auth, resetPassword);
+router.patch(
+    "/password",
+    (request, ...op) => {
+        request.select = {
+            password: true,
+        };
+        auth(request, ...op);
+    },
+    resetPassword
+);
 
 router.delete("/avatar", auth, deleteAvatar);
 

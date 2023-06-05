@@ -129,7 +129,7 @@ export const getChats = async (request, response, next) => {
 
 export const resetUnseenMsgsCount = async (request, response, next) => {
     const user = request.user;
-    const chatId = parseInt(request.params.chatId) || 0;
+    const chatId = request.params.chatId;
 
     try {
         const chat = await prisma.chat.findUnique({

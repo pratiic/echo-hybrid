@@ -78,3 +78,35 @@ export const transactionSelectionFields = {
     createdYear: true,
     createdAt: true,
 };
+
+export const deliveryInclusionFields = {
+    order: {
+        include: {
+            product: true,
+        },
+    },
+    madeBy: {
+        select: genericUserFields,
+    },
+};
+
+export const orderInclusionFields = {
+    origin: {
+        select: genericUserFields,
+    },
+    product: true,
+    store: {
+        include: {
+            user: {
+                select: { ...genericUserFields, address: true },
+            },
+            business: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+    },
+    orderCompletion: true,
+};

@@ -233,7 +233,7 @@ export const getProducts = async (request, response, next) => {
     }
 
     if (!storeId || (storeId && storeId !== user.store?.id)) {
-        // if stock not set -> only show inside the store of the requesting user
+        // if stock not set or if a second hand product has been sold -> only show inside the store of the requesting user
         primaryFilter = {
             ...primaryFilter,
             OR: [
@@ -247,6 +247,15 @@ export const getProducts = async (request, response, next) => {
                     },
                 },
             ],
+            // OR: [
+            //     {
+            //         isSecondHand: false,
+            //     },
+            //     {
+            //         isSecondHand: true,
+            //         hasBeenSold: false,
+            //     },
+            // ],
         };
     }
 

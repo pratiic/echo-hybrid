@@ -17,6 +17,7 @@ import notificationsReducer from "./slices/notifications-slice";
 import chatReducer from "./slices/chat-slice";
 import sellersReducer from "./slices/sellers-slice";
 import ordersReducer from "./slices/orders-slice";
+import deliveryReducer from "./slices/delivery-slice";
 
 export const store = configureStore({
     reducer: {
@@ -36,6 +37,7 @@ export const store = configureStore({
         chat: chatReducer,
         sellers: sellersReducer,
         orders: ordersReducer,
+        delivery: deliveryReducer,
     },
     middleware: [logger],
 });

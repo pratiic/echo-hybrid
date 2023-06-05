@@ -218,6 +218,7 @@ const OrderCard = ({
 
             <OrderRest
                 {...{
+                    id,
                     isSellerItem: isSellerOrder,
                     isUserItem: isUserOrder,
                     user: origin,

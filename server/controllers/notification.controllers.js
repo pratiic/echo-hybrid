@@ -47,28 +47,41 @@ export const sendNotification = async (request, response, next) => {
 export const getNotifications = async (request, response, next) => {
     const user = request.user;
     const page = parseInt(request.query.page) || 1;
-    const skip = parseInt(request.query.skip) || 0;
-
+    let skip = parseInt(request.query.skip);
     const PAGE_SIZE = 25;
 
-    try {
-        const notifications = await prisma.notification.findMany({
-            where: {
-                destinationId: user.id,
-            },
-            include: {
-                origin: {
-                    select: genericUserFields,
-                },
-            },
-            orderBy: {
-                createdAt: "desc",
-            },
-            take: PAGE_SIZE,
-            skip: (page - 1) * PAGE_SIZE + skip,
-        });
+    if (skip < 0) {
+        skip = 0;
+    }
 
-        response.json({ notifications });
+    const whereObj = {
+        destinationId: user?.isDeliveryPersonnel ? 0 : user.id,
+    };
+
+    try {
+        const [notifications, totalCount] = await Promise.all([
+            prisma.notification.findMany({
+                // delivery personnel -> destinationId is 0
+                // admin -> destinationId is -1
+
+                where: whereObj,
+                include: {
+                    origin: {
+                        select: genericUserFields,
+                    },
+                },
+                orderBy: {
+                    createdAt: "desc",
+                },
+                take: PAGE_SIZE,
+                skip: (page - 1) * PAGE_SIZE + skip,
+            }),
+            prisma.notification.count({
+                where: whereObj,
+            }),
+        ]);
+
+        response.json({ notifications, totalCount });
     } catch (error) {
         next(new HttpError());
     }
@@ -88,7 +101,10 @@ export const deleteNotification = async (request, response, next) => {
             return next(new HttpError("notification not found", 404));
         }
 
-        if (notification.destinationId !== user.id) {
+        if (
+            (user.isDeliveryPersonnel && notification.destinationId !== 0) ||
+            notification.destinationId !== user.id
+        ) {
             return next(
                 new HttpError(
                     "you are not authorized to delete this notification",
@@ -128,7 +144,7 @@ export const setNotificationsSeen = async (request, response, next) => {
 
     try {
         await prisma.notification.updateMany({
-            where: { destinationId: user.id },
+            where: { destinationId: user.isDeliveryPersonnel ? 0 : user.id },
             data: { seen: true },
         });
 

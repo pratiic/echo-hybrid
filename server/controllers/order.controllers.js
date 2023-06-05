@@ -1,5 +1,7 @@
 import {
+    deliveryInclusionFields,
     genericUserFields,
+    orderInclusionFields,
     transactionSelectionFields,
 } from "../lib/data-source.lib.js";
 import { checkDelivery } from "../lib/delivery.lib.js";
@@ -238,13 +240,28 @@ export const getOrders = async (request, response, next) => {
     const user = request.user;
     const type = request.query.type; // user or seller
     const page = parseInt(request.query.page) || 1;
-    let skip = parseInt(request.query.skip) || 0;
+    let skip = parseInt(request.query.skip);
     const searchQuery = request.query.query || "";
     const PAGE_SIZE = 10;
 
-    if (type !== "user" && type !== "seller") {
+    if (skip < 0) {
+        skip = 0;
+    }
+
+    if (type !== "user" && type !== "seller" && type !== "delivery") {
         return next(
-            new HttpError("invalid type, valid type is 'user' or 'seller'")
+            new HttpError(
+                "invalid type, valid types is 'user', 'seller' and 'delivery'"
+            )
+        );
+    }
+
+    if (type === "delivery" && !user?.isDeliveryPersonnel) {
+        return next(
+            new HttpError(
+                "you have to be a delivery personnel to get these orders",
+                401
+            )
         );
     }
 
@@ -260,12 +277,17 @@ export const getOrders = async (request, response, next) => {
                 not: "CANCELLED",
             },
         };
-    } else {
+    } else if (type === "seller") {
         filter = {
             storeId: user.store?.id || -1,
             status: {
                 not: "REJECTED",
             },
+        };
+    } else {
+        filter = {
+            status: "PACKAGED",
+            isDelivered: true,
         };
     }
 
@@ -280,12 +302,21 @@ export const getOrders = async (request, response, next) => {
 
     if (searchQuery) {
         searchFilter = {
-            product: {
-                name: {
-                    contains: searchQuery.trim(),
-                    mode: "insensitive",
+            OR: [
+                {
+                    product: {
+                        name: {
+                            contains: searchQuery.trim(),
+                            mode: "insensitive",
+                        },
+                    },
                 },
-            },
+                {
+                    id: {
+                        equals: parseInt(searchQuery.trim()) || -1,
+                    },
+                },
+            ],
         };
     }
 
@@ -295,26 +326,7 @@ export const getOrders = async (request, response, next) => {
         const [orders, totalCount] = await Promise.all([
             prisma.order.findMany({
                 where: filter,
-                include: {
-                    origin: {
-                        select: genericUserFields,
-                    },
-                    product: true,
-                    store: {
-                        include: {
-                            user: {
-                                select: { ...genericUserFields, address: true },
-                            },
-                            business: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                },
-                            },
-                        },
-                    },
-                    orderCompletion: true,
-                },
+                include: orderInclusionFields,
                 orderBy: {
                     createdAt: "desc",
                 },
@@ -519,6 +531,17 @@ export const controlOrder = async (request, response, next) => {
             sellerId: order.store.userId,
         });
 
+        if (action === "package" && order.isDelivered) {
+            const orderWithAllFields = await prisma.order.findUnique({
+                where: {
+                    id: order.id,
+                },
+                include: orderInclusionFields,
+            });
+
+            io.emit("delivery-request", orderWithAllFields);
+        }
+
         response.json({ order: updatedOrder });
     } catch (error) {
         console.log(error);
@@ -618,6 +641,7 @@ export const requestCompletion = async (request, response, next) => {
                 madeBy: user.isDeliveryPersonnel
                     ? "DELIVERY_PERSONNEL"
                     : "SELLER",
+                requestorId: user.id,
             },
         });
 
@@ -664,71 +688,103 @@ export const handleCompletionRequest = async (request, response, next) => {
         );
     }
 
-    let createdTransaction;
-
-    if (action === "accept") {
-        // update the status of the order and create a transaction
-        await prisma.$transaction(async (prisma) => {
-            const [, transaction] = await Promise.all([
-                prisma.order.update({
-                    where: {
-                        id: order.id,
-                    },
-                    data: {
-                        status: "COMPLETED",
-                        isDeleted: true,
-                    },
-                }),
-                prisma.transaction.create({
-                    data: {
-                        orderId: order.id,
-                        createdMonth: new Date().getMonth(),
-                        createdYear: new Date().getFullYear(),
-                    },
-                    select: transactionSelectionFields,
-                }),
-            ]);
-
-            createdTransaction = transaction;
-        });
-    }
-
     try {
-        // delete order completion request
-        await prisma.orderCompletion.delete({
-            where: {
-                id: order.orderCompletion.id,
-            },
-        });
+        await prisma.$transaction(async (prisma) => {
+            let createdTransaction, createdDelivery;
 
-        io.emit(`order-completion-${action}`, {
-            id: order.id,
-            originId: order.originId,
-            updateInfo:
-                action === "accept"
-                    ? {
-                          status: "completed",
-                          orderCompletion: null,
-                      }
-                    : {
-                          orderCompletion: null,
-                      },
-        });
+            if (action === "accept") {
+                // update the status of the order and create a transaction
+                const operations = [
+                    prisma.order.update({
+                        where: {
+                            id: order.id,
+                        },
+                        data: {
+                            status: "COMPLETED",
+                            isDeleted: true,
+                        },
+                    }),
+                    prisma.transaction.create({
+                        data: {
+                            orderId: order.id,
+                            createdMonth: new Date().getMonth(),
+                            createdYear: new Date().getFullYear(),
+                        },
+                        select: transactionSelectionFields,
+                    }),
+                ];
 
-        if (createdTransaction) {
-            io.emit("new-transaction", {
-                ...createdTransaction,
+                if (order.isDelivered) {
+                    // create a delivery
+                    operations.push(
+                        prisma.delivery.create({
+                            data: {
+                                orderId: order.id,
+                                madeById: order.orderCompletion.requestorId,
+                            },
+                            include: deliveryInclusionFields,
+                        })
+                    );
+                }
+
+                if (order.product.isSecondHand) {
+                    // second hand product -> hasBeenSold true after order completion
+                    operations.push(
+                        prisma.product.update({
+                            where: {
+                                id: order.product.id,
+                            },
+                            data: {
+                                hasBeenSold: true,
+                            },
+                        })
+                    );
+                }
+
+                const data = await Promise.all(operations);
+                createdTransaction = data[1];
+                createdDelivery = data[2];
+            }
+
+            // delete order completion request
+            await prisma.orderCompletion.delete({
+                where: {
+                    id: order.orderCompletion.id,
+                },
             });
-        }
 
-        response.json(
-            action === "accept"
-                ? {
-                      transaction: createdTransaction,
-                  }
-                : {}
-        );
+            io.emit(`order-completion-${action}`, {
+                id: order.id,
+                originId: order.originId,
+                updateInfo:
+                    action === "accept"
+                        ? {
+                              status: "completed",
+                              orderCompletion: null,
+                          }
+                        : {
+                              orderCompletion: null,
+                          },
+            });
+
+            if (createdTransaction) {
+                io.emit("new-transaction", {
+                    ...createdTransaction,
+                });
+            }
+
+            if (createdDelivery) {
+                io.emit("delivery-completion", {
+                    ...createdDelivery,
+                });
+            }
+
+            response.json(
+                action === "accept" ? { transaction: createdTransaction } : {}
+            );
+        });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

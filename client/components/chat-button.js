@@ -19,6 +19,10 @@ const ChatButton = ({
     const { theme } = useSelector((state) => state.theme);
 
     const openChat = () => {
+        if (isDisabled) {
+            return null;
+        }
+
         router.push(`/chats/${userId}`);
     };
 

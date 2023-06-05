@@ -16,6 +16,7 @@ import Notification from "../real-time/notification";
 import Rating from "../real-time/rating";
 import Chat from "../real-time/chat";
 import Order from "../real-time/order";
+import Delivery from "../real-time/delivery";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -32,6 +33,16 @@ const Layout = ({ children }) => {
         "/account-recovery/verify",
     ];
     const unverifiedAccessiblePaths = ["/profile", "/account-verification"];
+    const deliveryPaths = [
+        "/delivery",
+        "/delivery",
+        "/notifications",
+        "/chats",
+        "/chats/[id]",
+        "/sellers/[id]",
+        ...unprotectedPaths,
+        ...unverifiedAccessiblePaths,
+    ];
 
     useEffect(() => {
         if (!authUser) {
@@ -47,7 +58,21 @@ const Layout = ({ children }) => {
                 router.push("/account-verification");
             }
         }
-    }, [authUser, router, unprotectedPaths, unverifiedAccessiblePaths]);
+
+        // restrict most of the application routes to delivery personnel
+        if (authUser?.isDeliveryPersonnel) {
+            if (deliveryPaths.indexOf(router.pathname) === -1) {
+                console.log(router.pathname);
+                router.push("/delivery");
+            }
+        }
+    }, [
+        authUser,
+        router,
+        unprotectedPaths,
+        unverifiedAccessiblePaths,
+        deliveryPaths,
+    ]);
 
     useEffect(() => {
         fetchCategories();
@@ -86,6 +111,7 @@ const Layout = ({ children }) => {
                         <Rating />
                         <Chat />
                         <Order />
+                        {authUser?.isDeliveryPersonnel && <Delivery />}
 
                         {/* fake components to preserve cache */}
                         <Products />

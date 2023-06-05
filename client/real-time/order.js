@@ -14,6 +14,7 @@ import {
     setTotalCount,
     updateOrder,
 } from "../redux/slices/orders-slice";
+import { updateDelivery } from "../redux/slices/delivery-slice";
 // import useAudio from "../hooks/use-audio-realtime";
 import { fetcher } from "../lib/fetcher";
 import useSocket from "../hooks/use-socket";
@@ -67,7 +68,6 @@ const Order = () => {
         });
 
         socket.on("order-completion-request", (orderInfo) => {
-            console.log(orderInfo);
             handleOrderCompletion(orderInfo);
         });
 
@@ -159,6 +159,7 @@ const Order = () => {
             ) {
                 dispatch(setTotalCount({ count: data.totalCount, type }));
             }
+
             dispatch(resetPageSize(type));
         } catch (error) {
             dispatch(setError({ error: error.message, type }));
@@ -169,8 +170,6 @@ const Order = () => {
     };
 
     const handleOrderControl = (orderInfo) => {
-        console.log(orderInfo);
-
         const { id, status, originId } = orderInfo;
 
         if (originId === authUser?.id) {
@@ -180,6 +179,17 @@ const Order = () => {
 
     const handleOrderCompletion = (orderInfo) => {
         const { id, originId, updateInfo } = orderInfo;
+
+        if (authUser?.isDeliveryPersonnel) {
+            dispatch(
+                updateDelivery({
+                    type: "pending",
+                    id,
+                    updateInfo,
+                })
+            );
+            return;
+        }
 
         dispatch(
             updateOrder({

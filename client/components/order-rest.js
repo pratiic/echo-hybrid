@@ -4,17 +4,19 @@ import {
     LocationMarkerIcon,
     ShoppingBagIcon,
 } from "@heroicons/react/outline";
+import { useSelector } from "react-redux";
 
 import { getAddress } from "../lib/address";
 import { getDate, getHowLongAgo } from "../lib/date-time";
 import { addCommas, capitalizeAll } from "../lib/strings";
 import { getSubtotal } from "../lib/order";
 
-import Avatar from "./avatar";
 import InfoUnit from "./info-unit";
 import IconInfo from "./icon-info";
+import UserPreview from "./user-preview";
 
 const OrderRest = ({
+    id,
     isSellerItem,
     isUserItem,
     user,
@@ -28,30 +30,25 @@ const OrderRest = ({
     itemType = "order",
 }) => {
     // information such as address, user, date of an order
+    const { authUser } = useSelector((state) => state.auth);
+
     return (
         <div>
             {/* other details */}
             <div className="mb-3">
-                {isSellerItem && (
-                    <div className="flex items-center mb-3">
-                        <Avatar avatar={user.avatar} smaller />
-
-                        <div className="flex flex-col ml-2">
-                            <span className="text-sm">
-                                {itemType === "order"
-                                    ? "order by"
-                                    : "purchased by"}
-                            </span>
-                            <span className="black-white capitalize">
-                                {user?.firstName} {user?.lastName}
-                            </span>
-                            <span className="text-sm">{user.email}</span>
-                        </div>
-                    </div>
+                {/* buyer info */}
+                {(isSellerItem || authUser?.isDeliveryPersonnel) && (
+                    <UserPreview
+                        user={user}
+                        title={
+                            itemType === "order" ? "order by" : "purchased by"
+                        }
+                    />
                 )}
 
                 <div className="space-y-1">
-                    {isUserItem && (
+                    {/* seller info */}
+                    {(isUserItem || authUser?.isDeliveryPersonnel) && (
                         <IconInfo
                             icon={<ShoppingBagIcon className="icon-no-bg" />}
                         >
@@ -71,15 +68,19 @@ const OrderRest = ({
                         </IconInfo>
                     )}
 
-                    {isSellerItem && isDelivered && (
-                        <IconInfo
-                            icon={<LocationMarkerIcon className="icon-no-bg" />}
-                        >
-                            <span className="text-sm">
-                                {getAddress(address)}
-                            </span>
-                        </IconInfo>
-                    )}
+                    {/* delivery address */}
+                    {isDelivered &&
+                        (isSellerItem || authUser?.isDeliveryPersonnel) && (
+                            <IconInfo
+                                icon={
+                                    <LocationMarkerIcon className="icon-no-bg" />
+                                }
+                            >
+                                <span className="text-sm whitespace-pre">
+                                    {getAddress(address, true)}
+                                </span>
+                            </IconInfo>
+                        )}
 
                     <IconInfo
                         icon={<CalendarIcon className="icon-no-bg text-sm" />}
@@ -92,9 +93,11 @@ const OrderRest = ({
                 </div>
             </div>
 
-            {/* price and delivery details */}
+            {/* order id, price and delivery details */}
             <div>
                 <div className="flex flex-wrap mb-2">
+                    <InfoUnit label="order Id" value={id} />
+
                     <InfoUnit
                         label="unit price"
                         value={addCommas(unitPrice)}

@@ -5,6 +5,7 @@ import NotificationCard from "./notification-card";
 import CartItem from "./cart-item";
 import UserCard from "./user-card";
 import OrderCard from "./order-card";
+import DeliveryCard from "./delivery-card";
 
 import Human from "./human";
 
@@ -77,6 +78,10 @@ const ContentList = ({
 
                     if (type === "cart-item") {
                         return <CartItem {...content} key={content.id} />;
+                    }
+
+                    if (type === "delivery") {
+                        return <DeliveryCard {...content} key={content.id} />;
                     }
                 })}
             </div>

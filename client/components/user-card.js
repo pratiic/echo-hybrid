@@ -10,6 +10,7 @@ import Avatar from "./avatar";
 import ChatButton from "./chat-button";
 import Rating from "./rating";
 import CustomLink from "./custom-link";
+import Tag from "./tag";
 
 const UserCard = ({
     id,
@@ -22,6 +23,8 @@ const UserCard = ({
     hasChatOption,
     counts,
     stars,
+    fullName,
+    isDeliveryPersonnel,
 }) => {
     const router = useRouter();
     const dispatch = useDispatch();
@@ -38,11 +41,13 @@ const UserCard = ({
                 setActiveChat({
                     id: chatId,
                     user: {
+                        id,
                         firstName,
                         lastName,
                         email,
                         avatar,
-                        id,
+                        fullName,
+                        isDeliveryPersonnel,
                     },
                 })
             );
@@ -81,13 +86,13 @@ const UserCard = ({
                         <p className="capitalize black-white">
                             {id === authUser.id
                                 ? "me"
-                                : `${capitalizeAll(
-                                      `${firstName} ${lastName}`
-                                  )}`}
+                                : capitalizeAll(fullName)}
                         </p>
 
                         {/* user's email */}
-                        <p className="-mt-1 text-sm">{email}</p>
+                        <p className="text-sm">{email}</p>
+
+                        {/* {isDeliveryPersonnel && <Tag text="delivery" />} */}
 
                         {/* when showing ratings, show stars */}
                         {stars && (

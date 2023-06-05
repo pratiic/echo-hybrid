@@ -24,6 +24,7 @@ const PrimaryInfo = ({
     toggleSecondaryInfo,
     isMyProduct,
     isSecondHand,
+    hasBeenSold,
 }) => {
     const dispatch = useDispatch();
 
@@ -65,6 +66,7 @@ const PrimaryInfo = ({
                             text={isSecondHand ? "second hand" : "brand new"}
                         />
                         {isMyProduct && <Tag text="my product" />}
+                        {hasBeenSold && <Tag text="sold out" />}
                     </div>
 
                     {/* product price  */}
@@ -86,7 +88,7 @@ const PrimaryInfo = ({
                         </p>
                     )}
 
-                    <div className="flex text-sm border border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-ten w-fit rounded-full 1200:hidden mb-2 px-1">
+                    <div className="flex text-sm border border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-ten w-fit rounded-full 1200:hidden mb-3 px-1">
                         <Icon
                             toolName="more details"
                             onClick={toggleSecondaryInfo}
@@ -94,17 +96,14 @@ const PrimaryInfo = ({
                             <InformationCircleIcon className="icon" />
                         </Icon>
 
-                        {
-                            <ChatButton
-                                small
-                                // isDisabled={isMyProduct ? true : false}
-                                isDisabled={true}
-                            />
-                        }
+                        <ChatButton
+                            small
+                            isDisabled={isMyProduct ? true : false}
+                        />
                     </div>
 
                     {/* control for second hand products */}
-                    {isSecondHand && !isMyProduct && (
+                    {isSecondHand && !isMyProduct && !hasBeenSold && (
                         <ProductControl isSecondHand={true} productId={id} />
                     )}
                 </div>

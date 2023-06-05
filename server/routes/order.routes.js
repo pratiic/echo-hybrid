@@ -93,6 +93,7 @@ export const orderRouter = (io) => {
                         email: true,
                     },
                 },
+                isDelivered: true,
             };
             validateOrder(request, response, next);
         },
@@ -161,9 +162,17 @@ export const orderRouter = (io) => {
                 orderCompletion: {
                     select: {
                         id: true,
+                        requestorId: true,
                     },
                 },
                 originId: true,
+                product: {
+                    select: {
+                        id: true,
+                        isSecondHand: true,
+                    },
+                },
+                isDelivered: true,
             };
             validateOrder(request, ...op);
         },

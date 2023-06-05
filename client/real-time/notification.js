@@ -10,6 +10,7 @@ import {
     setNeedToFetch,
     setNoMoreData,
     setNotifications,
+    setTotalCount,
 } from "../redux/slices/notifications-slice";
 import { fetcher } from "../lib/fetcher";
 import useSocket from "../hooks/use-socket";
@@ -35,7 +36,12 @@ const Notification = () => {
 
     useEffect(() => {
         socket.on("notification", (notification) => {
-            if (notification.destinationId === authUser?.id) {
+            if (
+                (authUser?.isDeliveryPersonnel &&
+                    notification.destinationId === 0) ||
+                (!authUser?.isDeliveryPersonnel &&
+                    notification.destinationId === authUser?.id)
+            ) {
                 dispatch(addNotification({ notification }));
             }
         });
@@ -67,10 +73,14 @@ const Notification = () => {
                 dispatch(
                     setNotifications([...notifications, ...data.notifications])
                 );
+            }
 
-                if (data.notifications.PAGE_SIZE < 25) {
-                    dispatch(setNoMoreData(true));
-                }
+            if (data.notifications.length < PAGE_SIZE) {
+                dispatch(setNoMoreData(true));
+            }
+
+            if (page === 1) {
+                dispatch(setTotalCount(data.totalCount));
             }
 
             dispatch(resetPageSize());

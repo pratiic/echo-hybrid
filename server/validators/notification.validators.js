@@ -4,7 +4,7 @@ import { validate } from "./base.validators.js";
 
 const notificationSchema = Joi.object({
     text: Joi.string().required().trim(),
-    destinationId: Joi.number().integer().positive().required(),
+    destinationId: Joi.number().integer().required(),
     linkTo: Joi.string().allow("").allow(null).trim(),
 });
 

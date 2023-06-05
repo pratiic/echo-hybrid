@@ -3,11 +3,7 @@ import { useRouter } from "next/router";
 import { BsImage } from "react-icons/bs";
 import { useSelector } from "react-redux";
 
-import {
-    addCommas,
-    capitalizeAll,
-    capitalizeFirstLetter,
-} from "../lib/strings";
+import { addCommas, capitalizeAll } from "../lib/strings";
 import { getAddress } from "../lib/address";
 
 import Rating from "./rating";

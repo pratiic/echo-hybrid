@@ -38,6 +38,8 @@ model User {
     createdReports      Report[]             @relation(name: "report_creator")
     reports             Report[]             @relation(name: "reported_user")
     suspension          Suspension?
+    deliveries          Delivery[]
+    orderCompletion     OrderCompletion[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -133,6 +135,7 @@ model Product {
     rating         Float?   @default(0)
     subCategory    String
     isDeleted      Boolean  @default(false)
+    hasBeenSold    Boolean  @default(false) // only for second hand products
 
     store        Store?             @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId      Int?
@@ -290,6 +293,7 @@ model Order {
     storeId         Int
     orderCompletion OrderCompletion?
     transaction     Transaction?
+    delivery        Delivery?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -299,8 +303,24 @@ model OrderCompletion {
     id     Int                      @id @default(autoincrement())
     madeBy OrderCompletionRequestor
 
-    order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-    orderId Int   @unique
+    order       Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    orderId     Int   @unique
+    requestor   User  @relation(fields: [requestorId], references: [id])
+    requestorId Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Delivery {
+    id             Int     @id @default(autoincrement())
+    deletedFor     Int[]   @default([])
+    isAcknowledged Boolean @default(false)
+
+    order    Order @relation(fields: [orderId], references: [id])
+    orderId  Int   @unique
+    madeBy   User  @relation(fields: [madeById], references: [id])
+    madeById Int
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

@@ -17,7 +17,7 @@ import Dropdown from "./dropdown";
 import DropdownItem from "./dropdown-item";
 import Icon from "./icon";
 
-const ProductMenu = ({ isMyProduct }) => {
+const ProductMenu = ({ isMyProduct, hasBeenSold }) => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     const router = useRouter();
@@ -73,14 +73,17 @@ const ProductMenu = ({ isMyProduct }) => {
             <Dropdown show={showDropdown} toggleDropdown={toggleDropdown}>
                 {isMyProduct && (
                     <React.Fragment>
-                        <DropdownItem
-                            action="update"
-                            onClick={() =>
-                                router.push("/set-product/?mode=update")
-                            }
-                        >
-                            update product
-                        </DropdownItem>
+                        {!hasBeenSold && (
+                            <DropdownItem
+                                action="update"
+                                onClick={() =>
+                                    router.push("/set-product/?mode=update")
+                                }
+                            >
+                                update product
+                            </DropdownItem>
+                        )}
+
                         <DropdownItem action="delete" onClick={handleDeletion}>
                             delete product
                         </DropdownItem>

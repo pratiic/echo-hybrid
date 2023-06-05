@@ -1,4 +1,3 @@
-import uniqid from "uniqid";
 import bcrypt from "bcrypt";
 
 import { HttpError } from "../models/http-error.models.js";
@@ -87,6 +86,8 @@ export const resetPassword = async (request, response, next) => {
 
         response.json({ message: "password has been reset" });
     } catch (error) {
+        console.log(error);
+
         next(new HttpError());
     }
 };

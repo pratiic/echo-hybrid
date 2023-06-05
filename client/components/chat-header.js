@@ -5,13 +5,14 @@ import { MenuAlt4Icon } from "@heroicons/react/outline";
 import { useSelector, useDispatch } from "react-redux";
 
 import { toggleDeleteMode } from "../redux/slices/chat-slice";
+import { capitalizeAll } from "../lib/strings";
 
 import Avatar from "./avatar";
 import Dropdown from "./dropdown";
 import DropdownItem from "./dropdown-item";
 import Switch from "./switch";
 import Icon from "./icon";
-import { capitalizeAll } from "../lib/strings";
+import Tag from "./tag";
 
 const ChatHeader = ({ user }) => {
     const [showDropdown, setShowDropdown] = useState(false);
@@ -38,15 +39,22 @@ const ChatHeader = ({ user }) => {
                 <Avatar avatar={user?.avatar} small />
 
                 {/* chat user name and email */}
-                <div className="flex flex-col ml-3 leading-tight">
-                    <span className="capitalize black-white">
-                        {capitalizeAll(`${user?.firstName} ${user?.lastName}`)}
-                    </span>
-                    <span className="text-sm dark-light">{user?.email}</span>
+                <div className="flex items-center space-x-3">
+                    <div className="flex flex-col ml-3 leading-tight">
+                        <span className="capitalize black-white">
+                            {capitalizeAll(user?.fullName)}
+                        </span>
+
+                        <span className="text-sm dark-light">
+                            {user?.email}
+                        </span>
+                    </div>
+
+                    {user?.isDeliveryPersonnel && <Tag text="delivery" />}
                 </div>
             </div>
 
-            <div>
+            <div className="flex items-center">
                 <Icon onClick={toggleDropdown}>
                     <MenuAlt4Icon className="icon" />
                 </Icon>

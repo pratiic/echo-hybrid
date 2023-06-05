@@ -14,7 +14,7 @@ const InfoUnit = ({
 }) => {
     return (
         <div
-            className={`flex leading-tight mb-1 mr-3 flex-${direction} ${direction ===
+            className={`flex leading-tight mr-3 flex-${direction} ${direction ===
                 "row" &&
                 "items-center w-full justify-between border-b border-faint py-[5px] px-1"}`}
         >

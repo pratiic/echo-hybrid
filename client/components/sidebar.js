@@ -7,12 +7,16 @@ import {
     LogoutIcon,
     ChatAlt2Icon,
     BellIcon,
-    ShoppingBagIcon,
     ClipboardListIcon,
     UserCircleIcon,
+    ClipboardCheckIcon,
 } from "@heroicons/react/outline";
-import { MdOutlineExplore, MdExplore, MdOutlineHistory } from "react-icons/md";
-import { AiOutlineShop, AiFillShop } from "react-icons/ai";
+import {
+    MdOutlineExplore,
+    MdOutlineHistory,
+    MdOutlineDeliveryDining,
+} from "react-icons/md";
+import { AiOutlineShop } from "react-icons/ai";
 import { HiOutlineCash } from "react-icons/hi";
 
 import { setSidebar } from "../redux/slices/sidebar-slice";
@@ -27,13 +31,16 @@ const Sidebar = () => {
     const { showSidebar } = useSelector((state) => state.sidebar);
     const { notifications } = useSelector((state) => state.notifications);
     const { sellerOrders } = useSelector((state) => state.orders);
+    const { pending, completed } = useSelector((state) => state.delivery);
 
-    const [counts, setCounts] = useState({});
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [ordersCount, setOrdersCount] = useState(0);
     const [chatsCount, setChatsCount] = useState(0);
     const [transactionsCount, setTransactionsCount] = useState(0);
+    const [pendingDeliveriesCount, setPendingDeliveriesCount] = useState(0);
+    const [completedDeliveriesCount, setCompletedDeliveriesCount] = useState(0);
     const [activeLink, setActiveLink] = useState("");
+    const [linksToRender, setLinksToRender] = useState([]);
 
     const router = useRouter();
     const dispatch = useDispatch();
@@ -54,7 +61,6 @@ const Sidebar = () => {
             linkTo: "/sell-products",
             icon: <HiOutlineCash className="icon-sidebar" />,
         },
-
         {
             name: "chats",
             linkTo: "/chats",
@@ -111,6 +117,44 @@ const Sidebar = () => {
         },
     ]);
 
+    const [deliveryLinks, setDeliveryLinks] = useState([
+        {
+            name: "pending",
+            linkTo: "/delivery/?show=pending",
+            icon: <MdOutlineDeliveryDining className="icon-sidebar" />,
+            activePath: "/delivery?show=pending",
+        },
+        {
+            name: "completed",
+            linkTo: "/delivery/?show=completed",
+            icon: <ClipboardCheckIcon className="icon-sidebar" />,
+            activePath: "/delivery?show=completed",
+        },
+        {
+            name: "chats",
+            linkTo: "/chats",
+            count: 0,
+            icon: <ChatAlt2Icon className="icon-sidebar" />,
+
+            countFlat: true,
+        },
+        {
+            name: "notifications",
+            linkTo: "/notifications",
+            count: 0,
+            icon: <BellIcon className="icon-sidebar" />,
+        },
+        {
+            name: "sign out",
+            linkTo: "/signin",
+            icon: <LogoutIcon className="icon-sidebar" />,
+        },
+    ]);
+
+    useEffect(() => {
+        setLinksToRender(authUser?.isDeliveryPersonnel ? deliveryLinks : links);
+    }, [authUser]);
+
     useEffect(() => {
         // unseen notifications count
         let unseenCount = 0;
@@ -127,6 +171,7 @@ const Sidebar = () => {
     useEffect(() => {
         // orders count
         let unacknowledgedCount = 0;
+
         sellerOrders.forEach((sellerOrder) => {
             if (!sellerOrder.isAcknowledged) {
                 unacknowledgedCount++;
@@ -137,10 +182,24 @@ const Sidebar = () => {
     }, [sellerOrders]);
 
     useEffect(() => {
-        for (let link of links) {
+        let unacknowledgedCount = 0;
+
+        completed.forEach((delivery) => {
+            if (!delivery.isAcknowledged) {
+                unacknowledgedCount++;
+            }
+        });
+
+        setCompletedDeliveriesCount(unacknowledgedCount);
+    }, [completed]);
+
+    useEffect(() => {
+        for (let link of linksToRender) {
             if (
                 router.pathname === link.activePath ||
-                router.pathname === link.linkTo
+                router.pathname === link.linkTo ||
+                router.asPath === link.linkTo ||
+                router.asPath === link.activePath
             ) {
                 setActiveLink(link.name);
                 break;
@@ -148,7 +207,7 @@ const Sidebar = () => {
 
             setActiveLink("");
         }
-    }, [router]);
+    }, [router, linksToRender]);
 
     const handleLinkClick = (name, link) => {
         if (showSidebar) {
@@ -179,7 +238,7 @@ const Sidebar = () => {
         >
             <ThemeToggler />
 
-            {links.map((link) => {
+            {linksToRender.map((link) => {
                 if (link.name === "sell on echo") {
                     // do not show if store type is IND or business is already verified
                     if (
@@ -214,6 +273,10 @@ const Sidebar = () => {
                                 ? notificationsCount
                                 : link.name === "orders"
                                 ? ordersCount
+                                : link.name === "delivery/?show=pending"
+                                ? pendingDeliveriesCount
+                                : link.name === "completed"
+                                ? completedDeliveriesCount
                                 : 0
                         }
                         active={activeLink === link.name}

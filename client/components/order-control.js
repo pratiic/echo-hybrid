@@ -16,6 +16,7 @@ import { deleteOrder, updateOrder } from "../redux/slices/orders-slice";
 // import { addTransaction } from "../redux/slices/transactions-slice";
 
 import Button from "./button";
+import { updateDelivery } from "../redux/slices/delivery-slice";
 
 const OrderControl = ({
     orderId,
@@ -153,7 +154,7 @@ const OrderControl = ({
 
                             // prepare notification data
                             notification.destinationId = origin?.id;
-                            notification.text = `a completion request for the order of - ${product?.name} - has been received`;
+                            notification.text = `a completion request for the order of - ${product?.name} - with order Id ${orderId} has been received`;
                             notification.linkTo = `/orders/?show=user`;
                         } else {
                             if (action === "accept") {
@@ -184,25 +185,46 @@ const OrderControl = ({
                                 };
                             }
 
-                            if (orderCompletion?.madeBy === "SELLER") {
-                                // prepare notification data
-                                notification.destinationId = store?.userId;
-                                notification.text = `your completion request for the order of - ${product?.name} - has been ${action}ed`;
-                                notification.linkTo = `/${
-                                    action === "accept"
-                                        ? "transactions"
-                                        : "orders"
-                                }/?show=seller`;
-                            }
+                            // prepare notification data
+                            notification.destinationId =
+                                orderCompletion?.madeBy === "SELLER"
+                                    ? store?.userId
+                                    : 0; // destinationId -> 0 for delivery personnel
+                            notification.text = `the completion request for the order of - ${product?.name} - with order Id ${orderId} has been ${action}ed`;
+                            notification.linkTo =
+                                orderCompletion?.madeBy === "SELLER"
+                                    ? `/${
+                                          action === "accept"
+                                              ? "transactions"
+                                              : "orders"
+                                      }/?show=seller`
+                                    : `/${
+                                          action === "accept"
+                                              ? "delivery/?show=completed"
+                                              : "delivery/?show=pending"
+                                      }`; // do not redirect anywhere in case of delivery personnel
                         }
 
-                        dispatch(
-                            updateOrder({
-                                id: orderId,
-                                type: router.query.show,
-                                updateInfo,
-                            })
-                        );
+                        // orderCompletion.madeBy -> SELLER, then update order
+                        // orderCompletion.madeBy -> DELIVERY_PERSONNEL, then update pending delivery
+
+                        if (!authUser?.isDeliveryPersonnel) {
+                            dispatch(
+                                updateOrder({
+                                    id: orderId,
+                                    type: router.query.show,
+                                    updateInfo,
+                                })
+                            );
+                        } else {
+                            dispatch(
+                                updateDelivery({
+                                    id: orderId,
+                                    type: "pending",
+                                    updateInfo,
+                                })
+                            );
+                        }
 
                         dispatch(
                             setAlert({
@@ -214,13 +236,7 @@ const OrderControl = ({
                         );
 
                         // send notification
-                        if (
-                            action === "req" ||
-                            orderCompletion.madeBy === "SELLER"
-                        ) {
-                            // do not send notification when the order completion is made by a delivery personnel
-                            fetcher("notifications", "POST", notification);
-                        }
+                        fetcher("notifications", "POST", notification);
                     } catch (error) {
                         dispatch(setErrorAlert(error.message));
                     } finally {

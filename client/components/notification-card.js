@@ -8,7 +8,7 @@ import { getHowLongAgo } from "../lib/date-time";
 import { closeModal, showLoadingModal } from "../redux/slices/modal-slice";
 import { fetcher } from "../lib/fetcher";
 import { deleteNotification } from "../redux/slices/notifications-slice";
-import { setErrorAlert } from "../redux/slices/alerts-slice";
+import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 
 import CustomLink from "./custom-link";
 import Avatar from "./avatar";
@@ -32,6 +32,9 @@ const NotificationCard = ({ id, origin, text, createdAt, linkTo }) => {
             await fetcher(`notifications/${id}`, "DELETE");
 
             dispatch(deleteNotification(id));
+            dispatch(
+                setAlert({ message: "the notification has been deleted" })
+            );
         } catch (error) {
             dispatch(setErrorAlert(error.message));
         } finally {

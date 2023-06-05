@@ -97,7 +97,10 @@ const ProductPage = () => {
                     <ProductInfo {...activeProduct} isMyProduct={isMyProduct} />
                 </div>
 
-                <ProductMenu isMyProduct={isMyProduct} />
+                <ProductMenu
+                    isMyProduct={isMyProduct}
+                    hasBeenSold={activeProduct?.hasBeenSold}
+                />
             </div>
 
             <div
