@@ -12,8 +12,6 @@ export const getDeliveries = async (request, response, next) => {
     const searchQuery = request.query.query;
     const PAGE_SIZE = 10;
 
-    console.log(skip);
-
     if (skip < 1) {
         skip = 0;
     }
