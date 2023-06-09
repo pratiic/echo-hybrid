@@ -1,0 +1,497 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  firstName String [not null]
+  lastName String [not null]
+  email String [unique, not null]
+  avatar String
+  password String [not null]
+  isVerified Boolean [not null, default: false]
+  isAdmin Boolean [not null, default: false]
+  isDeliveryPersonnel Boolean [not null, default: false]
+  fullName String [not null]
+  accountVerification AccountVerification
+  accountRecovery AccountRecovery
+  store Store
+  reviews Review [not null]
+  replies Reply [not null]
+  rating Rating [not null]
+  address Address
+  notifications Notification [not null]
+  categoryRequests CategoryRequest [not null]
+  orders Order [not null]
+  chats UserChat [not null]
+  messages Message [not null]
+  cart Cart
+  createdReports Report [not null]
+  reports Report [not null]
+  suspension Suspension
+  deliveries Delivery [not null]
+  orderCompletion OrderCompletion [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table AccountVerification {
+  id Int [pk, increment]
+  code String [not null]
+  user User [not null]
+  userId Int [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table AccountRecovery {
+  id Int [pk, increment]
+  code String [not null]
+  user User [not null]
+  userId Int [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table Image {
+  id Int [pk, increment]
+  binary Bytes [not null]
+  src String [not null]
+  uniqueStr String [unique]
+  userId Int [unique]
+  reviewId Int [unique]
+  businessId Int [unique]
+  productId Int
+  messageId Int [unique]
+  replyId Int [unique]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table Store {
+  id Int [pk, increment]
+  storeType StoreType [not null]
+  rating Float [not null, default: 0]
+  isDeleted Boolean [not null, default: false]
+  user User
+  userId Int [unique]
+  business Business
+  product Product [not null]
+  reviews Review [not null]
+  ratings Rating [not null]
+  orders Order [not null]
+  reports Report [not null]
+  suspension Suspension
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table Business {
+  id Int [pk, increment]
+  name String [not null]
+  PAN String
+  regImage String
+  phone String [not null]
+  isVerified Boolean [not null, default: false]
+  store Store [not null]
+  storeId Int [unique, not null]
+  address Address
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+}
+
+Table Product {
+  id Int [pk, increment]
+  name String [not null]
+  description String [not null]
+  price Float [not null]
+  per String
+  isSecondHand Boolean [not null]
+  images String[] [not null]
+  brand String
+  madeIn String
+  stockType String
+  deliveryCharge Int [not null]
+  rating Float [default: 0]
+  subCategory String [not null]
+  isDeleted Boolean [not null, default: false]
+  hasBeenSold Boolean [not null, default: false]
+  store Store
+  storeId Int
+  reviews Review [not null]
+  ratings Rating [not null]
+  category Category
+  categoryName String
+  stock Stock
+  variations ProductVariation [not null]
+  orders Order [not null]
+  cartItems CartItem [not null]
+  reports Report [not null]
+  suspension Suspension
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table ProductVariation {
+  id Int [pk, increment]
+  label String [not null]
+  options String[] [not null]
+  product Product [not null]
+  productId Int [not null]
+}
+
+Table Category {
+  name String [pk]
+  products Product [not null]
+}
+
+Table CategoryRequest {
+  name String [pk]
+  user User [not null]
+  userId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Review {
+  id Int [pk, increment]
+  text String [not null]
+  image String
+  user User [not null]
+  userId Int [not null]
+  product Product
+  productId Int
+  store Store
+  storeId Int
+  replies Reply [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+
+  indexes {
+    (userId, storeId) [unique]
+    (userId, productId) [unique]
+  }
+}
+
+Table Rating {
+  id Int [pk, increment]
+  stars Float [not null]
+  user User [not null]
+  userId Int [not null]
+  product Product
+  productId Int
+  store Store
+  storeId Int
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+
+  indexes {
+    (userId, productId) [unique]
+    (userId, storeId) [unique]
+  }
+}
+
+Table Reply {
+  id Int [pk, increment]
+  text String [not null]
+  image String
+  user User [not null]
+  userId Int [not null]
+  review Review [not null]
+  reviewId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Address {
+  id Int [pk, increment]
+  province String [not null]
+  city String [not null]
+  area String [not null]
+  description String [default: '']
+  user User
+  userId Int [unique]
+  business Business
+  businessId Int [unique]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Notification {
+  id Int [pk, increment]
+  text String [not null]
+  origin User [not null]
+  originId Int [not null]
+  destinationId Int [not null]
+  linkTo String [default: '']
+  seen Boolean [default: false]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Stock {
+  id Int [pk, increment]
+  quantity Int
+  variants Json
+  product Product [not null]
+  productId Int [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Order {
+  id Int [pk, increment]
+  status OrderStatus [not null, default: 'PLACED']
+  unitPrice Float [not null]
+  isDelivered Boolean [not null]
+  deliveryCharge Int
+  variant Json
+  quantity Int
+  consumerAddress Json
+  isDeleted Boolean [not null, default: false]
+  isAcknowledged Boolean [not null, default: false]
+  product Product [not null]
+  productId Int [not null]
+  origin User [not null]
+  originId Int [not null]
+  store Store [not null]
+  storeId Int [not null]
+  orderCompletion OrderCompletion
+  transaction Transaction
+  delivery Delivery
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table OrderCompletion {
+  id Int [pk, increment]
+  madeBy OrderCompletionRequestor [not null]
+  order Order [not null]
+  orderId Int [unique, not null]
+  requestor User [not null]
+  requestorId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Delivery {
+  id Int [pk, increment]
+  deletedFor Int[] [not null]
+  isAcknowledged Boolean [not null, default: false]
+  order Order [not null]
+  orderId Int [unique, not null]
+  madeBy User [not null]
+  madeById Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Transaction {
+  id Int [pk, increment]
+  deletedFor Int
+  isDeleted Boolean [not null, default: false]
+  isAcknowledged Boolean [not null, default: false]
+  createdMonth Int [not null]
+  createdYear Int [not null]
+  order Order [not null]
+  orderId Int [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Chat {
+  id String [pk]
+  userIds Int[] [not null]
+  unseenMsgsCounts Json [not null]
+  users UserChat [not null]
+  messages Message [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table UserChat {
+  id Int [pk, increment]
+  user User [not null]
+  userId Int [not null]
+  chat Chat [not null]
+  chatId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Message {
+  id Int [pk, increment]
+  text String
+  image String
+  seen Boolean [not null, default: false]
+  deleted Boolean [not null, default: false]
+  chat Chat [not null]
+  chatId String [not null]
+  user User [not null]
+  userId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Cart {
+  id Int [pk, increment]
+  user User [not null]
+  userId Int [unique, not null]
+  items CartItem [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table CartItem {
+  id Int [pk, increment]
+  quantity Int
+  variant Json
+  cart Cart [not null]
+  cartId Int [not null]
+  product Product [not null]
+  productId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Report {
+  id Int [pk, increment]
+  cause String [not null]
+  product Product
+  productId Int
+  store Store
+  storeId Int
+  user User
+  userId Int
+  creator User [not null]
+  creatorId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+
+  indexes {
+    (creatorId, productId) [unique]
+    (creatorId, storeId) [unique]
+  }
+}
+
+Table Suspension {
+  id Int [pk, increment]
+  cause String [not null]
+  product Product
+  productId Int [unique]
+  store Store
+  storeId Int [unique]
+  user User
+  userId Int [unique]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Enum StoreType {
+  IND
+  BUS
+}
+
+Enum BusinessStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+Enum OrderStatus {
+  PLACED
+  CONFIRMED
+  REJECTED
+  CANCELLED
+  PACKAGED
+  COMPLETED
+}
+
+Enum OrderCompletionRequestor {
+  SELLER
+  DELIVERY_PERSONNEL
+}
+
+Ref: AccountVerification.userId - User.id [delete: Cascade]
+
+Ref: AccountRecovery.userId - User.id [delete: Cascade]
+
+Ref: Store.userId - User.id [delete: Cascade]
+
+Ref: Business.storeId - Store.id [delete: Cascade]
+
+Ref: Product.storeId > Store.id [delete: Cascade]
+
+Ref: Product.categoryName > Category.name
+
+Ref: ProductVariation.productId > Product.id [delete: Cascade]
+
+Ref: CategoryRequest.userId > User.id
+
+Ref: Review.userId > User.id [delete: Cascade]
+
+Ref: Review.productId > Product.id [delete: Cascade]
+
+Ref: Review.storeId > Store.id [delete: Cascade]
+
+Ref: Rating.userId > User.id [delete: Cascade]
+
+Ref: Rating.productId > Product.id [delete: Cascade]
+
+Ref: Rating.storeId > Store.id [delete: Cascade]
+
+Ref: Reply.userId > User.id [delete: Cascade]
+
+Ref: Reply.reviewId > Review.id [delete: Cascade]
+
+Ref: Address.userId - User.id
+
+Ref: Address.businessId - Business.id [delete: Cascade]
+
+Ref: Notification.originId > User.id [delete: Cascade]
+
+Ref: Stock.productId - Product.id [delete: Cascade]
+
+Ref: Order.productId > Product.id [delete: Cascade]
+
+Ref: Order.originId > User.id [delete: Cascade]
+
+Ref: Order.storeId > Store.id [delete: Cascade]
+
+Ref: OrderCompletion.orderId - Order.id [delete: Cascade]
+
+Ref: OrderCompletion.requestorId > User.id
+
+Ref: Delivery.orderId - Order.id
+
+Ref: Delivery.madeById > User.id
+
+Ref: Transaction.orderId - Order.id [delete: Cascade]
+
+Ref: UserChat.userId > User.id [delete: Cascade]
+
+Ref: UserChat.chatId > Chat.id [delete: Cascade]
+
+Ref: Message.chatId > Chat.id [delete: Cascade]
+
+Ref: Message.userId > User.id [delete: Cascade]
+
+Ref: Cart.userId - User.id
+
+Ref: CartItem.cartId > Cart.id [delete: Cascade]
+
+Ref: CartItem.productId > Product.id [delete: Cascade]
+
+Ref: Report.productId > Product.id [delete: Cascade]
+
+Ref: Report.storeId > Store.id
+
+Ref: Report.userId > User.id
+
+Ref: Report.creatorId > User.id
+
+Ref: Suspension.productId - Product.id
+
+Ref: Suspension.storeId - Store.id
+
+Ref: Suspension.userId - User.id

@@ -6,13 +6,13 @@ import { useRouter } from "next/router";
 import { clearErrors, displayError } from "../lib/validation";
 import { generateFormData } from "../lib/form-data";
 import { fetcher } from "../lib/fetcher";
-import { setAlert } from "../redux/slices/alerts-slice";
+import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
+import { updateProduct } from "../redux/slices/products-slice";
 
 import Form from "../components/form";
 import InputGroup from "../components/input-group";
 import Button from "../components/button";
 import FileSelector from "../components/file-selector";
-import { updateProduct } from "../redux/slices/products-slice";
 
 const SetProduct = () => {
     const [name, setName] = useState("");
@@ -184,6 +184,8 @@ const SetProduct = () => {
             );
             router.push(`/products/${data.product.id}`);
         } catch (error) {
+            dispatch(setErrorAlert("view the fields for error"));
+
             if (
                 error.message.includes("image") ||
                 error.message.includes("File")
@@ -235,7 +237,7 @@ const SetProduct = () => {
 
                 <InputGroup
                     label="product description"
-                    placeholder="min 50 chars, max 150 chars"
+                    placeholder="min 50 chars, max 200 chars"
                     view="textarea"
                     minChars={50}
                     maxChars={150}

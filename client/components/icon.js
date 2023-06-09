@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import Tooltip from "./tooltip";
 
-const Icon = ({ children, className, toolName, toolPosition, onClick }) => {
+const Icon = ({
+    children,
+    className,
+    toolName,
+    toolPosition,
+    isDisabled,
+    onClick,
+}) => {
     const [isFocused, setIsFocused] = useState(false);
     const [isMouseEntered, setIsMouseEntered] = useState(false);
 
@@ -54,7 +61,7 @@ const Icon = ({ children, className, toolName, toolPosition, onClick }) => {
             onBlur={handleBlur}
             onClick={handleIconClick}
         >
-            {toolName && (isFocused || isMouseEntered) && (
+            {toolName && (isFocused || isMouseEntered) && !isDisabled && (
                 <Tooltip toolName={toolName} toolPosition={toolPosition} />
             )}
 

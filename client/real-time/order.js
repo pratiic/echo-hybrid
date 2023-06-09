@@ -119,6 +119,11 @@ const Order = () => {
     }, [needToFetch, userPage, sellerPage]);
 
     const getOrders = async (type) => {
+        if (authUser?.isDeliveryPersonnel) {
+            // delivery personnel have no need for orders
+            return;
+        }
+
         const currentPage = type === "user" ? userPage : sellerPage;
         const query = type === "user" ? userQuery : sellerQuery;
 

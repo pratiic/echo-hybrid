@@ -30,6 +30,7 @@ import { reportRouter } from "./routes/report.routes.js";
 import { suspensionRouter } from "./routes/suspension.routes.js";
 import { deliveryRouter } from "./routes/delivery.routes.js";
 import { transactionRouter } from "./routes/transaction.routes.js";
+import { recRouter } from "./routes/rec.routes.js";
 
 dotenv.config();
 
@@ -63,6 +64,7 @@ app.use("/api/reports", reportRouter());
 app.use("/api/suspensions", suspensionRouter());
 app.use("/api/delivery", deliveryRouter());
 app.use("/api/transactions", transactionRouter());
+app.use("/api/rec", recRouter());
 app.use("/receipts", receiptRouter);
 
 // error handler middleware

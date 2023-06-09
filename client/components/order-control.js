@@ -39,11 +39,15 @@ const OrderControl = ({
     const controlOrder = (event, action) => {
         event.stopPropagation();
 
-        const modalTitle = action === "package" ? "order package" : "";
+        const modalTitleMap = {
+            package: "order package",
+            confirm: "order confirmation",
+            reject: "order rejection",
+        };
 
         dispatch(
             showConfirmationModal({
-                title: modalTitle,
+                title: modalTitleMap[action],
                 message:
                     action === "package"
                         ? "Are you sure that the product has been packaged and ready for delivery ?"
@@ -307,6 +311,16 @@ const OrderControl = ({
             // access to order completion
             const isAuthUserOriginator = origin?.id === authUser?.id; // auth user made the order
             const isAuthUserSeller = store?.userId === authUser?.id;
+
+            if (isDelivered && isAuthUserSeller) {
+                return (
+                    <p className="dark-light italic max-w-[300px]">
+                        The delivery team will take care of the delivery of this
+                        order. If they have not already, they will be in touch
+                        regarding the pick up.
+                    </p>
+                );
+            }
 
             if (
                 isDelivered &&

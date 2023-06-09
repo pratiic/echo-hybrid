@@ -251,6 +251,7 @@ const StockView = ({ productId, stockType, variations, stock, userCanBuy }) => {
                 {!userCanBuy && (
                     <div className="mt-3">
                         <Button
+                            small
                             onClick={() =>
                                 dispatch(
                                     showGenericModal(

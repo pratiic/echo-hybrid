@@ -152,21 +152,26 @@ const SellerPage = () => {
             </Head>
 
             <PageHeader heading={sellerName} hasBackArrow>
-                <SellerMenu
-                    isMyStore={isMyStore}
-                    storeId={storeDetails?.id}
-                    storeType={storeDetails?.storeType}
-                />
+                {!authUser?.isDeliveryPersonnel && (
+                    <SellerMenu
+                        isMyStore={isMyStore}
+                        storeId={storeDetails?.id}
+                        storeType={storeDetails?.storeType}
+                    />
+                )}
             </PageHeader>
 
-            <div className="mb-5 -mt-1">
-                <OptionsToggle
-                    options={options}
-                    rounded={false}
-                    active={activeOption}
-                    onClick={handleOptionClick}
-                />
-            </div>
+            {!authUser?.isDeliveryPersonnel && (
+                // do not show options toggle to delivery personnel
+                <div className="mb-5 -mt-1">
+                    <OptionsToggle
+                        options={options}
+                        rounded={false}
+                        active={activeOption}
+                        onClick={handleOptionClick}
+                    />
+                </div>
+            )}
 
             {activeOption === "details" && (
                 <SellerDetails

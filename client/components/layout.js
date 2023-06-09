@@ -108,13 +108,13 @@ const Layout = ({ children }) => {
                     <>
                         {/* fake components for real time  */}
                         <Notification />
-                        <Rating />
+                        {!authUser?.isDeliveryPersonnel && <Rating />}
                         <Chat />
                         <Order />
                         {authUser?.isDeliveryPersonnel && <Delivery />}
 
                         {/* fake components to preserve cache */}
-                        <Products />
+                        {!authUser?.isDeliveryPersonnel && <Products />}
                     </>
                 )}
 

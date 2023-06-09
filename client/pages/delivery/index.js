@@ -163,6 +163,10 @@ const Deliveries = () => {
         );
     };
 
+    if (!router.query.show) {
+        return null;
+    }
+
     return (
         <section>
             <Head>

@@ -29,13 +29,13 @@ const AddressSetter = ({
         onAddressChange(
             {
                 province,
-                city: city || province === "bagmati" ? "kathmandu" : "",
+                city: city ? city : province === "bagmati" ? "kathmandu" : "",
                 area,
                 description,
             },
             deliveryAddressSelf
         );
-    }, [province, city, area, deliveryAddressSelf]);
+    }, [province, city, area, description, deliveryAddressSelf]);
 
     const handleAddressOptionChange = () => {
         setDeliveryAddressSelf(!deliveryAddressSelf);

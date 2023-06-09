@@ -5,6 +5,7 @@ import {
     ShoppingBagIcon,
 } from "@heroicons/react/outline";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/router";
 
 import { getAddress } from "../lib/address";
 import { getDate, getHowLongAgo } from "../lib/date-time";
@@ -32,6 +33,14 @@ const OrderRest = ({
     // information such as address, user, date of an order
     const { authUser } = useSelector((state) => state.auth);
 
+    const router = useRouter();
+
+    const handleSellerClick = (event) => {
+        event.stopPropagation();
+
+        router.push(`/sellers/${store?.id}`);
+    };
+
     return (
         <div>
             {/* other details */}
@@ -57,10 +66,15 @@ const OrderRest = ({
                                     seller deleted
                                 </span>
                             ) : (
-                                <span className="text-blue-three cursor-pointer text-sm">
+                                <span
+                                    className="text-blue-three cursor-pointer text-sm"
+                                    onClick={handleSellerClick}
+                                >
                                     {capitalizeAll(
                                         store?.storeType === "IND"
-                                            ? `${store?.user?.firstName} ${store?.user?.lastName}`
+                                            ? capitalizeAll(
+                                                  store?.user?.fullName
+                                              )
                                             : store?.business?.name
                                     )}
                                 </span>

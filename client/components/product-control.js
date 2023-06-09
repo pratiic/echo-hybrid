@@ -79,14 +79,19 @@ const ProductControl = ({
     return (
         <div className={`flex items-center mt-3 ${className}`}>
             <div className={canAddToCart && "mr-3"}>
-                <Button small={!canAddToCart} onClick={handleOrderClick}>
+                <Button small onClick={handleOrderClick}>
                     order now
                 </Button>
             </div>
 
             {canAddToCart && (
-                <Button type="secondary" onClick={handleCartClick}>
-                    add to cart
+                <Button
+                    type="secondary"
+                    small
+                    textAsIs
+                    onClick={handleCartClick}
+                >
+                    Add to Cart
                 </Button>
             )}
         </div>

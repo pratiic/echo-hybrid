@@ -238,7 +238,7 @@ export const placeOrder = async (request, response, next) => {
 
 export const getOrders = async (request, response, next) => {
     const user = request.user;
-    const type = request.query.type; // user or seller
+    const type = request.query.type; // user, seller or delivery
     const page = parseInt(request.query.page) || 1;
     let skip = parseInt(request.query.skip);
     const searchQuery = request.query.query || "";

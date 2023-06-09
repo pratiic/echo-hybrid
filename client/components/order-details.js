@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { getSubtotal } from "../lib/order";
 import { addCommas, capitalizeFirstLetter } from "../lib/strings";
 import { setAlert } from "../redux/slices/alerts-slice";
-// import { addUserOrder } from "../redux/slices/orders-slice";
 import { closeModal } from "../redux/slices/modal-slice";
 import { deleteCartItem } from "../redux/slices/cart-slice";
 import { fetcher } from "../lib/fetcher";

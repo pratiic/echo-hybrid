@@ -90,7 +90,7 @@ const FileSelector = ({
                             key={index}
                         >
                             <span className="mr-1">{index + 1}.</span>
-                            <span className="flex-1">
+                            <span className="flex-1 max-w-[300px] text-ellipsis">
                                 {selectedFile.name}
                             </span>{" "}
                             <XIcon

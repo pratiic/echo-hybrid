@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 import Button from "../components/button";
 
@@ -10,12 +11,22 @@ const Home = () => {
 
     useEffect(() => {
         if (authUser) {
-            router.push("/products");
+            if (!authUser?.isDeliveryPersonnel) {
+                router.push("/products");
+            }
+
+            if (authUser?.isDeliveryPersonnel) {
+                router.push("/delivery");
+            }
         }
     }, [authUser]);
 
     return (
         <section className="wrapper">
+            <Head>
+                <title>Echo</title>
+            </Head>
+
             <div className="flex pt-[20px] justify-center h-[calc(100vh-80px)] relative">
                 <div className="mr-12">
                     <h1 className="text-4xl font-bold text-gray-700 mb-3 tracking-wide mt-[75px]">

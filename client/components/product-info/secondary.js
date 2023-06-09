@@ -9,7 +9,6 @@ import { getHowLongAgo, getDate } from "../../lib/date-time";
 import { capitalizeFirstLetter } from "../../lib/strings";
 
 import IconInfo from "../icon-info";
-import ChatButton from "../chat-button";
 import DeliveryInfo from "../delivery-info";
 import SellerInfo from "../seller-info";
 
@@ -97,13 +96,6 @@ const SecondaryInfo = ({
                     </span>
                 </IconInfo>
             </div>
-
-            {!isMyProduct && (
-                <div className="mt-3 hidden w-fit text-sm 1200:block">
-                    {" "}
-                    <ChatButton userId={store?.userId} />
-                </div>
-            )}
         </div>
     );
 };

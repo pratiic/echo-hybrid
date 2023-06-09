@@ -5,13 +5,14 @@ import { LocationMarkerIcon, CalendarIcon } from "@heroicons/react/outline";
 
 import { getHowLongAgo, getDate } from "../lib/date-time";
 import { getAddress } from "../lib/address";
+import { capitalizeAll } from "../lib/strings";
 
 import Image from "../components/image";
 import Avatar from "../components/avatar";
 import Rating from "../components/rating";
 import CommentsContainer from "../components/comments-container";
 import Tag from "../components/tag";
-import { capitalizeAll } from "../lib/strings";
+import ChatButton from "../components/chat-button";
 
 const SellerDetails = ({
     id,
@@ -109,30 +110,41 @@ const SellerDetails = ({
                             {isMyStore && <Tag text="my seller profile" />}
                         </div>
                     </div>
+
+                    {/* button to start chat with the seller */}
+                    {!isMyStore && (
+                        <div className="mt-5">
+                            <ChatButton userId={user?.id} type="tertiary" />
+                        </div>
+                    )}
                 </div>
 
-                <Rating
-                    rating={rating}
-                    ratings={ratings}
-                    userCanRate={!isMyStore}
-                    target={{
-                        id,
-                        name: capitalizeAll(
-                            storeType === "IND"
-                                ? `${user?.firstName} ${user?.lastName}`
-                                : business?.name
-                        ),
-                    }}
-                    isTargetBusiness={storeType === "BUS"}
-                    onRate={updateStore}
-                />
+                {!authUser?.isDeliveryPersonnel && (
+                    <Rating
+                        rating={rating}
+                        ratings={ratings}
+                        userCanRate={!isMyStore}
+                        target={{
+                            id,
+                            name: capitalizeAll(
+                                storeType === "IND"
+                                    ? `${user?.firstName} ${user?.lastName}`
+                                    : business?.name
+                            ),
+                        }}
+                        isTargetBusiness={storeType === "BUS"}
+                        onRate={updateStore}
+                    />
+                )}
             </div>
 
-            <CommentsContainer
-                contentId={id}
-                contentOwner={user}
-                isTargetBusiness={storeType === "BUS"}
-            />
+            {!authUser?.isDeliveryPersonnel && (
+                <CommentsContainer
+                    contentId={id}
+                    contentOwner={user}
+                    isTargetBusiness={storeType === "BUS"}
+                />
+            )}
         </div>
     );
 };

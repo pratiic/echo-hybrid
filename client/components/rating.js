@@ -207,7 +207,7 @@ const Rating = ({
                             {singularOrPlural(ratings, "user", "users")}
                         </span>
 
-                        {ratings.length > 0 && (
+                        {/* {ratings.length > 0 && (
                             <Button
                                 small
                                 type="tertiary"
@@ -216,12 +216,12 @@ const Rating = ({
                             >
                                 view ratings
                             </Button>
-                        )}
+                        )} */}
                     </div>
 
                     {/* show only if the auth user can rate */}
                     {userCanRate && (
-                        <div className="mt-3 dark-light">
+                        <div className="mt-2 dark-light">
                             {authUserRating ? (
                                 // auth user has already rated
                                 <p className="flex items-center -mt-2">
@@ -246,7 +246,7 @@ const Rating = ({
                                             ? targetType
                                             : "seller"}
                                     </span>
-                                    <Button onClick={handleRateClick}>
+                                    <Button small onClick={handleRateClick}>
                                         rate it
                                     </Button>
                                 </React.Fragment>

@@ -99,9 +99,10 @@ const OrderCard = ({
                 >
                     <DropdownItem
                         icon={<ChatAlt2Icon className="icon-no-bg" />}
+                        textAsIs
                         onClick={handleChatClick}
                     >
-                        chat now
+                        {isUserOrder ? "Chat with Seller" : "Chat with Buyer"}
                     </DropdownItem>
 
                     {renderDropdownItems()}
@@ -192,7 +193,9 @@ const OrderCard = ({
     };
 
     const handleOrderClick = () => {
-        router.push(`/products/${product.id}`);
+        if (!authUser?.isDeliveryPersonnel) {
+            router.push(`/products/${product.id}`);
+        }
     };
 
     return (

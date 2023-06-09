@@ -14,6 +14,7 @@ const ChatButton = ({
     fullText = false,
     role = "seller",
     isDisabled,
+    type = "secondary",
 }) => {
     const router = useRouter();
     const { theme } = useSelector((state) => state.theme);
@@ -27,7 +28,7 @@ const ChatButton = ({
     };
 
     return small ? (
-        <Icon onClick={openChat} toolName={isDisabled ? "" : "chat"}>
+        <Icon onClick={openChat} toolName="chat" isDisabled={isDisabled}>
             <ChatAlt2Icon
                 className={`${isDisabled ? "icon-disabled" : "icon"} `}
             />
@@ -35,13 +36,17 @@ const ChatButton = ({
     ) : (
         <Button
             small
-            type={theme === "light" ? "secondary" : "tertiary"}
+            type={theme === "light" ? type : "tertiary"}
             textAsIs={true}
             disabled={isDisabled}
             onClick={openChat}
         >
             <span className="flex items-center">
-                <ChatAlt2Icon className="icon-no-bg mr-2" />
+                <ChatAlt2Icon
+                    className={`icon-no-bg mr-2 ${
+                        type === "primary" ? "text-white" : ""
+                    }`}
+                />
                 {!fullText
                     ? "Chat Now"
                     : `Chat with ${capitalizeFirstLetter(role)}`}

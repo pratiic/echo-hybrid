@@ -100,6 +100,7 @@ const ProductPage = () => {
                 <ProductMenu
                     isMyProduct={isMyProduct}
                     hasBeenSold={activeProduct?.hasBeenSold}
+                    store={activeProduct?.store}
                 />
             </div>
 

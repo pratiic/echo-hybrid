@@ -53,8 +53,9 @@ const Notifications = () => {
         if (notifications.length > 0) {
             dispatch(
                 showConfirmationModal({
+                    title: "delete all notifications",
                     message:
-                        "Are you sure you want to delete all notifications?",
+                        "you will not be able to revert this action. Do you want to continue ?",
                     handler: async () => {
                         dispatch(
                             showLoadingModal("deleting all notifications...")

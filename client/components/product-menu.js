@@ -17,7 +17,7 @@ import Dropdown from "./dropdown";
 import DropdownItem from "./dropdown-item";
 import Icon from "./icon";
 
-const ProductMenu = ({ isMyProduct, hasBeenSold }) => {
+const ProductMenu = ({ isMyProduct, hasBeenSold, store }) => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     const router = useRouter();
@@ -60,6 +60,10 @@ const ProductMenu = ({ isMyProduct, hasBeenSold }) => {
         );
     };
 
+    const handleChatClick = () => {
+        router.push(`/chats/${store?.userId}`);
+    };
+
     return (
         <div className="w-fit">
             <Icon
@@ -91,7 +95,19 @@ const ProductMenu = ({ isMyProduct, hasBeenSold }) => {
                 )}
 
                 {!isMyProduct && (
-                    <DropdownItem action="report">report product</DropdownItem>
+                    <React.Fragment>
+                        <DropdownItem action="report">
+                            report product
+                        </DropdownItem>
+
+                        <DropdownItem
+                            action="chat"
+                            textAsIs
+                            onClick={handleChatClick}
+                        >
+                            Chat with Seller
+                        </DropdownItem>
+                    </React.Fragment>
                 )}
             </Dropdown>
         </div>
