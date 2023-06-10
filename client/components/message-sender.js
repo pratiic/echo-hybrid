@@ -4,7 +4,7 @@ import { PaperAirplaneIcon } from "@heroicons/react/solid";
 import { XCircleIcon } from "@heroicons/react/outline";
 
 import { addOutgoingMsg, removeOutgoingMsg } from "../redux/slices/chat-slice";
-import { resetFiles } from "../redux/slices/files-slices";
+import { resetFiles } from "../redux/slices/files-slice";
 import { setErrorAlert } from "../redux/slices/alerts-slice";
 import { setPreview } from "../lib/files";
 import { fetcher } from "../lib/fetcher";

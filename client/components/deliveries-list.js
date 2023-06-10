@@ -1,4 +1,6 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+
+import { setPage } from "../redux/slices/delivery-slice";
 
 import ContentList from "./content-list";
 
@@ -14,6 +16,7 @@ const DeliveriesList = ({ type }) => {
         noMoreData,
         PAGE_SIZE,
     } = useSelector((state) => state.delivery);
+    const dispatch = useDispatch();
 
     const incrementPageNumber = (deliveryType) => {
         dispatch(

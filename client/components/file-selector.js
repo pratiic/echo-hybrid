@@ -8,7 +8,7 @@ import {
     selectFiles,
     resetFiles,
     unselectFile,
-} from "../redux/slices/files-slices";
+} from "../redux/slices/files-slice";
 import Button from "./button";
 import Icon from "./icon";
 import Image from "./image";
@@ -82,7 +82,7 @@ const FileSelector = ({
         }
 
         return (
-            <div className="text-gray-one px-2">
+            <div className="text-gray-one px-2 space-y-1">
                 {selectedFiles.map((selectedFile, index) => {
                     return (
                         <p

@@ -10,7 +10,7 @@ export const sendEmail = async (recipientEmail, subject, text) => {
         const CLIENT_SECRET = "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";
         const REDIRECT_URI = "https://developers.google.com/oauthplayground";
         const REFRESH_TOKEN =
-            "1//04oXYxKy1Yc2RCgYIARAAGAQSNwF-L9IrXgXSNFAonS2F47qO3B9B1P3n6hfH8iCuXNXQ81QfiQ3tI91DHEgob8YGr37oTU1iMcc";
+            "1//04Y5xXERKdsBZCgYIARAAGAQSNwF-L9Irakbg-oGFqkSynqEqQTc_QJLzpK98V_EOti930lwAXJZ2p_bWSnWMskUXAbkEzN6tCCw";
         const oAuth2Client = new google.auth.OAuth2(
             CLIENT_ID,
             CLIENT_SECRET,

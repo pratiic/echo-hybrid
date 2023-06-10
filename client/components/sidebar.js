@@ -31,7 +31,8 @@ const Sidebar = () => {
     const { showSidebar } = useSelector((state) => state.sidebar);
     const { notifications } = useSelector((state) => state.notifications);
     const { sellerOrders } = useSelector((state) => state.orders);
-    const { pending, completed } = useSelector((state) => state.delivery);
+    const { completed } = useSelector((state) => state.delivery);
+    const { chats } = useSelector((state) => state.chat);
 
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [ordersCount, setOrdersCount] = useState(0);
@@ -194,6 +195,17 @@ const Sidebar = () => {
     }, [completed]);
 
     useEffect(() => {
+        let unseenChatCount = 0;
+        chats.forEach((chat) => {
+            if (chat.unseenMsgsCounts && chat.unseenMsgsCounts[authUser?.id]) {
+                unseenChatCount++;
+            }
+        });
+
+        setChatsCount(unseenChatCount);
+    }, [chats, authUser]);
+
+    useEffect(() => {
         for (let link of linksToRender) {
             if (
                 router.pathname === link.activePath ||
@@ -277,6 +289,8 @@ const Sidebar = () => {
                                 ? pendingDeliveriesCount
                                 : link.name === "completed"
                                 ? completedDeliveriesCount
+                                : link.name === "chats"
+                                ? chatsCount
                                 : 0
                         }
                         active={activeLink === link.name}
