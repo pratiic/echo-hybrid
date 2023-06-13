@@ -14,139 +14,134 @@ import InputGroup from "./input-group";
 import Button from "./button";
 
 const UserAddress = () => {
-    const [province, setProvince] = useState("");
-    const [city, setCity] = useState("");
-    const [area, setArea] = useState("");
-    const [description, setDescription] = useState("");
-    const [provinceError, setProvinceError] = useState("");
-    const [cityError, setCityError] = useState("");
-    const [areaError, setAreaError] = useState("");
-    const [descriptionError, setDescriptionError] = useState("");
+  const [province, setProvince] = useState("");
+  const [city, setCity] = useState("");
+  const [area, setArea] = useState("");
+  const [description, setDescription] = useState("");
+  const [provinceError, setProvinceError] = useState("");
+  const [cityError, setCityError] = useState("");
+  const [areaError, setAreaError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
 
-    const [updating, setUpdating] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
-    const { authUser } = useSelector((state) => state.auth);
+  const { authUser } = useSelector((state) => state.auth);
 
-    const dispatch = useDispatch();
-    const router = useRouter();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-    useEffect(() => {
-        const address = authUser?.address;
+  useEffect(() => {
+    const address = authUser?.address;
 
-        setProvince(address?.province || "bagmati");
-        setCity(address?.city || "");
-        setArea(address?.area || "");
-        setDescription(address?.description || "");
-    }, [authUser]);
+    setProvince(address?.province || "bagmati");
+    setCity(address?.city || "");
+    setArea(address?.area || "");
+    setDescription(address?.description || "");
+  }, [authUser]);
 
-    useEffect(() => {
-        if (
-            province === "bagmati" &&
-            !districtOptions.find((option) => option.value === city)
-        ) {
-            setCity("kathmandu");
-        }
-    }, [province, city]);
+  useEffect(() => {
+    if (
+      province === "bagmati" &&
+      !districtOptions.find((option) => option.value === city)
+    ) {
+      setCity("kathmandu");
+    }
+  }, [province, city]);
 
-    const handleFormSubmit = async (event) => {
-        event.preventDefault();
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
 
-        setUpdating(true);
-        clearErrors([
-            setProvinceError,
-            setCityError,
-            setAreaError,
-            setDescriptionError,
-        ]);
+    setUpdating(true);
+    clearErrors([
+      setProvinceError,
+      setCityError,
+      setAreaError,
+      setDescriptionError,
+    ]);
 
-        try {
-            const data = await fetcher("addresses/user", "POST", {
-                province,
-                city,
-                area,
-                description,
-            });
+    try {
+      const data = await fetcher("addresses/user", "POST", {
+        province,
+        city,
+        area,
+        description,
+      });
 
-            dispatch(
-                updateAuthUser({
-                    address: data.address,
-                })
-            );
-            dispatch(setAlert({ message: "address updated successfully" }));
+      dispatch(
+        updateAuthUser({
+          address: data.address,
+        })
+      );
+      dispatch(setAlert({ message: "address updated successfully" }));
 
-            const { redirect, prevRedirect } = router.query;
-            let redirectUrl = "";
+      const { redirect, prevRedirect } = router.query;
+      let redirectUrl = "";
 
-            if (redirect) {
-                redirectUrl += `/${router.query.redirect}`;
-            }
+      if (redirect) {
+        redirectUrl += `/${router.query.redirect}`;
+      }
 
-            if (prevRedirect) {
-                redirectUrl += `/?redirect=${prevRedirect}`;
-            }
+      if (prevRedirect) {
+        redirectUrl += `/?redirect=${prevRedirect}`;
+      }
 
-            if (redirectUrl) {
-                router.push(redirectUrl);
-            }
-        } catch (error) {
-            displayError(
-                error.message,
-                ["province", "city", "area", "description"],
-                [
-                    setProvinceError,
-                    setCityError,
-                    setAreaError,
-                    setDescriptionError,
-                ]
-            );
-        } finally {
-            setUpdating(false);
-        }
-    };
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      }
+    } catch (error) {
+      displayError(
+        error.message,
+        ["province", "city", "area", "description"],
+        [setProvinceError, setCityError, setAreaError, setDescriptionError]
+      );
+    } finally {
+      setUpdating(false);
+    }
+  };
 
-    return (
-        <Form onSubmit={handleFormSubmit}>
-            <InputGroup
-                label="province"
-                view="select"
-                options={provinceOptions}
-                value={province}
-                error={provinceError}
-                onChange={setProvince}
-            />
+  return (
+    <Form onSubmit={handleFormSubmit}>
+      <InputGroup
+        label="province"
+        view="select"
+        options={provinceOptions}
+        value={province}
+        error={provinceError}
+        onChange={setProvince}
+      />
 
-            <InputGroup
-                label="city"
-                view={province === "bagmati" ? "select" : "input"}
-                options={districtOptions}
-                value={city}
-                error={cityError}
-                onChange={setCity}
-            />
+      <InputGroup
+        label="city"
+        view={province === "bagmati" ? "select" : "input"}
+        options={districtOptions}
+        value={city}
+        error={cityError}
+        onChange={setCity}
+      />
 
-            <InputGroup
-                label="area"
-                placeholder="e.g. koteshwor"
-                value={area}
-                error={areaError}
-                onChange={setArea}
-            />
+      <InputGroup
+        label="area"
+        placeholder="e.g. koteshwor"
+        value={area}
+        error={areaError}
+        onChange={setArea}
+      />
 
-            <InputGroup
-                label="description"
-                value={description}
-                placeholder="max 100 chars"
-                error={descriptionError}
-                onChange={setDescription}
-                view="textarea"
-                showRequired={false}
-            />
+      <InputGroup
+        label="description"
+        value={description}
+        placeholder="max 100 chars"
+        error={descriptionError}
+        onChange={setDescription}
+        view="textarea"
+        showRequired={false}
+      />
 
-            <Button loading={updating} full>
-                {updating ? "updating" : "update"} address
-            </Button>
-        </Form>
-    );
+      <Button loading={updating} full>
+        {updating ? "updating" : "update"} address
+      </Button>
+    </Form>
+  );
 };
 
 export default UserAddress;
