@@ -1,3 +1,4 @@
+import { businessInclusionFields } from "../lib/data-source.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { trimValues } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
@@ -7,6 +8,7 @@ export const setAddress = async (request, response, next) => {
     const user = request.user;
     let addressInfo = request.body;
     const targetType = request.params.targetType;
+    const io = request.io;
 
     // validate target type
     if (targetType !== "user" && targetType !== "business") {
@@ -60,6 +62,18 @@ export const setAddress = async (request, response, next) => {
             create: addressInfo,
             update: addressInfo,
         });
+
+        if (targetType === "business") {
+            // targetType -> business means new business registration request
+            const business = await prisma.business.findUnique({
+                where: {
+                    id: user.store.business.id,
+                },
+                include: businessInclusionFields,
+            });
+
+            io.emit("business-request", business);
+        }
 
         response.json({ address });
     } catch (error) {

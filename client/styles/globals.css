@@ -272,6 +272,10 @@ textarea {
   .seller-icon {
 	@apply h-7 w-7;
   }
+
+  .modal-title {
+    @apply text-2xl font-semibold mb-1 leading-tight;
+  }
 }
 
 .shadow-custom {

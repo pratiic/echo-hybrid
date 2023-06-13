@@ -8,6 +8,7 @@ import { fetcher } from "../lib/fetcher";
 import {
     closeModal,
     showConfirmationModal,
+    showGenericModal,
     showLoadingModal,
 } from "../redux/slices/modal-slice";
 import { setActiveProduct } from "../redux/slices/products-slice";
@@ -16,8 +17,9 @@ import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 import Dropdown from "./dropdown";
 import DropdownItem from "./dropdown-item";
 import Icon from "./icon";
+import TargetReporter from "./target-reporter";
 
-const ProductMenu = ({ isMyProduct, hasBeenSold, store }) => {
+const ProductMenu = ({ id, isMyProduct, hasBeenSold, store }) => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     const router = useRouter();
@@ -64,6 +66,14 @@ const ProductMenu = ({ isMyProduct, hasBeenSold, store }) => {
         router.push(`/chats/${store?.userId}`);
     };
 
+    const handleReportClick = () => {
+        dispatch(
+            showGenericModal(
+                <TargetReporter targetType="product" targetId={id} />
+            )
+        );
+    };
+
     return (
         <div className="w-fit">
             <Icon
@@ -96,7 +106,10 @@ const ProductMenu = ({ isMyProduct, hasBeenSold, store }) => {
 
                 {!isMyProduct && (
                     <React.Fragment>
-                        <DropdownItem action="report">
+                        <DropdownItem
+                            action="report"
+                            onClick={handleReportClick}
+                        >
                             report product
                         </DropdownItem>
 

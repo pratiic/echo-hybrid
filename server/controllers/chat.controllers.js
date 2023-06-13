@@ -174,3 +174,21 @@ export const resetUnseenMsgsCount = async (request, response, next) => {
         next(new HttpError());
     }
 };
+
+// for testing purposes only
+
+export const deleteChat = async (request, response, next) => {
+    const chatId = request.params.chatId;
+
+    try {
+        await prisma.chat.delete({
+            where: {
+                id: chatId,
+            },
+        });
+
+        response.json({});
+    } catch (error) {
+        next(new HttpError());
+    }
+};

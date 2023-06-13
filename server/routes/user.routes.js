@@ -3,10 +3,12 @@ import express from "express";
 import auth from "../middleware/auth.middleware.js";
 import {
     deleteAvatar,
+    deleteUser,
     getSelfDetails,
     getUserDetails,
     resetPassword,
     updateUser,
+    verifyUser,
 } from "../controllers/user.controllers.js";
 import { getUpload } from "../middleware/multer.middleware.js";
 import { extraUserFields, genericUserFields } from "../lib/data-source.lib.js";
@@ -28,6 +30,10 @@ router.patch(
 
 router.delete("/avatar", auth, deleteAvatar);
 
+router.get("/:email", auth, getUserDetails);
+
+// for test purposes only
+
 router.get(
     "/",
     (request, response, next) => {
@@ -41,4 +47,20 @@ router.get(
     getSelfDetails
 );
 
-router.get("/:email", auth, getUserDetails);
+router.delete(
+    "/:userId",
+    (request, ...op) => {
+        request.validateAdmin = true;
+        auth(request, ...op);
+    },
+    deleteUser
+);
+
+router.patch(
+    "/:userId/verification",
+    (request, ...op) => {
+        request.validateAdmin = true;
+        auth(request, ...op);
+    },
+    verifyUser
+);

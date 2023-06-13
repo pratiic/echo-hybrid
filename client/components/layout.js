@@ -17,6 +17,9 @@ import Rating from "../real-time/rating";
 import Chat from "../real-time/chat";
 import Order from "../real-time/order";
 import Delivery from "../real-time/delivery";
+import Business from "../real-time/business";
+import Category from "../real-time/category";
+import Report from "../real-time/report";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -75,19 +78,8 @@ const Layout = ({ children }) => {
     ]);
 
     useEffect(() => {
-        fetchCategories();
-    }, []);
-
-    useEffect(() => {
         fetchSelfDetails();
     }, []);
-
-    const fetchCategories = async () => {
-        try {
-            const data = await fetcher("categories");
-            dispatch(setCategories(data.categories));
-        } catch (error) {}
-    };
 
     const fetchSelfDetails = async () => {
         try {
@@ -112,6 +104,9 @@ const Layout = ({ children }) => {
                         <Chat />
                         <Order />
                         {authUser?.isDeliveryPersonnel && <Delivery />}
+                        <Business />
+                        <Category />
+                        {authUser?.isAdmin && <Report />}
 
                         {/* fake components to preserve cache */}
                         {!authUser?.isDeliveryPersonnel && <Products />}

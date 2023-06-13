@@ -11,12 +11,14 @@ const InfoUnit = ({
     direction = "col",
     size = "small",
     toMoney,
+    textBlue = true,
+    capitalize,
 }) => {
     return (
         <div
             className={`flex leading-tight mr-3 flex-${direction} ${direction ===
                 "row" &&
-                "items-center w-full justify-between border-b border-faint py-[5px] px-1"}`}
+                "items-center w-fit justify-between border-b border-faint py-[5px] px-1 space-x-5"}`}
         >
             <span
                 className={`${
@@ -30,12 +32,14 @@ const InfoUnit = ({
                 {capitalizeFirstLetter(label)}
             </span>
             <span
-                className={`text-blue-four ${
+                className={`whitespace-pre-wrap ${
                     highlight
                         ? "text-xl"
                         : size === "small"
                         ? "text-sm"
                         : "text-base"
+                } ${textBlue ? "text-blue-400" : "font-semibold dark-light"} ${
+                    capitalize ? "capitalize" : ""
                 }`}
             >
                 {hasMoney && "Rs. "}

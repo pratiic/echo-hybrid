@@ -147,6 +147,7 @@ Table Category {
 
 Table CategoryRequest {
   name String [pk]
+  isAcknowledged Boolean [not null, default: false]
   user User [not null]
   userId Int [not null]
   createdAt DateTime [default: `now()`, not null]
@@ -426,7 +427,7 @@ Ref: Product.categoryName > Category.name
 
 Ref: ProductVariation.productId > Product.id [delete: Cascade]
 
-Ref: CategoryRequest.userId > User.id
+Ref: CategoryRequest.userId > User.id [delete: Cascade]
 
 Ref: Review.userId > User.id [delete: Cascade]
 

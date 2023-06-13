@@ -98,6 +98,7 @@ const ProductPage = () => {
                 </div>
 
                 <ProductMenu
+                    id={activeProduct?.id}
                     isMyProduct={isMyProduct}
                     hasBeenSold={activeProduct?.hasBeenSold}
                     store={activeProduct?.store}

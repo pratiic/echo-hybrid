@@ -1,3 +1,7 @@
+import {
+    genericUserFields,
+    reportInclusionFields,
+} from "../lib/data-source.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import {
@@ -9,6 +13,7 @@ export const reportTarget = async (request, response, next) => {
     const user = request.user;
     const targetType = request.params.targetType;
     const targetId = parseInt(request.params.targetId) || -1;
+    const io = request.io;
     const { cause } = request.body;
 
     // validate report
@@ -79,6 +84,12 @@ export const reportTarget = async (request, response, next) => {
     try {
         const createdReport = await prisma.report.create({
             data: reportData,
+            include: reportInclusionFields,
+        });
+
+        io.emit("target-report", {
+            targetType: targetType === "store" ? "seller" : targetType,
+            report: createdReport,
         });
 
         response.json({ report: createdReport });
@@ -117,17 +128,47 @@ export const getReports = async (request, response, next) => {
     }
 
     try {
-        const reports = await prisma.report.findMany({
-            where: filter,
-            take: PAGE_SIZE,
-            skip: (page - 1) * PAGE_SIZE,
-            orderBy: {
-                createdAt: "asc",
+        const [reports, totalCount] = await Promise.all([
+            prisma.report.findMany({
+                where: filter,
+                take: PAGE_SIZE,
+                skip: (page - 1) * PAGE_SIZE,
+                orderBy: {
+                    createdAt: "desc",
+                },
+                include: reportInclusionFields,
+            }),
+            prisma.report.count({
+                where: filter,
+            }),
+        ]);
+
+        response.json({ reports, totalCount });
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
+export const deleteReport = async (request, response, next) => {
+    const reportId = parseInt(request.params.reportId) || -1;
+
+    try {
+        await prisma.report.delete({
+            where: {
+                id: reportId,
             },
         });
 
-        response.json({ reports });
+        response.json({ message: "the report has been deleted" });
     } catch (error) {
+        if (
+            error.message
+                .toLowerCase()
+                .includes("record to delete does not exist")
+        ) {
+            return next(new HttpError("the report does not exist", 400));
+        }
+
         next(new HttpError());
     }
 };

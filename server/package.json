@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --testPathPattern=message.test.js",
+    "test": "jest --watch --testPathPattern=store.test.js",
     "front": "cd ../client && npm run dev",
     "back": "nodemon index.js",
     "dev": "concurrently \"npm run front\" \"npm run back\""

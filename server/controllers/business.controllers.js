@@ -1,3 +1,4 @@
+import { businessInclusionFields } from "../lib/data-source.lib.js";
 import { sendEmail } from "../lib/email.lib.js";
 import { prepareImageData } from "../lib/image.lib.js";
 import prisma from "../lib/prisma.lib.js";
@@ -149,6 +150,7 @@ export const controlBusinessRegistration = async (request, response, next) => {
     const business = request.business;
     const action = request.query.action;
     const { cause } = request.body;
+    const io = request.io;
 
     const errorMsg = validateBusinessRegistrationControl({ action, cause });
 
@@ -194,20 +196,22 @@ export const controlBusinessRegistration = async (request, response, next) => {
         });
     }
 
-    // send email to business owner
-    const recipientEmail = business.store.user.email;
-    const subject = "business registration";
-    const text =
-        action === "accept"
-            ? "Congratulations, the business you had registered on Echo has been verified. You can start selling products on Echo now."
-            : `We are sorry to inform that the business you had registered on Echo has been rejected. The reason for rejection: \n${capitalizeFirstLetter(
-                  cause
-              )}.`;
-
-    sendEmail(recipientEmail, subject, text);
-
     try {
         await operation;
+
+        // send email to business owner
+        const recipientEmail = business.store.user.email;
+        const subject = "business registration";
+        const text =
+            action === "accept"
+                ? "Congratulations, the business you had registered on Echo has been verified. You can start selling products on Echo now."
+                : `We are sorry to inform that the business you had registered on Echo has been rejected. The reason for rejection: \n${capitalizeFirstLetter(
+                      cause
+                  )}.`;
+
+        sendEmail(recipientEmail, subject, text);
+
+        io.emit(`business-request-${action}`, business.id);
 
         response.json({
             message: `the business has been ${
@@ -362,6 +366,36 @@ export const deleteBusiness = async (request, response, next) => {
         response.json({
             message: "business has been deleted",
         });
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
+export const getBusinessRequests = async (request, response, next) => {
+    // business registration requests for the admin to accept or reject
+
+    const whereObj = {
+        isVerified: false,
+        NOT: {
+            address: null,
+        },
+    };
+
+    try {
+        const [requests, totalCount] = await Promise.all([
+            prisma.business.findMany({
+                where: whereObj,
+                orderBy: {
+                    updatedAt: "desc",
+                },
+                include: businessInclusionFields,
+            }),
+            prisma.business.count({
+                where: whereObj,
+            }),
+        ]);
+
+        response.json({ requests, totalCount });
     } catch (error) {
         next(new HttpError());
     }

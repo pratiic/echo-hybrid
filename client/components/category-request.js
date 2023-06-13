@@ -1,57 +1,118 @@
 import { useState } from "react";
+import {
+    UserIcon,
+    CalendarIcon,
+    MenuAlt4Icon,
+    CheckCircleIcon,
+    XCircleIcon,
+} from "@heroicons/react/outline";
 import { useDispatch } from "react-redux";
 
+import { getDate, getHowLongAgo } from "../lib/date-time";
+import {
+    closeModal,
+    showConfirmationModal,
+    showLoadingModal,
+} from "../redux/slices/modal-slice";
 import { fetcher } from "../lib/fetcher";
-import { closeModal } from "../redux/slices/modal-slice";
-import { setAlert } from "../redux/slices/alerts-slice";
+import { deleteCategoryRequest } from "../redux/slices/categories-slice";
+import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 
-import InputGroup from "./input-group";
-import Button from "./button";
+import IconInfo from "./icon-info";
+import Icon from "./icon";
+import Dropdown from "./dropdown";
+import DropdownItem from "./dropdown-item";
 
-const CategoryRequest = () => {
-    const [categoryName, setCategoryName] = useState("");
-    const [errorMsg, setErrorMsg] = useState("");
-    const [requesting, setRequesting] = useState(false);
+const CategoryRequest = ({ id, name, user, createdAt }) => {
+    const [showDropdown, setShowDropdown] = useState(false);
 
     const dispatch = useDispatch();
 
-    const requestCategory = async () => {
-        setRequesting(true);
-        setErrorMsg("");
+    const toggleDropdown = (event) => {
+        event.stopPropagation();
 
-        try {
-            await fetcher(`categories/request/?name=${categoryName}`, "POST");
+        setShowDropdown(!showDropdown);
+    };
 
-            dispatch(closeModal());
-            dispatch(setAlert({ message: "the category has been requested" }));
-        } catch (error) {
-            setErrorMsg(error.message);
-        } finally {
-            setRequesting(false);
-        }
+    const controlCategoryRequest = (action) => {
+        dispatch(
+            showConfirmationModal({
+                title: `category request ${
+                    action === "accept" ? "acceptance" : "rejection"
+                }`,
+                message: `are you sure you want to ${action} this category request ?`,
+                handler: async () => {
+                    try {
+                        dispatch(
+                            showLoadingModal(
+                                `${action}ing the category request...`
+                            )
+                        );
+
+                        await fetcher(
+                            `categories/requests/?name=${name}&action=${action}`,
+                            "PATCH"
+                        );
+
+                        // send notification to the user who requested the category
+                        fetcher("notifications", "POST", {
+                            text: `the category that you requested - ${name} - has been ${action}ed`,
+                            destinationId: user?.id,
+                        });
+
+                        dispatch(deleteCategoryRequest(name));
+                        dispatch(
+                            setAlert({
+                                message: `the category request has been ${action}ed`,
+                            })
+                        );
+                    } catch (error) {
+                        dispatch(setErrorAlert(error.message));
+                    } finally {
+                        dispatch(closeModal());
+                    }
+                },
+            })
+        );
     };
 
     return (
-        <div>
-            <h3 className="text-2xl font-semibold black-white mb-2">
-                Request new category
-            </h3>
+        <div className="dark-light border border-faint rounded px-3 pt-2 pb-5 relative">
+            {/* category name */}
+            <h4 className="font-semibold capitalize mb-2 tracking-wide text-blue-four">
+                {name}
+            </h4>
 
-            <p className="dark-light max-w-[350px] mb-3">
-                Once the admin accepts or rejects the category you request, you
-                will receive a notification.
-            </p>
+            <div className="text-sm space-y-2 mb-3">
+                <IconInfo icon={<UserIcon className="icon-no-bg" />} capitalize>
+                    {user?.fullName}
+                </IconInfo>
 
-            <InputGroup
-                placeholder="Category name"
-                className="mb-4"
-                error={errorMsg}
-                onChange={setCategoryName}
-            />
+                <IconInfo icon={<CalendarIcon className="icon-no-bg" />}>
+                    {getHowLongAgo(createdAt)} ago on {getDate(createdAt)}
+                </IconInfo>
+            </div>
 
-            <Button loading={requesting} onClick={requestCategory}>
-                {requesting ? "requesting" : "request"} category
-            </Button>
+            <div className="absolute -bottom-1 right-0">
+                <Icon toolName="options" onClick={toggleDropdown}>
+                    <MenuAlt4Icon className="icon icon-small" />
+                </Icon>
+
+                <Dropdown show={showDropdown} toggleDropdown={toggleDropdown}>
+                    <DropdownItem
+                        icon={<CheckCircleIcon className="icon-no-bg" />}
+                        onClick={() => controlCategoryRequest("accept")}
+                    >
+                        accept request
+                    </DropdownItem>
+                    <DropdownItem
+                        icon={<XCircleIcon className="icon-no-bg" />}
+                        onClick={() => controlCategoryRequest("reject")}
+                    >
+                        reject request
+                    </DropdownItem>
+                </Dropdown>
+            </div>
         </div>
     );
 };

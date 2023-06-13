@@ -8,7 +8,7 @@ import { showGenericModal } from "../redux/slices/modal-slice";
 
 import CustomLink from "./custom-link";
 import Icon from "./icon";
-import CategoryRequest from "./category-request";
+import CategoryRequestor from "./category-requestor";
 
 const CategoriesPanel = ({
     show,
@@ -59,7 +59,7 @@ const CategoriesPanel = ({
     };
 
     const handleCategoryRequest = () => {
-        dispatch(showGenericModal(<CategoryRequest />));
+        dispatch(showGenericModal(<CategoryRequestor />));
     };
 
     return (

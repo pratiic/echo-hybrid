@@ -10,6 +10,8 @@ import {
     ClipboardListIcon,
     UserCircleIcon,
     ClipboardCheckIcon,
+    ChartBarIcon,
+    FlagIcon,
 } from "@heroicons/react/outline";
 import {
     MdOutlineExplore,
@@ -18,6 +20,7 @@ import {
 } from "react-icons/md";
 import { AiOutlineShop } from "react-icons/ai";
 import { HiOutlineCash } from "react-icons/hi";
+import { BiCategory } from "react-icons/bi";
 
 import { setSidebar } from "../redux/slices/sidebar-slice";
 import { showConfirmationModal } from "../redux/slices/modal-slice";
@@ -33,18 +36,42 @@ const Sidebar = () => {
     const { sellerOrders } = useSelector((state) => state.orders);
     const { completed } = useSelector((state) => state.delivery);
     const { chats } = useSelector((state) => state.chat);
+    const { requests } = useSelector((state) => state.categories);
 
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [ordersCount, setOrdersCount] = useState(0);
     const [chatsCount, setChatsCount] = useState(0);
     const [transactionsCount, setTransactionsCount] = useState(0);
-    const [pendingDeliveriesCount, setPendingDeliveriesCount] = useState(0);
+    const [pendingDeliveriesCount] = useState(0);
     const [completedDeliveriesCount, setCompletedDeliveriesCount] = useState(0);
+    const [categoryRequestsCount, setCategoryRequestsCount] = useState(0);
     const [activeLink, setActiveLink] = useState("");
     const [linksToRender, setLinksToRender] = useState([]);
 
     const router = useRouter();
     const dispatch = useDispatch();
+
+    const [commonLinks, setCommonLinks] = useState([
+        {
+            name: "chats",
+            linkTo: "/chats",
+            count: 0,
+            icon: <ChatAlt2Icon className="icon-sidebar" />,
+
+            countFlat: true,
+        },
+        {
+            name: "notifications",
+            linkTo: "/notifications",
+            count: 0,
+            icon: <BellIcon className="icon-sidebar" />,
+        },
+        {
+            name: "sign out",
+            linkTo: "/signin",
+            icon: <LogoutIcon className="icon-sidebar" />,
+        },
+    ]);
 
     const [links, setLinks] = useState([
         {
@@ -62,20 +89,7 @@ const Sidebar = () => {
             linkTo: "/sell-products",
             icon: <HiOutlineCash className="icon-sidebar" />,
         },
-        {
-            name: "chats",
-            linkTo: "/chats",
-            count: 0,
-            icon: <ChatAlt2Icon className="icon-sidebar" />,
-
-            countFlat: true,
-        },
-        {
-            name: "notifications",
-            linkTo: "/notifications",
-            count: 0,
-            icon: <BellIcon className="icon-sidebar" />,
-        },
+        ...commonLinks.slice(0, 2),
         {
             name: "cart",
             linkTo: "/cart",
@@ -111,11 +125,7 @@ const Sidebar = () => {
             icon: <UserIcon className="icon-sidebar" />,
             activePath: "/profile",
         },
-        {
-            name: "sign out",
-            linkTo: "/signin",
-            icon: <LogoutIcon className="icon-sidebar" />,
-        },
+        commonLinks[commonLinks.length - 1],
     ]);
 
     const [deliveryLinks, setDeliveryLinks] = useState([
@@ -131,29 +141,41 @@ const Sidebar = () => {
             icon: <ClipboardCheckIcon className="icon-sidebar" />,
             activePath: "/delivery?show=completed",
         },
-        {
-            name: "chats",
-            linkTo: "/chats",
-            count: 0,
-            icon: <ChatAlt2Icon className="icon-sidebar" />,
-
-            countFlat: true,
-        },
-        {
-            name: "notifications",
-            linkTo: "/notifications",
-            count: 0,
-            icon: <BellIcon className="icon-sidebar" />,
-        },
-        {
-            name: "sign out",
-            linkTo: "/signin",
-            icon: <LogoutIcon className="icon-sidebar" />,
-        },
+        ...commonLinks,
     ]);
 
+    const adminLinks = [
+        {
+            name: "statistics",
+            linkTo: "/statistics",
+            icon: <ChartBarIcon className="icon-sidebar" />,
+        },
+        {
+            name: "businesses",
+            linkTo: "/business-requests",
+            icon: <AiOutlineShop className="icon-sidebar" />,
+        },
+        {
+            name: "categories",
+            linkTo: "/category-requests",
+            icon: <BiCategory className="icon-sidebar" />,
+        },
+        {
+            name: "reports",
+            linkTo: "/reports",
+            icon: <FlagIcon className="icon-sidebar" />,
+        },
+        ...commonLinks,
+    ];
+
     useEffect(() => {
-        setLinksToRender(authUser?.isDeliveryPersonnel ? deliveryLinks : links);
+        setLinksToRender(
+            authUser?.isDeliveryPersonnel
+                ? deliveryLinks
+                : authUser?.isAdmin
+                ? adminLinks
+                : links
+        );
     }, [authUser]);
 
     useEffect(() => {
@@ -196,6 +218,7 @@ const Sidebar = () => {
 
     useEffect(() => {
         let unseenChatCount = 0;
+
         chats.forEach((chat) => {
             if (chat.unseenMsgsCounts && chat.unseenMsgsCounts[authUser?.id]) {
                 unseenChatCount++;
@@ -204,6 +227,18 @@ const Sidebar = () => {
 
         setChatsCount(unseenChatCount);
     }, [chats, authUser]);
+
+    useEffect(() => {
+        let categoryRequestsCount = 0;
+
+        requests.list.forEach((request) => {
+            if (!request.isAcknowledged) {
+                categoryRequestsCount++;
+            }
+        });
+
+        setCategoryRequestsCount(categoryRequestsCount);
+    }, [requests.list]);
 
     useEffect(() => {
         for (let link of linksToRender) {
@@ -291,6 +326,8 @@ const Sidebar = () => {
                                 ? completedDeliveriesCount
                                 : link.name === "chats"
                                 ? chatsCount
+                                : link.name === "categories"
+                                ? categoryRequestsCount
                                 : 0
                         }
                         active={activeLink === link.name}

@@ -6,6 +6,9 @@ import CartItem from "./cart-item";
 import UserCard from "./user-card";
 import OrderCard from "./order-card";
 import DeliveryCard from "./delivery-card";
+import BusinessRequest from "./business-request";
+import CategoryRequest from "./category-request";
+import ReportCard from "./report-card";
 
 import Human from "./human";
 
@@ -38,8 +41,19 @@ const ContentList = ({
     return (
         <div>
             <div
-                className={`${(type === "product" || type === "seller") &&
-                    "grid"} grid-cols-list-xs 600:grid-cols-list gap-2 600:gap-5 750:gap-7 mb-5`}
+                className={`${(type === "product" ||
+                    type === "seller" ||
+                    type === "category-request" ||
+                    type === "report") &&
+                    "grid"} ${
+                    type === "product" || type === "seller"
+                        ? "grid-cols-list-xs 600:grid-cols-list"
+                        : type === "category-request"
+                        ? "grid-cols-list-request"
+                        : type === "report"
+                        ? "grid-cols-list-report"
+                        : ""
+                } gap-2 600:gap-5 750:gap-7 mb-5`}
             >
                 {list.map((content) => {
                     if (type === "product" || type === "seller") {
@@ -82,6 +96,22 @@ const ContentList = ({
 
                     if (type === "delivery") {
                         return <DeliveryCard {...content} key={content.id} />;
+                    }
+
+                    if (type === "business-request") {
+                        return (
+                            <BusinessRequest {...content} key={content.id} />
+                        );
+                    }
+
+                    if (type === "category-request") {
+                        return (
+                            <CategoryRequest {...content} key={content.id} />
+                        );
+                    }
+
+                    if (type === "report") {
+                        return <ReportCard {...content} key={content.id} />;
                     }
                 })}
             </div>

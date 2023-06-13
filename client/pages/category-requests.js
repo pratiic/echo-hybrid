@@ -1,0 +1,63 @@
+import { useEffect } from "react";
+import Head from "next/head";
+
+import { useSelector, useDispatch } from "react-redux";
+import { fetcher } from "../lib/fetcher";
+import { acknowledgeCategoryRequests } from "../redux/slices/categories-slice";
+
+import PageHeader from "../components/page-header";
+import ContentList from "../components/content-list";
+
+const CategoryRequests = () => {
+    const {
+        requests: { list: requestsList, loading, error },
+    } = useSelector((state) => state.categories);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (requestsList.find((request) => !request.isAcknowledged)) {
+            acknowledgeRequests();
+        }
+    }, [requestsList]);
+
+    const acknowledgeRequests = async () => {
+        try {
+            dispatch(acknowledgeCategoryRequests());
+            await fetcher("categories/requests/acknowledge", "PATCH");
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    return (
+        <section>
+            <Head>
+                <title>Category requests</title>
+            </Head>
+
+            <PageHeader heading="category requests" hasBackArrow />
+
+            {requestsList.length > 0 && (
+                <p className="history-message -mt-2">
+                    Users have made{" "}
+                    <span className="font-semibold">
+                        {requestsList.length}{" "}
+                    </span>
+                    category requests
+                </p>
+            )}
+
+            <ContentList
+                list={requestsList}
+                loadingMsg={loading && "Loading category requests..."}
+                error={error}
+                emptyMsg="No category requests found"
+                human="no-items"
+                type="category-request"
+            />
+        </section>
+    );
+};
+
+export default CategoryRequests;

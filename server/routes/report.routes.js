@@ -1,14 +1,19 @@
 import express from "express";
 
 import auth from "../middleware/auth.middleware.js";
-import { getReports, reportTarget } from "../controllers/report.controllers.js";
+import {
+    deleteReport,
+    getReports,
+    reportTarget,
+} from "../controllers/report.controllers.js";
 
-export const reportRouter = () => {
+export const reportRouter = (io) => {
     const router = express.Router();
 
     router.post(
         "/:targetType/:targetId",
         (request, ...op) => {
+            request.io = io;
             request.select = {
                 store: {
                     select: {
@@ -28,6 +33,15 @@ export const reportRouter = () => {
             auth(request, ...op);
         },
         getReports
+    );
+
+    router.delete(
+        "/:reportId",
+        (request, ...op) => {
+            request.validateAdmin = true;
+            auth(request, ...op);
+        },
+        deleteReport
     );
 
     return router;

@@ -110,3 +110,36 @@ export const orderInclusionFields = {
     },
     orderCompletion: true,
 };
+
+export const businessInclusionFields = {
+    store: {
+        select: {
+            id: true,
+            user: {
+                select: genericUserFields,
+            },
+        },
+    },
+    address: true,
+};
+
+export const reportInclusionFields = {
+    product: {
+        select: {
+            id: true,
+        },
+    },
+    store: {
+        select: {
+            id: true,
+        },
+    },
+    user: {
+        select: {
+            id: true,
+        },
+    },
+    creator: {
+        select: genericUserFields,
+    },
+};

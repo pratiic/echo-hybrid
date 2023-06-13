@@ -142,8 +142,45 @@ export const getUserDetails = async (request, response, next) => {
     }
 };
 
+// for testing purposes only
+
 export const getSelfDetails = async (request, response, next) => {
     const user = request.user;
 
     response.json({ user });
+};
+
+export const deleteUser = async (request, response, next) => {
+    const userId = parseInt(request.params.userId) || -1;
+
+    try {
+        await prisma.user.delete({
+            where: {
+                id: userId,
+            },
+        });
+
+        response.json({});
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
+export const verifyUser = async (request, response, next) => {
+    const userId = parseInt(request.params.userId) || -1;
+
+    try {
+        await prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                isVerified: true,
+            },
+        });
+
+        response.json({});
+    } catch (error) {
+        next(new HttpError());
+    }
 };

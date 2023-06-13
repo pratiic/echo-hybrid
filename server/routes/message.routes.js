@@ -67,6 +67,7 @@ export const messageRouter = (io) => {
             request.select = {
                 userId: true,
                 image: true,
+                deleted: true,
             };
             validateMessage(request, ...op);
         },

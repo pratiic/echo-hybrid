@@ -217,7 +217,7 @@ export const deleteStore = async (request, response, next) => {
     const io = request.io;
 
     if (!store) {
-        return next(new HttpError("you are not registered as a seller", 400));
+        return next(new HttpError("you are not registered as a seller", 404));
     }
 
     const operations = [
