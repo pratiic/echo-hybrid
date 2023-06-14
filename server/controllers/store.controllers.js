@@ -79,10 +79,6 @@ export const getStoreDetails = async (request, response, next) => {
             return next(new HttpError("the seller has been deleted", 404));
         }
 
-        if (store.suspension) {
-            return next(new HttpError("the seller has been suspended", 400));
-        }
-
         // check if the business has been verified
         if (store.storeType === "BUS" && !store.business.isVerified) {
             return next(

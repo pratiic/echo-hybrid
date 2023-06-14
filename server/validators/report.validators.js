@@ -3,7 +3,7 @@ import Joi from "joi";
 import { validate } from "./base.validators.js";
 
 export const targetTypeSchema = Joi.string()
-    .valid("product", "store", "user")
+    .valid("product", "store", "user", "review")
     .required()
     .trim();
 export const causeSchema = Joi.string().min(20).max(150).required().trim();
@@ -22,4 +22,12 @@ export const validateTargetType = (targetType) => {
     });
 
     return validate({ targetType }, schema);
+};
+
+export const validateCause = (cause) => {
+    const schema = Joi.object({
+        cause: causeSchema,
+    });
+
+    return validate({ cause }, schema);
 };

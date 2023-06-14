@@ -1,3 +1,4 @@
+import { suspensionInclusionFields } from "../lib/data-source.lib.js";
 import { sendEmail } from "../lib/email.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { capitalizeFirstLetter } from "../lib/strings.lib.js";
@@ -9,6 +10,7 @@ export const controlSuspension = async (request, response, next) => {
     const targetType = request.params.targetType;
     const targetId = parseInt(request.params.targetId) || -1;
     const action = request.query.action;
+    const io = request.io;
     const { cause } = request.body;
 
     // validate suspension
@@ -31,6 +33,7 @@ export const controlSuspension = async (request, response, next) => {
                 },
             },
             name: true,
+            isDeleted: true,
         },
         store: {
             user: {
@@ -57,7 +60,7 @@ export const controlSuspension = async (request, response, next) => {
         },
     });
 
-    if (!target) {
+    if (!target || target.isDeleted) {
         return next(new HttpError(`${targetType} not found`, 404));
     }
 
@@ -77,9 +80,11 @@ export const controlSuspension = async (request, response, next) => {
         operations.push(
             prisma.suspension.create({
                 data: {
-                    [`${targetType}Id`]: targetId,
                     cause: cause.trim(),
+                    targetType,
+                    [`${targetType}Id`]: targetId,
                 },
+                include: suspensionInclusionFields,
             })
         );
         operations.push(
@@ -100,7 +105,7 @@ export const controlSuspension = async (request, response, next) => {
     }
 
     try {
-        await Promise.all(operations);
+        const results = await Promise.all(operations);
 
         // send email to affected party
         let recipientEmail = "",
@@ -128,7 +133,6 @@ export const controlSuspension = async (request, response, next) => {
                 text += "your account on Echo has been";
                 break;
         }
-
         subject += action === "suspend" ? " suspension" : " reinstatement";
         text +=
             action === "suspend"
@@ -136,18 +140,32 @@ export const controlSuspension = async (request, response, next) => {
                       cause
                   )}.`
                 : " reinstated.";
+
         sendEmail(recipientEmail, subject, text);
 
-        response.json({ message: `the ${targetType} has been ${action}ed` });
+        if (action === "suspend") {
+            io.emit(`${targetType}-suspension`, {
+                targetType,
+                targetId,
+            });
+        }
+
+        const res =
+            action === "suspend"
+                ? { suspension: results[0] }
+                : { message: `the ${targetType} has been reinstated` };
+
+        response.json(res);
     } catch (error) {
+        console.log(error);
+
         next(new HttpError());
     }
 };
 
 export const getSuspensions = async (request, response, next) => {
     const targetType = request.query.targetType || "";
-    const page = request.query.page || 1;
-    const PAGE_SIZE = 15;
+    const searchQuery = request.query.query;
     let filter = {};
 
     if (targetType) {
@@ -164,13 +182,22 @@ export const getSuspensions = async (request, response, next) => {
         };
     }
 
+    if (searchQuery && targetType) {
+        // if targetType not defined -> not clear which targetType to search for since only the id is provided
+        filter = {
+            ...filter,
+            [`${targetType}Id`]: {
+                equals: parseInt(searchQuery.trim()) || -1,
+            },
+        };
+    }
+
     try {
         const suspensions = await prisma.suspension.findMany({
             where: filter,
-            take: PAGE_SIZE,
-            skip: (page - 1) * PAGE_SIZE,
+            include: suspensionInclusionFields,
             orderBy: {
-                createdAt: "asc",
+                createdAt: "desc",
             },
         });
 

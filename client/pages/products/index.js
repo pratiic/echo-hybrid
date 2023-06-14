@@ -104,6 +104,7 @@ const Products = () => {
                         }
                         isHeadingComponent={true}
                         hasAddBtn
+                        addToolname="add product"
                         onAddClick={() => router.push("/set-product")}
                     >
                         <FilterTrigger />

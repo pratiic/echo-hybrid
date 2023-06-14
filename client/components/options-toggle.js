@@ -90,7 +90,7 @@ const OptionsToggle = ({
                             key={option.name}
                             onClick={() => onClick(option.name)}
                         >
-                            {option.name}
+                            {option.value || option.name}
                         </DropdownItem>
                     );
                 })}

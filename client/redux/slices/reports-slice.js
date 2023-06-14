@@ -7,22 +7,14 @@ export const reportsSlice = createSlice({
         loading: false,
         loadingMore: false,
         error: "",
-        page: 1,
-        totalCount: 0,
-        addedReportsCount: 0,
-        noMoreData: false,
-        PAGE_SIZE: 10,
-        targetType: "all reports",
+        needToFetch: true,
+        targetType: "all",
     },
     reducers: {
         setReportsProp: (state, action) => {
             const { prop, value } = action.payload;
 
             state[prop] = value;
-
-            if (prop === "error") {
-                state.page -= 1;
-            }
 
             if (prop === "reports") {
                 state.needToFetch = false;
@@ -33,17 +25,25 @@ export const reportsSlice = createSlice({
                 !state.reports.find((report) => report.id === action.payload.id)
             ) {
                 state.reports = [action.payload, ...state.reports];
-                state.addedReportsCount++;
             }
+        },
+        acknowledgeReports: (state, action) => {
+            state.reports = state.reports.map((report) => {
+                return { ...report, isAcknowledged: true };
+            });
         },
         deleteReport: (state, action) => {
             state.reports = state.reports.filter(
                 (report) => report.id !== action.payload
             );
-            state.addedReportsCount -= 1;
         },
     },
 });
 
 export default reportsSlice.reducer;
-export const { setReportsProp, addReport, deleteReport } = reportsSlice.actions;
+export const {
+    setReportsProp,
+    addReport,
+    acknowledgeReports,
+    deleteReport,
+} = reportsSlice.actions;

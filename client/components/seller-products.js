@@ -12,6 +12,7 @@ import Icon from "./icon";
 import FilterTrigger from "./filter-trigger";
 import SearchBar from "./search-bar";
 import ContentList from "./content-list";
+import Button from "./button";
 
 const SellerProducts = ({ sellerId }) => {
     const [products, setProducts] = useState([]);
@@ -39,18 +40,10 @@ const SellerProducts = ({ sellerId }) => {
     }, [router]);
 
     useEffect(() => {
-        getShopProducts();
-    }, [page]);
+        getSellerProducts();
+    }, [activeFilter, locationFilter, sortBy, sortType, query, page]);
 
-    useEffect(() => {
-        setPage(1);
-    }, [activeFilter, locationFilter, sortBy, sortType, query]);
-
-    const getShopProducts = async () => {
-        if (loading || loadingMore) {
-            return;
-        }
-
+    const getSellerProducts = async () => {
         if (page === 1) {
             setLoading(true);
         } else {
@@ -91,20 +84,21 @@ const SellerProducts = ({ sellerId }) => {
 
     return (
         <section>
-            <div className="flex items-center mb-7">
+            <div className="flex items-center mb-8">
                 {sellerId === authUser?.store?.id && (
-                    <Icon
-                        className="mr-3"
-                        toolName="add product"
+                    <Button
+                        type="tertiary"
+                        small
                         onClick={() => router.push("/set-product/?mode=create")}
                     >
-                        <PlusIcon className="icon" />
-                    </Icon>
+                        <PlusIcon className="icon-no-bg mr-2" />
+                        add product
+                    </Button>
                 )}
-                {/* <div className="flex items-center space-x-2 mr-2 500:mr-5">
-                </div> */}
 
-                <FilterTrigger isGlobal={false} />
+                {authUser?.store?.id !== sellerId && (
+                    <FilterTrigger isGlobal={false} />
+                )}
             </div>
 
             <SearchBar
@@ -125,7 +119,7 @@ const SellerProducts = ({ sellerId }) => {
 
             {/* count of products */}
             {!query && totalCount > 0 && (
-                <div className="-mt-3 mb-3 text-sm ml-1 dark-light">
+                <div className="-mt-2 mb-4 text-sm ml-1 dark-light">
                     <span>
                         {capitalizeFirstLetter(
                             getFilterMap(locationFilter, sellerFilter, true)[

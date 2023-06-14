@@ -12,9 +12,10 @@ const PageHeader = ({
     heading,
     isHeadingComponent,
     hasAddBtn,
+    addToolname,
+    onAddClick,
     hasBackArrow,
     onSearchClick,
-    onAddClick,
     activeSearch,
     count,
     children,
@@ -63,7 +64,7 @@ const PageHeader = ({
                     <Icon
                         className="ml-3"
                         onClick={onAddClick}
-                        toolName="add product"
+                        toolName={addToolname}
                     >
                         <PlusIcon className="icon" />
                     </Icon>

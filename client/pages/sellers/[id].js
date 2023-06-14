@@ -15,6 +15,7 @@ import SellerDetails from "../../components/seller-details";
 import SellerProducts from "../../components/seller-products";
 import SellerMenu from "../../components/seller-menu";
 import Human from "../../components/human";
+import InfoBanner from "../../components/info-banner";
 
 const SellerPage = () => {
     const [options, setOptions] = useState([
@@ -145,6 +146,15 @@ const SellerPage = () => {
         return <p className="status">{errorMsg}</p>;
     }
 
+    if (storeDetails?.suspension && !authUser?.isAdmin && !isMyStore) {
+        return (
+            <p className="status">
+                this seller has been suspended and will be accessible once they
+                get reinstated
+            </p>
+        );
+    }
+
     return (
         <section>
             <Head>
@@ -160,6 +170,19 @@ const SellerPage = () => {
                     />
                 )}
             </PageHeader>
+
+            {storeDetails?.suspension && (
+                <InfoBanner className="mb-7">
+                    <p>
+                        This seller has been suspended and is only accessible to
+                        us and the seller themselves.
+                    </p>
+                    <p className="font-semibold">
+                        The suspension will be lifted if or when we deem
+                        appropriate.
+                    </p>
+                </InfoBanner>
+            )}
 
             {!authUser?.isDeliveryPersonnel && (
                 // do not show options toggle to delivery personnel

@@ -1,19 +1,18 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { addReport, setReportsProp } from "../redux/slices/reports-slice";
+import {
+    addReport,
+    deleteTargetReport,
+    setReportsProp,
+} from "../redux/slices/reports-slice";
 import { fetcher } from "../lib/fetcher";
 import useSocket from "../hooks/use-socket";
 
 const Report = () => {
-    const {
-        reports,
-        needToFetch,
-        loading,
-        loadingMore,
-        page,
-        targetType,
-    } = useSelector((state) => state.reports);
+    const { needToFetch, loading, targetType } = useSelector(
+        (state) => state.reports
+    );
 
     const dispatch = useDispatch();
     const socket = useSocket();
@@ -25,7 +24,6 @@ const Report = () => {
     }, [needToFetch]);
 
     useEffect(() => {
-        setProp("page", 1);
         setProp("needToFetch", true);
     }, [targetType]);
 
@@ -33,7 +31,8 @@ const Report = () => {
         socket.on("target-report", (reportInfo) => {
             const { targetType: targetT, report } = reportInfo;
 
-            if (targetType === "all reports") {
+            if (targetType === "all" || targetType === targetT) {
+                console.log("pratiic");
                 dispatch(addReport(report));
             }
         });
@@ -43,39 +42,30 @@ const Report = () => {
         dispatch(setReportsProp({ prop, value }));
     };
 
-    const targetUrlMap = {
-        "all reports": "",
-        "product reports": "product",
-        "seller reports": "store",
-        "user reports": "user",
-    };
-
     const fetchReports = async () => {
-        if (loading || loadingMore) {
+        if (loading) {
             return;
         }
 
-        setProp(page === 1 ? "loading" : "loadingMore", true);
+        setProp("loading", true);
 
         try {
+            const targetUrlMap = {
+                all: "",
+                product: "product",
+                seller: "store",
+                user: "user",
+            };
+
             const data = await fetcher(
                 `reports/?targetType=${targetUrlMap[targetType]}`
             );
 
-            setProp(
-                "reports",
-                page === 1 ? data.reports : [...reports, ...data.reports]
-            );
-
-            if (page === 1) {
-                setProp("totalCount", data.totalCount);
-                setProp("addedReportsCount", 0);
-            }
+            setProp("reports", data.reports);
         } catch (error) {
             setProp("error", error.message);
         } finally {
             setProp("loading", false);
-            setProp("loadinMore", false);
         }
     };
 

@@ -12,6 +12,7 @@ import {
     ClipboardCheckIcon,
     ChartBarIcon,
     FlagIcon,
+    ExclamationCircleIcon,
 } from "@heroicons/react/outline";
 import {
     MdOutlineExplore,
@@ -37,6 +38,7 @@ const Sidebar = () => {
     const { completed } = useSelector((state) => state.delivery);
     const { chats } = useSelector((state) => state.chat);
     const { requests } = useSelector((state) => state.categories);
+    const { reports } = useSelector((state) => state.reports);
 
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [ordersCount, setOrdersCount] = useState(0);
@@ -45,6 +47,7 @@ const Sidebar = () => {
     const [pendingDeliveriesCount] = useState(0);
     const [completedDeliveriesCount, setCompletedDeliveriesCount] = useState(0);
     const [categoryRequestsCount, setCategoryRequestsCount] = useState(0);
+    const [reportsCount, setReportsCount] = useState(0);
     const [activeLink, setActiveLink] = useState("");
     const [linksToRender, setLinksToRender] = useState([]);
 
@@ -165,6 +168,11 @@ const Sidebar = () => {
             linkTo: "/reports",
             icon: <FlagIcon className="icon-sidebar" />,
         },
+        {
+            name: "suspensions",
+            linkTo: "/suspensions",
+            icon: <ExclamationCircleIcon className="icon-sidebar" />,
+        },
         ...commonLinks,
     ];
 
@@ -239,6 +247,18 @@ const Sidebar = () => {
 
         setCategoryRequestsCount(categoryRequestsCount);
     }, [requests.list]);
+
+    useEffect(() => {
+        let unacknowledgedCount = 0;
+
+        reports.forEach((report) => {
+            if (!report.isAcknowledged) {
+                unacknowledgedCount++;
+            }
+        });
+
+        setReportsCount(unacknowledgedCount);
+    }, [reports]);
 
     useEffect(() => {
         for (let link of linksToRender) {
@@ -328,6 +348,8 @@ const Sidebar = () => {
                                 ? chatsCount
                                 : link.name === "categories"
                                 ? categoryRequestsCount
+                                : link.name === "reports"
+                                ? reportsCount
                                 : 0
                         }
                         active={activeLink === link.name}

@@ -1,43 +1,58 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import Head from "next/head";
+
+import {
+    acknowledgeReports as acknowledgeReportsRedux,
+    setReportsProp,
+} from "../redux/slices/reports-slice";
+import { capitalizeFirstLetter, singularOrPluralCount } from "../lib/strings";
+import { fetcher } from "../lib/fetcher";
 
 import PageHeader from "../components/page-header";
 import ContentList from "../components/content-list";
 import OptionsToggle from "../components/options-toggle";
-import { setReportsProp } from "../redux/slices/reports-slice";
-import { singularOrPluralCount } from "../lib/strings";
 
 const Reports = () => {
-    const {
-        reports,
-        loading,
-        error,
-        targetType,
-        totalCount,
-        addedReportsCount,
-    } = useSelector((state) => state.reports);
+    const { reports, loading, error, targetType } = useSelector(
+        (state) => state.reports
+    );
 
     const dispatch = useDispatch();
-
     const targetOptions = [
-        { name: "all reports" },
-        { name: "product reports" },
-        { name: "seller reports" },
-        { name: "user reports" },
+        { name: "all", value: "all reports" },
+        { name: "product", value: "product reports" },
+        { name: "seller", value: "seller reports" },
+        { name: "user", value: "user reports" },
     ];
+
+    useEffect(() => {
+        if (reports.find((report) => !report.isAcknowledged)) {
+            acknowledgeReports();
+        }
+    }, [reports]);
 
     useEffect(() => {
         return () => {
             // reset the targetType leave this page is left
-            dispatch(
-                setReportsProp({ prop: "targetType", value: "all reports" })
-            );
+            dispatch(setReportsProp({ prop: "targetType", value: "all" }));
         };
     }, []);
 
+    const acknowledgeReports = async () => {
+        try {
+            fetcher("reports/acknowledge", "PATCH");
+            dispatch(acknowledgeReportsRedux());
+        } catch (error) {}
+    };
+
     return (
         <section>
-            <PageHeader heading={targetType} hasBackArrow>
+            <Head>
+                <title>{capitalizeFirstLetter(targetType)} reports</title>
+            </Head>
+
+            <PageHeader heading={`${targetType} reports`} hasBackArrow>
                 <OptionsToggle
                     options={targetOptions}
                     active={targetType}
@@ -55,18 +70,16 @@ const Reports = () => {
 
             {reports.length > 0 && (
                 <p className="history-message -mt-2">
-                    There {singularOrPluralCount(totalCount, "is", "are")}{" "}
-                    <span className="font-semibold">
-                        {totalCount + addedReportsCount}
-                    </span>{" "}
-                    {targetType === "all reports"
+                    There {singularOrPluralCount(reports.length, "is", "are")}{" "}
+                    <span className="font-semibold">{reports.length}</span>{" "}
+                    {targetType === "all"
                         ? `${singularOrPluralCount(
-                              totalCount,
+                              reports.length,
                               "report",
                               "reports"
                           )} in total`
                         : ` ${targetType.split(" ")[0]} ${singularOrPluralCount(
-                              totalCount,
+                              reports.length,
                               "report",
                               "reports"
                           )}`}{" "}

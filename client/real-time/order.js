@@ -119,8 +119,8 @@ const Order = () => {
     }, [needToFetch, userPage, sellerPage]);
 
     const getOrders = async (type) => {
-        if (authUser?.isDeliveryPersonnel) {
-            // delivery personnel have no need for orders
+        if (authUser?.isDeliveryPersonnel || authUser?.isAdmin) {
+            // delivery personnel and admin have no need for orders
             return;
         }
 

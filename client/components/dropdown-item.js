@@ -37,7 +37,7 @@ const DropdownItem = ({
 
     return (
         <li
-            className={`flex items-center whitespace-nowrap px-5 py-[10px] first:rounded-tl-lg first:rounded-tr-lg last:rounded-bl-lg last:rounded-br-lg  ${hasAction &&
+            className={`flex items-center whitespace-nowrap px-5 py-[10px] first:rounded-tl-lg first:rounded-tr-lg last:rounded-bl-lg last:rounded-br-lg min-w-[100px] ${hasAction &&
                 "cursor-pointer hover:bg-gray-two dark:hover:bg-gray-800 hover:text-t-black dark:hover:text-gray-100 active:bg-gray-300 dark:active:bg-gray-700"} ${
                 active
                     ? "bg-gray-two dark:bg-gray-800 black-white"

@@ -11,38 +11,38 @@ export const sendEmail = async (recipientEmail, subject, text) => {
         const REDIRECT_URI = "https://developers.google.com/oauthplayground";
         const REFRESH_TOKEN =
             "1//04Y5xXERKdsBZCgYIARAAGAQSNwF-L9Irakbg-oGFqkSynqEqQTc_QJLzpK98V_EOti930lwAXJZ2p_bWSnWMskUXAbkEzN6tCCw";
-        const oAuth2Client = new google.auth.OAuth2(
-            CLIENT_ID,
-            CLIENT_SECRET,
-            REDIRECT_URI
-        );
-        oAuth2Client.setCredentials({
-            refresh_token: REFRESH_TOKEN,
-        });
+        // const oAuth2Client = new google.auth.OAuth2(
+        //     CLIENT_ID,
+        //     CLIENT_SECRET,
+        //     REDIRECT_URI
+        // );
+        // oAuth2Client.setCredentials({
+        //     refresh_token: REFRESH_TOKEN,
+        // });
 
-        const accessToken = await oAuth2Client.getAccessToken();
+        // const accessToken = await oAuth2Client.getAccessToken();
 
         // send email to the new user for account verification
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                type: "OAuth2",
-                user: "echo.ecommerce.web@gmail.com",
-                clientId: CLIENT_ID,
-                clientSecret: CLIENT_SECRET,
-                refreshToken: REFRESH_TOKEN,
-                accessToken,
-            },
-            tls: {
-                rejectUnauthorized: false,
-            },
-        });
+        // const transporter = nodemailer.createTransport({
+        //     service: "gmail",
+        //     auth: {
+        //         type: "OAuth2",
+        //         user: "echo.ecommerce.web@gmail.com",
+        //         clientId: CLIENT_ID,
+        //         clientSecret: CLIENT_SECRET,
+        //         refreshToken: REFRESH_TOKEN,
+        //         accessToken,
+        //     },
+        //     tls: {
+        //         rejectUnauthorized: false,
+        //     },
+        // });
 
-        transporter.sendMail({
-            to: recipientEmail,
-            subject: capitalizeFirstLetter(subject),
-            text: capitalizeFirstLetter(text),
-        });
+        // transporter.sendMail({
+        //     to: recipientEmail,
+        //     subject: capitalizeFirstLetter(subject),
+        //     text: capitalizeFirstLetter(text),
+        // });
     } catch (error) {
         throw new Error(error);
     }

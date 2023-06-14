@@ -6,12 +6,13 @@ import {
     getSuspensions,
 } from "../controllers/suspension.controllers.js";
 
-export const suspensionRouter = () => {
+export const suspensionRouter = (io) => {
     const router = express.Router();
 
     router.post(
         "/:targetType/:targetId",
         (request, ...op) => {
+            request.io = io;
             request.validateAdmin = true;
             auth(request, ...op);
         },

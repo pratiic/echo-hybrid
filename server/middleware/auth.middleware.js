@@ -87,8 +87,6 @@ const auth = async (request, response, next) => {
             return next(new HttpError(errorMsg, 401));
         }
     } catch (error) {
-        console.log(error);
-
         let msg = "",
             status = null;
 

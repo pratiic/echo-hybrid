@@ -51,7 +51,8 @@ const TargetReporter = ({ targetType, targetId }) => {
                 </p>
                 <p>
                     Note that once we investigate based on your report, the{" "}
-                    {targetType} may end up getting suspended.
+                    {targetType} may end up getting{" "}
+                    {targetType === "review" ? "deleted" : "suspended"}.
                 </p>
             </div>
 

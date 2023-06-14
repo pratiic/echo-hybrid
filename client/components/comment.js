@@ -8,6 +8,7 @@ import { getHowLongAgo } from "../lib/date-time";
 import { capitalizeFirstLetter } from "../lib/strings";
 import { setActiveComment } from "../redux/slices/comments-slice";
 import { openGallery } from "../redux/slices/gallery-slice";
+import { showGenericModal } from "../redux/slices/modal-slice";
 
 import Avatar from "./avatar";
 import ChatButton from "./chat-button";
@@ -15,6 +16,7 @@ import Icon from "./icon";
 import Dropdown from "./dropdown";
 import DropdownItem from "./dropdown-item";
 import CommentsContainer from "./comments-container";
+import TargetReporter from "./target-reporter";
 
 const Comment = ({
     id,
@@ -54,6 +56,14 @@ const Comment = ({
 
     const handleImageClick = () => {
         dispatch(openGallery({ images: [image] }));
+    };
+
+    const handleReportClick = () => {
+        dispatch(
+            showGenericModal(
+                <TargetReporter targetType="review" targetId={id} />
+            )
+        );
     };
 
     return (
@@ -148,11 +158,16 @@ const Comment = ({
                                 </DropdownItem>
                             </React.Fragment>
                         ) : (
-                            <React.Fragment>
-                                <DropdownItem action="report">
-                                    report user
-                                </DropdownItem>
-                            </React.Fragment>
+                            commentType === "review" && (
+                                <React.Fragment>
+                                    <DropdownItem
+                                        action="report"
+                                        onClick={handleReportClick}
+                                    >
+                                        report review
+                                    </DropdownItem>
+                                </React.Fragment>
+                            )
                         )}
                     </Dropdown>
                 </div>

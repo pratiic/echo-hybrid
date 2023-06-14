@@ -20,6 +20,7 @@ import ordersReducer from "./slices/orders-slice";
 import deliveryReducer from "./slices/delivery-slice";
 import businessesReducer from "./slices/businesses-slice";
 import reportsReducer from "./slices/reports-slice";
+import suspensionsReducer from "./slices/suspensions-slice";
 
 export const store = configureStore({
     reducer: {
@@ -42,6 +43,7 @@ export const store = configureStore({
         delivery: deliveryReducer,
         businesses: businessesReducer,
         reports: reportsReducer,
+        suspensions: suspensionsReducer,
     },
     middleware: [logger],
 });

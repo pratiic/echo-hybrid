@@ -2,6 +2,7 @@ import express from "express";
 
 import auth from "../middleware/auth.middleware.js";
 import {
+    acknowledgeReports,
     deleteReport,
     getReports,
     reportTarget,
@@ -42,6 +43,15 @@ export const reportRouter = (io) => {
             auth(request, ...op);
         },
         deleteReport
+    );
+
+    router.patch(
+        "/acknowledge",
+        (request, ...op) => {
+            request.validateAdmin = true;
+            auth(request, ...op);
+        },
+        acknowledgeReports
     );
 
     return router;

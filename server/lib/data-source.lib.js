@@ -139,7 +139,41 @@ export const reportInclusionFields = {
             id: true,
         },
     },
+    review: {
+        select: {
+            id: true,
+            text: true,
+            image: true,
+            userId: true,
+            productId: true,
+            storeId: true,
+        },
+    },
     creator: {
         select: genericUserFields,
+    },
+};
+
+export const suspensionInclusionFields = {
+    product: {
+        select: {
+            id: true,
+            store: {
+                select: {
+                    userId: true,
+                },
+            },
+        },
+    },
+    store: {
+        select: {
+            id: true,
+            userId: true,
+        },
+    },
+    user: {
+        select: {
+            id: true,
+        },
     },
 };

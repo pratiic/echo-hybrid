@@ -224,7 +224,6 @@ export const getProducts = async (request, response, next) => {
 
     let primaryFilter = {
         isDeleted: false,
-        suspension: null,
     };
 
     if (storeId) {
@@ -247,6 +246,10 @@ export const getProducts = async (request, response, next) => {
                     },
                 },
             ],
+            suspension: null,
+            store: {
+                suspension: null,
+            },
             // OR: [
             //     {
             //         isSecondHand: false,
@@ -365,11 +368,7 @@ export const getProductDetails = async (request, response, next) => {
         }
 
         if (product.isDeleted) {
-            return next(new HttpError("the product has been deleted", 404));
-        }
-
-        if (product.suspension) {
-            return next(new HttpError("the product has been suspended", 400));
+            return next(new HttpError("this product has been deleted", 404));
         }
 
         response.json({ product });

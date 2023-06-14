@@ -196,6 +196,7 @@ model Review {
     store     Store?   @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId   Int?
     replies   Reply[]
+    reports   Report[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -412,15 +413,19 @@ model CartItem {
 }
 
 model Report {
-    id    Int    @id @default(autoincrement())
-    cause String
+    id             Int     @id @default(autoincrement())
+    cause          String
+    targetType     String
+    isAcknowledged Boolean @default(false)
 
     product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
     productId Int?
-    store     Store?   @relation(fields: [storeId], references: [id])
+    store     Store?   @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId   Int?
-    user      User?    @relation(fields: [userId], references: [id], name: "reported_user")
+    user      User?    @relation(fields: [userId], references: [id], name: "reported_user", onDelete: Cascade)
     userId    Int?
+    review    Review?  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+    reviewId  Int?
     creator   User     @relation(fields: [creatorId], references: [id], onDelete: Cascade, name: "report_creator")
     creatorId Int
 
@@ -432,8 +437,9 @@ model Report {
 }
 
 model Suspension {
-    id    Int    @id @default(autoincrement())
-    cause String
+    id         Int    @id @default(autoincrement())
+    cause      String
+    targetType String
 
     product   Product? @relation(fields: [productId], references: [id])
     productId Int?     @unique

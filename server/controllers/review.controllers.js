@@ -1,7 +1,10 @@
 import { genericUserFields } from "../lib/data-source.lib.js";
+import { sendEmail } from "../lib/email.lib.js";
 import { prepareImageData } from "../lib/image.lib.js";
 import prisma from "../lib/prisma.lib.js";
+import { capitalizeFirstLetter } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
+import { validateCause } from "../validators/report.validators.js";
 import { validateReview } from "../validators/review.validators.js";
 
 export const postReview = async (request, response, next) => {
@@ -132,14 +135,37 @@ export const getReviews = async (request, response, next) => {
 };
 
 export const deleteReview = async (request, response, next) => {
+    // admin may also delete a review based on a report or discovery
     const user = request.user;
     const reviewId = parseInt(request.params.reviewId) || -1;
     const io = request.io;
+    const { cause } = request.body; // only for when deleted by admin
+
+    if (user.isAdmin) {
+        const errorMsg = validateCause(cause);
+
+        if (errorMsg) {
+            return next(new HttpError(errorMsg, 400));
+        }
+    }
 
     try {
         const review = await prisma.review.findUnique({
             where: {
                 id: reviewId,
+            },
+            select: {
+                id: true,
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                text: true,
+                image: true,
+                productId: true,
+                storeId: true,
             },
         });
 
@@ -147,7 +173,7 @@ export const deleteReview = async (request, response, next) => {
             return next(new HttpError("review not found", 404));
         }
 
-        if (review.userId !== user.id) {
+        if (review.user.id !== user.id && !user.isAdmin) {
             return next(
                 new HttpError("you are unauthorized to delete this review", 401)
             );
@@ -158,6 +184,21 @@ export const deleteReview = async (request, response, next) => {
                 id: reviewId,
             },
         });
+
+        if (user.isAdmin) {
+            // send email to the creator of the review
+            sendEmail(
+                review.user.email,
+                "review deletion",
+                `your review of ${
+                    review.productId ? "product" : "seller"
+                } with id ${
+                    review.productId ? review.productId : review.storeId
+                } has been deleted because of the reason:\n${capitalizeFirstLetter(
+                    cause
+                )}`
+            );
+        }
 
         io.emit("comment-delete", {
             type: "review",

@@ -17,12 +17,14 @@ import CommentsContainer from "../../components/comments-container";
 import StockView from "../../components/stock-view";
 import ProductMenu from "../../components/product-menu";
 import Human from "../../components/human";
+import InfoBanner from "../../components/info-banner";
 
 const ProductPage = () => {
-    const [loadingDetails, setLoadingDetails] = useState(false);
+    const [loadingDetails, setLoadingDetails] = useState(true);
     const [errorMsg, setErrorMsg] = useState("");
     const [isMyProduct, setIsMyProduct] = useState(false);
     const [notFound, setNotFound] = useState(false);
+    const [isSuspended, setIsSuspended] = useState(false); // in case a product is suspended while in the details page
 
     const { authUser } = useSelector((state) => state.auth);
     const { activeProduct } = useSelector((state) => state.products);
@@ -50,6 +52,10 @@ const ProductPage = () => {
                 setNotFound(true);
                 setErrorMsg("deleted");
             }
+        });
+
+        socket.on("product-suspension", (id) => {
+            setIsSuspended(true);
         });
     }, [activeProduct]);
 
@@ -86,11 +92,37 @@ const ProductPage = () => {
         return <p className="status">{errorMsg}</p>;
     }
 
+    if (
+        (activeProduct?.suspension || isSuspended) &&
+        !authUser?.isAdmin &&
+        !isMyProduct
+    ) {
+        return (
+            <p className="status">
+                this product has been suspended and will be accessible once it
+                gets reinstated
+            </p>
+        );
+    }
+
     return (
         <section className="500:mt-3">
             <Head>
                 <title>{capitalizeFirstLetter(activeProduct?.name)}</title>
             </Head>
+
+            {activeProduct?.suspension && (
+                <InfoBanner liftUp={false}>
+                    <p>
+                        This product has been suspended and is only accessible
+                        to the owner and us.
+                    </p>
+                    <p className="font-semibold">
+                        The suspension will be lifted if or when we deem
+                        appropriate.
+                    </p>
+                </InfoBanner>
+            )}
 
             <div className="flex relative">
                 <div className="flex-1">
