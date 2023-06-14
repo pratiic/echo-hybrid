@@ -18,6 +18,10 @@ const Home = () => {
             if (authUser?.isDeliveryPersonnel) {
                 router.push("/delivery");
             }
+
+            if (authUser?.isAdmin) {
+                router.push("/statistics");
+            }
         }
     }, [authUser]);
 

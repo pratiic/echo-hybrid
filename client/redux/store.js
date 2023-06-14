@@ -18,6 +18,8 @@ import chatReducer from "./slices/chat-slice";
 import sellersReducer from "./slices/sellers-slice";
 import ordersReducer from "./slices/orders-slice";
 import deliveryReducer from "./slices/delivery-slice";
+import businessesReducer from "./slices/businesses-slice";
+import reportsReducer from "./slices/reports-slice";
 
 export const store = configureStore({
     reducer: {
@@ -38,6 +40,8 @@ export const store = configureStore({
         sellers: sellersReducer,
         orders: ordersReducer,
         delivery: deliveryReducer,
+        businesses: businessesReducer,
+        reports: reportsReducer,
     },
     middleware: [logger],
 });

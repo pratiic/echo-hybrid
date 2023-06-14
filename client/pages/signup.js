@@ -29,7 +29,7 @@ const SignUp = () => {
 
     useEffect(() => {
         if (authUser) {
-            router.push("signin");
+            router.push("/signin");
         }
     }, [authUser]);
 

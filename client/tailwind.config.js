@@ -33,6 +33,8 @@ module.exports = {
                 "list-sm": "repeat(auto-fit, 14rem)",
                 "list-xs": "1fr 1fr",
                 variants: "repeat(auto-fit, auto)",
+                "list-request": "repeat(auto-fit, 15rem)",
+                "list-report": "repeat(auto-fit, 20rem)",
             },
             scale: {
                 103: "1.03",

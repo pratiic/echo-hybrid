@@ -174,9 +174,10 @@ model Category {
 }
 
 model CategoryRequest {
-    name String @id @unique
+    name           String  @id @unique
+    isAcknowledged Boolean @default(false)
 
-    user   User @relation(fields: [userId], references: [id])
+    user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId Int
 
     createdAt DateTime @default(now())

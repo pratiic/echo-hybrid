@@ -72,7 +72,7 @@ const BusinessRegistration = () => {
         setFetching(true);
 
         try {
-            const data = await fetcher(`businesses/0`);
+            const data = await fetcher(`businesses/0/details`);
             setBusiness(data.business);
         } catch (error) {
             setError(error.message);

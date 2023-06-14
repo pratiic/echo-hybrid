@@ -2,6 +2,7 @@ import express from "express";
 
 import auth from "../middleware/auth.middleware.js";
 import {
+    deleteChat,
     getChats,
     resetUnseenMsgsCount,
     startChat,
@@ -21,6 +22,17 @@ export const chatRouter = (io) => {
     });
 
     router.patch("/unseen/:chatId", auth, resetUnseenMsgsCount);
+
+    // for testing purposes only
+
+    router.delete(
+        "/:chatId",
+        (request, ...op) => {
+            request.validateAdmin = true;
+            auth(request, ...op);
+        },
+        deleteChat
+    );
 
     return router;
 };

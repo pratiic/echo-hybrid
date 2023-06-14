@@ -6,15 +6,17 @@ import { useRouter } from "next/router";
 import {
     closeModal,
     showConfirmationModal,
+    showGenericModal,
     showLoadingModal,
 } from "../redux/slices/modal-slice";
 import { fetcher } from "../lib/fetcher";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
+import { updateAuthUser } from "../redux/slices/auth-slice";
 
 import Icon from "./icon";
 import Dropdown from "./dropdown";
 import DropdownItem from "./dropdown-item";
-import { updateAuthUser } from "../redux/slices/auth-slice";
+import TargetReporter from "./target-reporter";
 
 const SellerMenu = ({ storeId, storeType, isMyStore }) => {
     const [showDropdown, setShowDropdown] = useState(false);
@@ -71,6 +73,14 @@ const SellerMenu = ({ storeId, storeType, isMyStore }) => {
         );
     };
 
+    const onReportClick = () => {
+        dispatch(
+            showGenericModal(
+                <TargetReporter targetType="seller" targetId={storeId} />
+            )
+        );
+    };
+
     return (
         <div className="relative">
             <Icon className="icon" onClick={toggleDropdown}>
@@ -83,7 +93,9 @@ const SellerMenu = ({ storeId, storeType, isMyStore }) => {
                         delete seller profile
                     </DropdownItem>
                 ) : (
-                    <DropdownItem action="report">report seller</DropdownItem>
+                    <DropdownItem action="report" onClick={onReportClick}>
+                        report seller
+                    </DropdownItem>
                 )}
             </Dropdown>
         </div>

@@ -87,6 +87,8 @@ const Notifications = () => {
     const getPageTitle = () => {
         return authUser?.isDeliveryPersonnel
             ? "Delivery notifications"
+            : authUser?.isAdmin
+            ? "Admin notifications"
             : "Your notifications";
     };
 

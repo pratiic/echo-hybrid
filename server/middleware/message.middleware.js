@@ -56,7 +56,7 @@ export const validateMessage = async (request, response, next) => {
             },
         });
 
-        if (!message) {
+        if (!message || message.deleted) {
             return next(new HttpError("message not found", 404));
         }
 

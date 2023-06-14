@@ -13,7 +13,11 @@ const Logo = () => {
             return "/";
         }
 
-        return authUser?.isDeliveryPersonnel ? "/delivery" : "/products";
+        return authUser?.isDeliveryPersonnel
+            ? "/delivery"
+            : authUser?.isAdmin
+            ? "/statistics"
+            : "/products";
     };
 
     return (
@@ -23,9 +27,9 @@ const Logo = () => {
                     <Image src={`/logo/logo-${theme}.svg`} layout="fill" />
                 </div>
             </CustomLink>
-            {authUser?.isDeliveryPersonnel && (
+            {(authUser?.isDeliveryPersonnel || authUser?.isAdmin) && (
                 <h5 className="ml-3 dark-light font-semibold tracking-wider">
-                    Delivery
+                    {authUser?.isDeliveryPersonnel ? "Delivery" : "Admin"}
                 </h5>
             )}
         </React.Fragment>
