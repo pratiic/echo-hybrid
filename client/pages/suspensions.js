@@ -115,7 +115,12 @@ const Suspensions = () => {
             <p className="history-message -mt-2">
                 There {singularOrPluralCount(suspensions.length, "is", "are")}
                 <span className="font-semibold"> {suspensions.length} </span>
-                {targetType !== "all" ? targetType : "total"} suspensions
+                {targetType !== "all" ? targetType : "total"}{" "}
+                {singularOrPluralCount(
+                    suspensions.length,
+                    "suspension",
+                    "suspensions"
+                )}
             </p>
         );
     };

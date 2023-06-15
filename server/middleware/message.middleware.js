@@ -14,11 +14,23 @@ export const validateChat = async (request, response, next) => {
                 id: true,
                 userIds: true,
                 unseenMsgsCounts: true,
+                users: {
+                    select: {
+                        id: true,
+                    },
+                },
             },
         });
 
         if (!chat) {
             return next(new HttpError("chat not found", 404));
+        }
+
+        if (chat.users.length < 2) {
+            // one of the users of the chat was deleted
+            return next(
+                new HttpError("the chat user may have been deleted", 400)
+            );
         }
 
         if (request.validateChatUser) {
@@ -41,7 +53,6 @@ export const validateChat = async (request, response, next) => {
 };
 
 export const validateMessage = async (request, response, next) => {
-    const user = request.user;
     const select = request.select;
     const messageId = parseInt(request.params.messageId) || 0;
 

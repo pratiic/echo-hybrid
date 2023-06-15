@@ -34,13 +34,18 @@ export const businessesSlice = createSlice({
                 )
             ) {
                 state.requests = [action.payload, ...state.requests];
-                state.addedCount += 1;
+                state.addedRequestsCount += 1;
             }
         },
         deleteRequest: (state, action) => {
-            state.requests = state.requests.filter(
-                (request) => request.id !== action.payload
-            );
+            if (
+                state.requests.find((request) => request.id === action.payload)
+            ) {
+                state.requests = state.requests.filter(
+                    (request) => request.id !== action.payload
+                );
+                state.addedRequestsCount -= 1;
+            }
         },
     },
 });

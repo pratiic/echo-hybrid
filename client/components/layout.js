@@ -3,8 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 
 import { fetcher } from "../lib/fetcher";
-import { setCategories } from "../redux/slices/categories-slice";
-import { updateAuthUser } from "../redux/slices/auth-slice";
+import { signUserOut, updateAuthUser } from "../redux/slices/auth-slice";
+import useSocket from "../hooks/use-socket";
 
 import Header from "./header";
 import Sidebar from "./sidebar";
@@ -27,6 +27,7 @@ const Layout = ({ children }) => {
 
     const router = useRouter();
     const dispatch = useDispatch();
+    const socket = useSocket();
 
     const unprotectedPaths = [
         "/",
@@ -38,14 +39,22 @@ const Layout = ({ children }) => {
     const unverifiedAccessiblePaths = ["/profile", "/account-verification"];
     const deliveryPaths = [
         "/delivery",
-        "/delivery",
         "/notifications",
         "/chats",
         "/chats/[id]",
         "/sellers/[id]",
+        "/products/[id]",
         ...unprotectedPaths,
         ...unverifiedAccessiblePaths,
     ];
+    const adminRestrictedPaths = [
+        "/cart",
+        "/orders",
+        "/transactions",
+        "/sell-products",
+        "/business-registration",
+    ];
+    const suspendedAccessiblePaths = ["/profile", "/suspended"];
 
     useEffect(() => {
         if (!authUser) {
@@ -62,11 +71,22 @@ const Layout = ({ children }) => {
             }
         }
 
+        if (authUser?.suspension) {
+            if (suspendedAccessiblePaths.indexOf(router.pathname) === -1) {
+                router.push("/suspended");
+            }
+        }
+
         // restrict most of the application routes to delivery personnel
-        if (authUser?.isDeliveryPersonnel) {
+        if (authUser?.isDeliveryPersonnel && !authUser?.suspension) {
             if (deliveryPaths.indexOf(router.pathname) === -1) {
-                console.log(router.pathname);
                 router.push("/delivery");
+            }
+        }
+
+        if (authUser?.isAdmin && !authUser?.suspension) {
+            if (adminRestrictedPaths.indexOf(router.pathname) !== -1) {
+                router.push("/statistics");
             }
         }
     }, [
@@ -81,12 +101,28 @@ const Layout = ({ children }) => {
         fetchSelfDetails();
     }, []);
 
+    useEffect(() => {
+        socket.on("user-delete", (userId) => {
+            // if the account is deleted while using the application
+            // happens in case of delivery personnel
+
+            if (userId === authUser?.id) {
+                dispatch(signUserOut());
+            }
+        });
+    }, [authUser]);
+
     const fetchSelfDetails = async () => {
         try {
             const data = await fetcher("users");
 
             dispatch(updateAuthUser({ ...data.user }));
-        } catch (error) {}
+        } catch (error) {
+            if (error.statusCode === 404) {
+                // user has been deleted
+                dispatch(signUserOut());
+            }
+        }
     };
 
     return (

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { MenuAlt4Icon } from "@heroicons/react/outline";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 
 import {
@@ -21,6 +21,8 @@ import TargetReporter from "./target-reporter";
 const SellerMenu = ({ storeId, storeType, isMyStore }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [deletionTitle, setDeletionTitle] = useState("");
+
+    const { authUser } = useSelector((state) => state.auth);
 
     const dispatch = useDispatch();
     const router = useRouter();
@@ -81,6 +83,10 @@ const SellerMenu = ({ storeId, storeType, isMyStore }) => {
         );
     };
 
+    const onChatClick = () => {
+        router.push(`/chats/${storeId}`);
+    };
+
     return (
         <div className="relative">
             <Icon className="icon" onClick={toggleDropdown}>
@@ -93,9 +99,26 @@ const SellerMenu = ({ storeId, storeType, isMyStore }) => {
                         delete seller profile
                     </DropdownItem>
                 ) : (
-                    <DropdownItem action="report" onClick={onReportClick}>
-                        report seller
-                    </DropdownItem>
+                    <React.Fragment>
+                        <DropdownItem
+                            action="chat"
+                            textAsIs
+                            onClick={onChatClick}
+                        >
+                            Chat with Seller
+                        </DropdownItem>
+
+                        {!(
+                            authUser?.isAdmin || authUser?.isDeliveryPersonnel
+                        ) && (
+                            <DropdownItem
+                                action="report"
+                                onClick={onReportClick}
+                            >
+                                report seller
+                            </DropdownItem>
+                        )}
+                    </React.Fragment>
                 )}
             </Dropdown>
         </div>

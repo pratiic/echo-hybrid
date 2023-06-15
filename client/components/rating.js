@@ -16,7 +16,6 @@ import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 
 import Button from "./button";
 import TargetRater from "./target-rater";
-// import UsersContainer from "./users-container";
 import Icon from "./icon";
 
 const Rating = ({
@@ -31,7 +30,6 @@ const Rating = ({
     onRate,
 }) => {
     const { authUser } = useSelector((state) => state.auth);
-    const { activeProduct } = useSelector((state) => state.products);
     const [authUserRating, setAuthUserRating] = useState(null);
     const [rating, setRating] = useState(1);
 
@@ -152,18 +150,6 @@ const Rating = ({
         );
     };
 
-    const viewRatings = () => {
-        // dispatch(
-        //     showGenericModal(
-        //         <UsersContainer
-        //             title={`${capitalizeFirstLetter(targetType)} ratings`}
-        //             targetType="ratings"
-        //             url={`ratings/${targetType}/${target.id}`}
-        //         />
-        //     )
-        // );
-    };
-
     return (
         <div>
             {!onlyStars && (
@@ -206,17 +192,6 @@ const Rating = ({
                             By {ratings?.length}{" "}
                             {singularOrPlural(ratings, "user", "users")}
                         </span>
-
-                        {/* {ratings.length > 0 && (
-                            <Button
-                                small
-                                type="tertiary"
-                                rounded={false}
-                                onClick={viewRatings}
-                            >
-                                view ratings
-                            </Button>
-                        )} */}
                     </div>
 
                     {/* show only if the auth user can rate */}
@@ -236,6 +211,15 @@ const Rating = ({
                                     >
                                         <TrashIcon className="icon-small" />
                                     </Icon>
+                                </p>
+                            ) : /* delivery personnel and admin are not allowed to rate products and sellers */
+                            authUser?.isDeliveryPersonnel ||
+                              authUser?.isAdmin ? (
+                                <p className="italic dark-light text-sm -mt-1">
+                                    you are not allowed to rate{" "}
+                                    {targetType === "products"
+                                        ? targetType
+                                        : "sellers"}
                                 </p>
                             ) : (
                                 // auth user has not rated

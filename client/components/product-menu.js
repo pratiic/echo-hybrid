@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { MenuAlt4Icon } from "@heroicons/react/outline";
 
 import { deleteProduct } from "../redux/slices/products-slice";
@@ -21,6 +21,8 @@ import TargetReporter from "./target-reporter";
 
 const ProductMenu = ({ id, isMyProduct, hasBeenSold, store }) => {
     const [showDropdown, setShowDropdown] = useState(false);
+
+    const { authUser } = useSelector((state) => state.auth);
 
     const router = useRouter();
     const dispatch = useDispatch();
@@ -106,12 +108,16 @@ const ProductMenu = ({ id, isMyProduct, hasBeenSold, store }) => {
 
                 {!isMyProduct && (
                     <React.Fragment>
-                        <DropdownItem
-                            action="report"
-                            onClick={handleReportClick}
-                        >
-                            report product
-                        </DropdownItem>
+                        {!(
+                            authUser?.isAdmin || authUser?.isDeliveryPersonnel
+                        ) && (
+                            <DropdownItem
+                                action="report"
+                                onClick={handleReportClick}
+                            >
+                                report product
+                            </DropdownItem>
+                        )}
 
                         <DropdownItem
                             action="chat"

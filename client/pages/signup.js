@@ -3,6 +3,7 @@ import Form from "../components/form";
 import Head from "next/head";
 import InputGroup from "../components/input-group";
 import Button from "../components/button";
+
 import { fetcher } from "../lib/fetcher";
 import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "../redux/slices/auth-slice";
@@ -29,7 +30,7 @@ const SignUp = () => {
 
     useEffect(() => {
         if (authUser) {
-            router.push("/signin");
+            router.push("/");
         }
     }, [authUser]);
 
@@ -60,7 +61,6 @@ const SignUp = () => {
             });
 
             dispatch(setAuthUser(data.user));
-            router.push("/products");
         } catch (error) {
             displayError(
                 error.message,
@@ -72,7 +72,6 @@ const SignUp = () => {
                     setPasswordError,
                 ]
             );
-            console.log(error);
         } finally {
             setSigningUp(false);
         }

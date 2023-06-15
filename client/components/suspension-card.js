@@ -13,6 +13,7 @@ import {
 import { fetcher } from "../lib/fetcher";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 import { deleteSuspension } from "../redux/slices/suspensions-slice";
+import { updateDeliveryPersonnel } from "../redux/slices/delivery-slice";
 
 import InfoUnit from "./info-unit";
 import Icon from "./icon";
@@ -79,6 +80,19 @@ const SuspensionCard = ({
                         );
 
                         dispatch(deleteSuspension(id));
+
+                        // if a delivery personnel was reinstated, update them
+                        if (targetType === "user") {
+                            dispatch(
+                                updateDeliveryPersonnel({
+                                    id: user?.id,
+                                    updateInfo: {
+                                        suspension: null,
+                                    },
+                                })
+                            );
+                        }
+
                         dispatch(
                             setAlert({
                                 message: `the ${targetTypeMap[targetType]} has been reinstated`,

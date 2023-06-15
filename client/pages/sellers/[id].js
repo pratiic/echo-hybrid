@@ -162,13 +162,11 @@ const SellerPage = () => {
             </Head>
 
             <PageHeader heading={sellerName} hasBackArrow>
-                {!authUser?.isDeliveryPersonnel && (
-                    <SellerMenu
-                        isMyStore={isMyStore}
-                        storeId={storeDetails?.id}
-                        storeType={storeDetails?.storeType}
-                    />
-                )}
+                <SellerMenu
+                    isMyStore={isMyStore}
+                    storeId={storeDetails?.id}
+                    storeType={storeDetails?.storeType}
+                />
             </PageHeader>
 
             {storeDetails?.suspension && (

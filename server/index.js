@@ -62,7 +62,7 @@ app.use("/api/carts", cartRouter);
 app.use("/api/stats", statRouter());
 app.use("/api/reports", reportRouter(io));
 app.use("/api/suspensions", suspensionRouter(io));
-app.use("/api/delivery", deliveryRouter());
+app.use("/api/delivery", deliveryRouter(io));
 app.use("/api/transactions", transactionRouter());
 app.use("/api/rec", recRouter());
 app.use("/receipts", receiptRouter);

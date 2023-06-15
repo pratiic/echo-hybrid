@@ -43,6 +43,14 @@ export const authSlice = createSlice({
             pending: PAGE_SIZE,
             completed: PAGE_SIZE,
         },
+        // delivery personnel portion
+        personnel: {
+            list: [],
+            loading: false,
+            error: "",
+            needToFetch: true,
+        },
+        personnelQuery: "",
     },
     reducers: {
         setDeliveries: (state, action) => {
@@ -104,6 +112,47 @@ export const authSlice = createSlice({
         resetPageSize: (state, action) => {
             state.PAGE_SIZE[action.payload] = PAGE_SIZE;
         },
+        // delivery personnel portion
+        setDeliveryPersonnelProp: (state, action) => {
+            const { prop, value } = action.payload;
+
+            state.personnel[prop] = value;
+
+            if (prop === "list") {
+                state.personnel.needToFetch = false;
+            }
+        },
+        addDeliveryPersonnel: (state, action) => {
+            if (
+                !state.personnel.list.find(
+                    (personnel) => personnel.id === action.payload.id
+                )
+            ) {
+                state.personnel.list = [
+                    action.payload,
+                    ...state.personnel.list,
+                ];
+            }
+        },
+        updateDeliveryPersonnel: (state, action) => {
+            const { id, updateInfo } = action.payload;
+
+            state.personnel.list = state.personnel.list.map((personnel) => {
+                if (personnel.id === id) {
+                    return {
+                        ...personnel,
+                        ...updateInfo,
+                    };
+                }
+
+                return personnel;
+            });
+        },
+        deleteDeliveryPersonnel: (state, action) => {
+            state.personnel.list = state.personnel.list.filter(
+                (personnel) => personnel.id !== action.payload
+            );
+        },
     },
 });
 
@@ -118,4 +167,8 @@ export const {
     deleteDelivery,
     acknowledgeDeliveries,
     resetPageSize,
+    setDeliveryPersonnelProp,
+    addDeliveryPersonnel,
+    updateDeliveryPersonnel,
+    deleteDeliveryPersonnel,
 } = authSlice.actions;

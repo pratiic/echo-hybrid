@@ -1,22 +1,16 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { DotsHorizontalIcon, FlagIcon } from "@heroicons/react/outline";
 import { BsReplyFill } from "react-icons/bs";
 
 import { getHowLongAgo } from "../lib/date-time";
 import { capitalizeFirstLetter } from "../lib/strings";
-import { setActiveComment } from "../redux/slices/comments-slice";
 import { openGallery } from "../redux/slices/gallery-slice";
-import { showGenericModal } from "../redux/slices/modal-slice";
 
 import Avatar from "./avatar";
-import ChatButton from "./chat-button";
 import Icon from "./icon";
-import Dropdown from "./dropdown";
-import DropdownItem from "./dropdown-item";
 import CommentsContainer from "./comments-container";
-import TargetReporter from "./target-reporter";
+import CommentMenu from "./comment-menu";
 
 const Comment = ({
     id,
@@ -27,22 +21,11 @@ const Comment = ({
     commentType = "review",
     handleCommentDeletion,
 }) => {
-    const [showDropdown, setShowDropdown] = useState(false);
     const [showReplies, setShowReplies] = useState(false);
 
     const { authUser } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const router = useRouter();
-
-    const toggleDropdown = (event) => {
-        event.stopPropagation();
-
-        setShowDropdown(!showDropdown);
-    };
-
-    const handleUpdateClick = () => {
-        dispatch(setActiveComment({ id, text, image }));
-    };
 
     const handleReplyClick = (event) => {
         // scroll down to show the replies part
@@ -58,14 +41,6 @@ const Comment = ({
         dispatch(openGallery({ images: [image] }));
     };
 
-    const handleReportClick = () => {
-        dispatch(
-            showGenericModal(
-                <TargetReporter targetType="review" targetId={id} />
-            )
-        );
-    };
-
     return (
         <div
             className={`px-4 pt-5 w-full ${
@@ -78,15 +53,13 @@ const Comment = ({
             <div className="flex items-center dark-light">
                 <Avatar
                     avatar={user?.avatar}
-                    alt={user?.firstName + " " + user?.lastName}
+                    alt={user?.fullName}
                     small={commentType === "reply"}
                 />
 
                 <div className="ml-2 flex-1">
                     <p className="capitalize black-white">
-                        {user?.id === authUser?.id
-                            ? "me"
-                            : user?.firstName + " " + user?.lastName}
+                        {user?.id === authUser?.id ? "me" : user?.fullName}
                     </p>
                     <p className=" text-xs">{user?.email}</p>
                 </div>
@@ -123,54 +96,14 @@ const Comment = ({
                     </Icon>
                 )}
 
-                {/* icon to chat with a comment user */}
-                {user?.id !== authUser?.id && (
-                    <ChatButton small userId={user?.id} />
-                )}
-
-                {/* only allow creator of the review to perform certain actions  */}
-                <div className="relative">
-                    <Icon onClick={toggleDropdown} toolName="options">
-                        <DotsHorizontalIcon className="icon" />
-                    </Icon>
-
-                    <Dropdown
-                        show={showDropdown}
-                        position="top"
-                        toggleDropdown={toggleDropdown}
-                    >
-                        {user?.id === authUser?.id ? (
-                            <React.Fragment>
-                                {commentType === "review" && (
-                                    <DropdownItem
-                                        action="update"
-                                        onClick={handleUpdateClick}
-                                    >
-                                        update {commentType}
-                                    </DropdownItem>
-                                )}
-
-                                <DropdownItem
-                                    action="delete"
-                                    onClick={() => handleCommentDeletion(id)}
-                                >
-                                    delete {commentType}
-                                </DropdownItem>
-                            </React.Fragment>
-                        ) : (
-                            commentType === "review" && (
-                                <React.Fragment>
-                                    <DropdownItem
-                                        action="report"
-                                        onClick={handleReportClick}
-                                    >
-                                        report review
-                                    </DropdownItem>
-                                </React.Fragment>
-                            )
-                        )}
-                    </Dropdown>
-                </div>
+                <CommentMenu
+                    id={id}
+                    text={text}
+                    image={image}
+                    user={user}
+                    handleCommentDeletion={handleCommentDeletion}
+                    commentType={commentType}
+                />
             </div>
 
             {/* replies of the comment  */}

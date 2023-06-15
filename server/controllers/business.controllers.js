@@ -342,6 +342,7 @@ export const updateBusiness = async (request, response, next) => {
 export const deleteBusiness = async (request, response, next) => {
     const user = request.user;
     const business = request.business;
+    const io = request.io;
 
     if (business.store.userId !== user.id) {
         return next(
@@ -362,6 +363,11 @@ export const deleteBusiness = async (request, response, next) => {
                 },
             }),
         ]);
+
+        if (!business.isVerified) {
+            // business registration cancellation
+            io.emit("business-registation-cancellation", business.id);
+        }
 
         response.json({
             message: "business has been deleted",

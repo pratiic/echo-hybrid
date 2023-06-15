@@ -311,7 +311,7 @@ model OrderCompletion {
 
     order       Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
     orderId     Int   @unique
-    requestor   User  @relation(fields: [requestorId], references: [id])
+    requestor   User  @relation(fields: [requestorId], references: [id], onDelete: Cascade)
     requestorId Int
 
     createdAt DateTime @default(now())
@@ -325,8 +325,8 @@ model Delivery {
 
     order    Order @relation(fields: [orderId], references: [id])
     orderId  Int   @unique
-    madeBy   User  @relation(fields: [madeById], references: [id])
-    madeById Int
+    madeBy   User? @relation(fields: [madeById], references: [id], onDelete: SetNull)
+    madeById Int?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

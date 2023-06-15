@@ -2,8 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { PaperAirplaneIcon } from "@heroicons/react/solid";
 import { XCircleIcon } from "@heroicons/react/outline";
+import { useRouter } from "next/router";
 
-import { addOutgoingMsg, removeOutgoingMsg } from "../redux/slices/chat-slice";
+import {
+    addOutgoingMsg,
+    deleteChat,
+    removeOutgoingMsg,
+} from "../redux/slices/chat-slice";
 import { resetFiles } from "../redux/slices/files-slice";
 import { setErrorAlert } from "../redux/slices/alerts-slice";
 import { setPreview } from "../lib/files";
@@ -20,6 +25,7 @@ const MessageSender = ({ chatId }) => {
     const { selectedFiles } = useSelector((state) => state.files);
 
     const dispatch = useDispatch();
+    const router = useRouter();
 
     useEffect(() => {
         if (selectedFiles.length > 0) {
@@ -62,7 +68,14 @@ const MessageSender = ({ chatId }) => {
 
             await fetcher(`messages/${chatId}`, "POST", formData);
         } catch (error) {
-            dispatch(setErrorAlert(error.message));
+            if (error.message.includes("chat user may have been deleted")) {
+                // if the chat user was deleted
+                dispatch(deleteChat(chatId));
+                dispatch(setErrorAlert("the chat user may have been deleted"));
+                router.back();
+            } else {
+                dispatch(setErrorAlert(error.message));
+            }
         } finally {
             dispatch(removeOutgoingMsg());
         }

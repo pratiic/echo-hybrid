@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import {
     addRequest,
+    deleteRequest,
     setBusinessesProp,
 } from "../redux/slices/businesses-slice";
 import { fetcher } from "../lib/fetcher";
@@ -27,6 +28,10 @@ const Business = () => {
     useEffect(() => {
         socket.on("business-request", (business) => {
             dispatch(addRequest(business));
+        });
+
+        socket.on("business-registation-cancellation", (businessId) => {
+            dispatch(deleteRequest(businessId));
         });
     }, []);
 

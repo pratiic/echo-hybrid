@@ -6,7 +6,9 @@ export const genericUserFields = {
     avatar: true,
     isAdmin: true,
     isDeliveryPersonnel: true,
+    isVerified: true,
     fullName: true,
+    createdAt: true,
 };
 
 export const extraUserFields = {
@@ -23,6 +25,13 @@ export const extraUserFields = {
         },
     },
     address: true,
+    suspension: {
+        select: {
+            id: true,
+            cause: true,
+            createdAt: true,
+        },
+    },
 };
 
 export const productDeletionFields = {

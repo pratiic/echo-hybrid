@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { AiOutlineMail } from "react-icons/ai";
 import { LocationMarkerIcon, CalendarIcon } from "@heroicons/react/outline";
@@ -12,7 +12,6 @@ import Avatar from "../components/avatar";
 import Rating from "../components/rating";
 import CommentsContainer from "../components/comments-container";
 import Tag from "../components/tag";
-import ChatButton from "../components/chat-button";
 
 const SellerDetails = ({
     id,
@@ -110,41 +109,30 @@ const SellerDetails = ({
                             {isMyStore && <Tag text="my seller profile" />}
                         </div>
                     </div>
-
-                    {/* button to start chat with the seller */}
-                    {!isMyStore && (
-                        <div className="mt-5">
-                            <ChatButton userId={user?.id} type="tertiary" />
-                        </div>
-                    )}
                 </div>
 
-                {!authUser?.isDeliveryPersonnel && (
-                    <Rating
-                        rating={rating}
-                        ratings={ratings}
-                        userCanRate={!isMyStore}
-                        target={{
-                            id,
-                            name: capitalizeAll(
-                                storeType === "IND"
-                                    ? `${user?.firstName} ${user?.lastName}`
-                                    : business?.name
-                            ),
-                        }}
-                        isTargetBusiness={storeType === "BUS"}
-                        onRate={updateStore}
-                    />
-                )}
+                <Rating
+                    rating={rating}
+                    ratings={ratings}
+                    userCanRate={!isMyStore}
+                    target={{
+                        id,
+                        name: capitalizeAll(
+                            storeType === "IND"
+                                ? `${user?.firstName} ${user?.lastName}`
+                                : business?.name
+                        ),
+                    }}
+                    isTargetBusiness={storeType === "BUS"}
+                    onRate={updateStore}
+                />
             </div>
 
-            {!authUser?.isDeliveryPersonnel && (
-                <CommentsContainer
-                    contentId={id}
-                    contentOwner={user}
-                    isTargetBusiness={storeType === "BUS"}
-                />
-            )}
+            <CommentsContainer
+                contentId={id}
+                contentOwner={user}
+                isTargetBusiness={storeType === "BUS"}
+            />
         </div>
     );
 };

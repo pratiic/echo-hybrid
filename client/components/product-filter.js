@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     DotsHorizontalIcon,
@@ -25,22 +24,26 @@ const ProductFilter = ({ isGlobal }) => {
     options = useSelector((state) =>
         isGlobal ? state.filter : state.filter.sellerFilter
     );
+    const { authUser } = useSelector((state) => state.auth);
     const {
         activeFilter: af,
         locationFilter: lf,
         sortingType: st,
         orderType: ot,
     } = options;
-    const dispatch = useDispatch();
 
     const [activeFilter, setActiveFilter] = useState(af);
     const [locationFilter, setLocationFilter] = useState(lf);
     const [sortingType, setSortingType] = useState(st);
     const [orderType, setOrderType] = useState(ot);
+    const [isRestricted, setIsRestricted] = useState(false);
 
-    const { authUser } = useSelector((state) => state.auth);
-
+    const dispatch = useDispatch();
     const headingStyles = "mb-2 text-xl font-semibold black-white";
+
+    useEffect(() => {
+        setIsRestricted(authUser?.isAdmin || authUser?.isDeliveryPersonnel);
+    }, [authUser]);
 
     const handleButtonClick = () => {
         dispatch(
@@ -62,12 +65,12 @@ const ProductFilter = ({ isGlobal }) => {
         {
             name: "location",
             icon: <LocationMarkerIcon className="icon-no-bg" />,
-            disabled: !authUser?.address,
+            disabled: !authUser?.address || isRestricted,
         },
         {
             name: "delivered",
             icon: <MdDeliveryDining className="icon-no-bg" />,
-            disabled: !authUser?.address,
+            disabled: !authUser?.address || isRestricted,
         },
         {
             name: "second hand",

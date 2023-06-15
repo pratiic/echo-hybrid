@@ -152,7 +152,7 @@ const BusinessRequest = (props) => {
             <div className="flex space-x-3 mb-5">
                 <div>
                     {infoUnits.map((infoUnit) => {
-                        return <InfoUnit {...infoUnit} />;
+                        return <InfoUnit {...infoUnit} key={infoUnit.label} />;
                     })}
                 </div>
 

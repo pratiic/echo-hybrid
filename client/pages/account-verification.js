@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
+import Head from "next/head";
+
+import { capitalizeFirstLetter } from "../lib/strings";
+import { fetcher } from "../lib/fetcher";
+import { updateAuthUser } from "../redux/slices/auth-slice";
+import { setAlert } from "../redux/slices/alerts-slice";
 
 import PageHeader from "../components/page-header";
 import InfoBanner from "../components/info-banner";
 import InputGroup from "../components/input-group";
 import Button from "../components/button";
-import { capitalizeFirstLetter } from "../lib/strings";
-import { fetcher } from "../lib/fetcher";
-import { updateAuthUser } from "../redux/slices/auth-slice";
-import { setAlert } from "../redux/slices/alerts-slice";
 
 const AccountVerification = () => {
     const [code, setCode] = useState("");
@@ -23,7 +25,7 @@ const AccountVerification = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (authUser?.verified) {
+        if (authUser?.isVerified) {
             router.push("/");
         }
     }, [authUser]);
@@ -39,8 +41,6 @@ const AccountVerification = () => {
 
             dispatch(setAlert({ message: "your account has been verified" }));
             dispatch(updateAuthUser({ isVerified: true }));
-
-            router.push("/");
         } catch (error) {
             setVerificationError(error.message);
         } finally {
@@ -72,6 +72,10 @@ const AccountVerification = () => {
 
     return (
         <section>
+            <Head>
+                <title>Account verification</title>
+            </Head>
+
             <PageHeader heading="Verify your account" hasBackArrow />
 
             <InfoBanner>

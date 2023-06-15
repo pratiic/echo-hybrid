@@ -10,6 +10,7 @@ import BusinessRequest from "./business-request";
 import CategoryRequest from "./category-request";
 import ReportCard from "./report-card";
 import SuspensionCard from "./suspension-card";
+import PersonnelCard from "./personnel-card";
 
 import Human from "./human";
 
@@ -118,6 +119,10 @@ const ContentList = ({
 
                     if (type === "suspension") {
                         return <SuspensionCard {...content} key={content.id} />;
+                    }
+
+                    if (type === "delivery-personnel") {
+                        return <PersonnelCard {...content} key={content.id} />;
                     }
                 })}
             </div>

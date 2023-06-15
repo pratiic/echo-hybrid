@@ -193,9 +193,7 @@ const OrderCard = ({
     };
 
     const handleOrderClick = () => {
-        if (!authUser?.isDeliveryPersonnel) {
-            router.push(`/products/${product.id}`);
-        }
+        router.push(`/products/${product.id}`);
     };
 
     return (

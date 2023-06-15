@@ -276,6 +276,14 @@ textarea {
   .modal-title {
     @apply text-2xl font-semibold mb-1 leading-tight;
   }
+
+  .address {
+    @apply whitespace-pre-wrap leading-snug;
+  }
+
+  .restricted-msg {
+    @apply dark-light italic text-sm;
+  }
 }
 
 .shadow-custom {

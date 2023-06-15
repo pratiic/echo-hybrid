@@ -63,6 +63,14 @@ const CommentsContainer = ({
             return setDisabledMsg(`You cannot review your own ${contentType}`);
         }
 
+        if (authUser?.isDeliveryPersonnel || authUser?.isAdmin) {
+            return setDisabledMsg(
+                `you are not allowed to post reviews on ${
+                    contentType === "store" ? "sellers" : "products"
+                }`
+            );
+        }
+
         const existingReview = reviews?.find((review) => {
             return review?.user?.id === authUser?.id;
         });

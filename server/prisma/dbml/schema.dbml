@@ -282,8 +282,8 @@ Table Delivery {
   isAcknowledged Boolean [not null, default: false]
   order Order [not null]
   orderId Int [unique, not null]
-  madeBy User [not null]
-  madeById Int [not null]
+  madeBy User
+  madeById Int
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -467,11 +467,11 @@ Ref: Order.storeId > Store.id [delete: Cascade]
 
 Ref: OrderCompletion.orderId - Order.id [delete: Cascade]
 
-Ref: OrderCompletion.requestorId > User.id
+Ref: OrderCompletion.requestorId > User.id [delete: Cascade]
 
 Ref: Delivery.orderId - Order.id
 
-Ref: Delivery.madeById > User.id
+Ref: Delivery.madeById > User.id [delete: Set Null]
 
 Ref: Transaction.orderId - Order.id [delete: Cascade]
 

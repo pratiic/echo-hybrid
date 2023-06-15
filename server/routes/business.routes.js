@@ -90,7 +90,18 @@ export const businessRouter = (io) => {
         controlBusinessRegistration
     );
 
-    router.delete("/:businessId", auth, validateBusiness, deleteBusiness);
+    router.delete(
+        "/:businessId",
+        auth,
+        (request, ...op) => {
+            request.io = io;
+            request.selectionFilter = {
+                isVerified: true,
+            };
+            validateBusiness(request, ...op);
+        },
+        deleteBusiness
+    );
 
     return router;
 };

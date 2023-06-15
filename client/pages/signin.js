@@ -25,7 +25,7 @@ const SignIn = () => {
 
     useEffect(() => {
         if (authUser) {
-            router.push("/products");
+            router.push("/");
         }
     }, [authUser]);
 

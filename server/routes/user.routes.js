@@ -32,8 +32,6 @@ router.delete("/avatar", auth, deleteAvatar);
 
 router.get("/:email", auth, getUserDetails);
 
-// for test purposes only
-
 router.get(
     "/",
     (request, response, next) => {
@@ -46,6 +44,8 @@ router.get(
     },
     getSelfDetails
 );
+
+// for test purposes only
 
 router.delete(
     "/:userId",

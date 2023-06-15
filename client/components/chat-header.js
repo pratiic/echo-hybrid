@@ -51,6 +51,8 @@ const ChatHeader = ({ user }) => {
                     </div>
 
                     {user?.isDeliveryPersonnel && <Tag text="delivery" />}
+
+                    {user?.isAdmin && <Tag text="admin" />}
                 </div>
             </div>
 

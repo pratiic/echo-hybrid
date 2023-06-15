@@ -1,10 +1,9 @@
 // 1. allows ordering a product or a variation
 // 2. allows adding a product to the cart
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { ShoppingCartIcon } from "@heroicons/react/outline";
 
 import { fetcher } from "../lib/fetcher";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
@@ -25,12 +24,19 @@ const ProductControl = ({
     productId,
     canAddToCart = true,
     product,
-    isSecondHand,
     className,
 }) => {
+    const [isRestricted, setIsRestricted] = useState(false);
+
     const { activeProduct } = useSelector((state) => state.products);
+    const { authUser } = useSelector((state) => state.auth);
+
     const dispatch = useDispatch();
     const router = useRouter();
+
+    useEffect(() => {
+        setIsRestricted(authUser?.isAdmin || authUser?.isDeliveryPersonnel);
+    }, [authUser]);
 
     const handleOrderClick = (event) => {
         event.stopPropagation();
@@ -75,6 +81,14 @@ const ProductControl = ({
             dispatch(closeModal());
         }
     };
+
+    if (isRestricted) {
+        return (
+            <p className="restricted-msg mt-1">
+                you are not allowed to buy products
+            </p>
+        );
+    }
 
     return (
         <div className={`flex items-center mt-3 ${className}`}>

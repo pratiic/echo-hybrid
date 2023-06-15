@@ -137,9 +137,10 @@ const UserAddress = () => {
                 value={description}
                 placeholder="max 100 chars"
                 error={descriptionError}
-                onChange={setDescription}
                 view="textarea"
                 showRequired={false}
+                maxChars={100}
+                onChange={setDescription}
             />
 
             <Button loading={updating} full>

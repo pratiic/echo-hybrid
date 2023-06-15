@@ -173,6 +173,11 @@ const Sidebar = () => {
             linkTo: "/suspensions",
             icon: <ExclamationCircleIcon className="icon-sidebar" />,
         },
+        {
+            name: "delivery",
+            linkTo: "/delivery-personnel",
+            icon: <MdOutlineDeliveryDining className="icon-sidebar" />,
+        },
         ...commonLinks,
     ];
 

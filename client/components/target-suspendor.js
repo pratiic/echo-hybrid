@@ -13,6 +13,7 @@ import {
 import OptionsToggle from "./options-toggle";
 import InputGroup from "./input-group";
 import Button from "./button";
+import { updateDeliveryPersonnel } from "../redux/slices/delivery-slice";
 
 const TargetSuspendor = () => {
     const [targetId, setTargetId] = useState(undefined);
@@ -72,6 +73,16 @@ const TargetSuspendor = () => {
                 suspensionsListTargetType === "all"
             ) {
                 dispatch(addSuspension(data.suspension));
+            }
+
+            // if a delivery personnel was suspended, update them
+            if (targetType === "user") {
+                dispatch(
+                    updateDeliveryPersonnel({
+                        id: data.suspension.user.id,
+                        updateInfo: { suspension: { id: data.suspension.id } },
+                    })
+                );
             }
 
             dispatch(

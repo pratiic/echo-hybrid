@@ -11,17 +11,13 @@ const Home = () => {
 
     useEffect(() => {
         if (authUser) {
-            if (!authUser?.isDeliveryPersonnel) {
-                router.push("/products");
-            }
-
-            if (authUser?.isDeliveryPersonnel) {
-                router.push("/delivery");
-            }
-
-            if (authUser?.isAdmin) {
-                router.push("/statistics");
-            }
+            router.push(
+                authUser?.isDeliveryPersonnel
+                    ? "/delivery"
+                    : authUser?.isAdmin
+                    ? "/statistics"
+                    : "/products"
+            );
         }
     }, [authUser]);
 

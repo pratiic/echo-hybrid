@@ -24,7 +24,12 @@ export const startChat = async (request, response, next) => {
         });
 
         if (!chatUser) {
-            return next(new HttpError("user not found", 404));
+            return next(
+                new HttpError(
+                    "the user you are trying to chat with was not found, they may have been deleted",
+                    404
+                )
+            );
         }
 
         // check to see if a chat with the provided user already exists
@@ -118,11 +123,14 @@ export const getChats = async (request, response, next) => {
         });
 
         response.json({
-            chats: chats.map((chat) => {
-                return getChatData(chat);
-            }),
+            chats: chats
+                .filter((chat) => chat.users.length === 2)
+                .map((chat) => {
+                    return getChatData(chat);
+                }),
         });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

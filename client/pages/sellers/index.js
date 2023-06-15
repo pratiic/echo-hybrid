@@ -57,7 +57,10 @@ const Sellers = () => {
         {
             name: "location",
             icon: <LocationMarkerIcon className="icon-no-bg" />,
-            disabled: !authUser?.address, // disable if the user has not added their address
+            disabled:
+                !authUser?.address ||
+                authUser?.isAdmin ||
+                authUser?.isDeliveryPersonnel, // disable if the user has not added their address
         },
     ];
     const locationOptions = [

@@ -1,4 +1,7 @@
-// shows buttons to increment and decrement the quantity of a product or different variations
+// buttons to increment and decrement the quantity of a product or different variations
+
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const CountController = ({
     count = 1,
@@ -8,6 +11,14 @@ const CountController = ({
     setZero,
     userCanBuy,
 }) => {
+    const [isRestricted, setIsRestricted] = useState(false);
+
+    const { authUser } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        setIsRestricted(authUser?.isDeliveryPersonnel || authUser?.isAdmin);
+    }, [authUser]);
+
     const handleCountControl = (action) => {
         let newCount;
 
@@ -23,7 +34,9 @@ const CountController = ({
     return (
         <div className="flex items-center space-x-5">
             <Controller
-                disabled={count === min || setZero || !userCanBuy}
+                disabled={
+                    count === min || setZero || !userCanBuy || isRestricted
+                }
                 onClick={() => handleCountControl("decrement")}
             >
                 -
@@ -32,7 +45,9 @@ const CountController = ({
                 {setZero ? 0 : count}
             </span>
             <Controller
-                disabled={count === max || setZero || !userCanBuy}
+                disabled={
+                    count === max || setZero || !userCanBuy || isRestricted
+                }
                 onClick={() => handleCountControl("increment")}
             >
                 +

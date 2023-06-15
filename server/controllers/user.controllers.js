@@ -142,13 +142,13 @@ export const getUserDetails = async (request, response, next) => {
     }
 };
 
-// for testing purposes only
-
 export const getSelfDetails = async (request, response, next) => {
     const user = request.user;
 
     response.json({ user });
 };
+
+// for testing purposes only
 
 export const deleteUser = async (request, response, next) => {
     const userId = parseInt(request.params.userId) || -1;

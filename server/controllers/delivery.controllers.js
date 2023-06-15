@@ -2,8 +2,10 @@ import { HttpError } from "../models/http-error.models.js";
 import prisma from "../lib/prisma.lib.js";
 import {
     deliveryInclusionFields,
+    extraUserFields,
     genericUserFields,
 } from "../lib/data-source.lib.js";
+import { sendEmail } from "../lib/email.lib.js";
 
 export const getDeliveries = async (request, response, next) => {
     const user = request.user;
@@ -107,6 +109,105 @@ export const acknowledgeDeliveries = async (request, response, next) => {
                 isAcknowledged: true,
             },
         });
+
+        response.json({});
+    } catch (error) {
+        next(new HttpError());
+    }
+};
+
+export const getDeliveryPersonnel = async (request, response, next) => {
+    const searchQuery = request.query.query || "";
+
+    let whereObj = {
+        isDeliveryPersonnel: true,
+    };
+
+    if (searchQuery) {
+        const fields = ["fullName", "email"];
+
+        whereObj = {
+            ...whereObj,
+            OR: [
+                ...fields.map((field) => {
+                    return {
+                        [field]: {
+                            contains: searchQuery.trim(),
+                            mode: "insensitive",
+                        },
+                    };
+                }),
+                {
+                    id: {
+                        equals: parseInt(searchQuery.trim()) || -1,
+                    },
+                },
+            ],
+        };
+    }
+
+    try {
+        const personnel = await prisma.user.findMany({
+            where: whereObj,
+            select: {
+                ...genericUserFields,
+                address: true,
+                _count: {
+                    select: {
+                        deliveries: true,
+                    },
+                },
+                suspension: {
+                    select: {
+                        id: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+
+        response.json({ personnel });
+    } catch (error) {
+        console.log(error);
+        next(new HttpError());
+    }
+};
+
+export const deleteDeliveryPersonnel = async (request, response, next) => {
+    const personnelId = parseInt(request.params.personnelId) || -1;
+    const io = request.io;
+
+    try {
+        const personnel = await prisma.user.findUnique({
+            where: {
+                id: personnelId,
+            },
+            select: {
+                id: true,
+                email: true,
+            },
+        });
+
+        if (!personnel) {
+            return next(new HttpError("delivery personnel not found", 404));
+        }
+
+        // send email to the personnel
+        sendEmail(
+            personnel.email,
+            "account termination",
+            "your account on Echo has been terminated, you are no longer a part of the delivery team."
+        );
+
+        await prisma.user.delete({
+            where: {
+                id: personnelId,
+            },
+        });
+
+        io.emit("user-delete", personnelId);
 
         response.json({});
     } catch (error) {

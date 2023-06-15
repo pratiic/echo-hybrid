@@ -86,6 +86,7 @@ const BusinessRegistration = () => {
 
         dispatch(
             showConfirmationModal({
+                title: "business registration cancellation",
                 message:
                     "are you sure you want to cancel your business registration ?",
                 handler: async () => {

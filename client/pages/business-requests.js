@@ -1,14 +1,19 @@
 import Head from "next/head";
 import { useSelector } from "react-redux";
 
-import PageHeader from "../components/page-header";
-import ContentList from "../components/content-list";
 import { singularOrPluralCount } from "../lib/strings";
 
+import PageHeader from "../components/page-header";
+import ContentList from "../components/content-list";
+
 const BusinessRequests = () => {
-    const { requests, loading, error, totalCount } = useSelector(
-        (state) => state.businesses
-    );
+    const {
+        requests,
+        loading,
+        error,
+        totalCount,
+        addedRequestsCount,
+    } = useSelector((state) => state.businesses);
 
     return (
         <section>
@@ -20,9 +25,20 @@ const BusinessRequests = () => {
 
             {requests.length > 0 && (
                 <p className="history-message -mt-2">
-                    There {singularOrPluralCount(totalCount, "is", "are")}{" "}
-                    <span className="font-semibold">{totalCount}</span>{" "}
-                    {singularOrPluralCount(totalCount, "request", "requests")}{" "}
+                    There{" "}
+                    {singularOrPluralCount(
+                        totalCount + addedRequestsCount,
+                        "is",
+                        "are"
+                    )}{" "}
+                    <span className="font-semibold">
+                        {totalCount + addedRequestsCount}
+                    </span>{" "}
+                    {singularOrPluralCount(
+                        totalCount + addedRequestsCount,
+                        "request",
+                        "requests"
+                    )}{" "}
                     for business registration
                 </p>
             )}

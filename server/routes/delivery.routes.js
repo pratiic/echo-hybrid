@@ -5,10 +5,12 @@ import { signUserUp } from "../controllers/auth.controllers.js";
 import {
     acknowledgeDeliveries,
     deleteDelivery,
+    deleteDeliveryPersonnel,
     getDeliveries,
+    getDeliveryPersonnel,
 } from "../controllers/delivery.controllers.js";
 
-export const deliveryRouter = () => {
+export const deliveryRouter = (io) => {
     const router = express.Router();
 
     router.post(
@@ -42,6 +44,25 @@ export const deliveryRouter = () => {
     );
 
     router.patch("/", auth, acknowledgeDeliveries);
+
+    router.get(
+        "/personnel",
+        (request, ...op) => {
+            request.validateAdmin = true;
+            auth(request, ...op);
+        },
+        getDeliveryPersonnel
+    );
+
+    router.delete(
+        "/personnel/:personnelId",
+        (request, ...op) => {
+            request.io = io;
+            request.validateAdmin = true;
+            auth(request, ...op);
+        },
+        deleteDeliveryPersonnel
+    );
 
     return router;
 };

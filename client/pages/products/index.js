@@ -34,6 +34,7 @@ const Products = () => {
         totalCount,
         PAGE_SIZE,
     } = useSelector((state) => state.products);
+    const { authUser } = useSelector((state) => state.auth);
 
     const router = useRouter();
     const dispatch = useDispatch();
@@ -103,7 +104,9 @@ const Products = () => {
                             </span>
                         }
                         isHeadingComponent={true}
-                        hasAddBtn
+                        hasAddBtn={
+                            !authUser?.isAdmin && !authUser?.isDeliveryPersonnel
+                        }
                         addToolname="add product"
                         onAddClick={() => router.push("/set-product")}
                     >
