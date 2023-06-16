@@ -8,6 +8,7 @@ import { capitalizeFirstLetter } from "../lib/strings";
 import PageHeader from "../components/page-header";
 import OptionsToggle from "../components/options-toggle";
 import TransactionsList from "../components/transactions-list";
+import TransactionsFilter from "../components/transactions-filter";
 
 const Transactions = () => {
   const [options, setOptions] = useState([
@@ -68,7 +69,15 @@ const Transactions = () => {
         </title>
       </Head>
 
-      <PageHeader heading={getOptionMessage(true)} hasBackArrow></PageHeader>
+      <PageHeader heading={getOptionMessage(true)} hasBackArrow>
+        <TransactionsFilter
+          transactionType={
+            activeOption === "purchase history" ? "user" : "seller"
+          }
+          setDateLabels={setDateLabels}
+          setDisplayOption={setDisplayOption}
+        />
+      </PageHeader>
 
       <div>
         <OptionsToggle

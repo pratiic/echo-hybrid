@@ -4,11 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import useSocket from "../hooks/use-socket";
 import {
   addTransaction,
+  resetPageSize,
   setError,
   setLoading,
   setLoadingMore,
   setNoMoreData,
   setPage,
+  setTotalCount,
+  setTransactions,
 } from "../redux/slices/transactions-slice";
 import { deleteOrder } from "../redux/slices/orders-slice";
 import { setNeedToFetch } from "../redux/slices/transactions-slice";
@@ -35,45 +38,45 @@ const Transaction = () => {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    socket.on("new-transaction", (data) => {
-      // console.log(data.transaction);
-      const transaction = data.transaction;
+  // useEffect(() => {
+  //   socket.on("new-transaction", (data) => {
+  //     // console.log(data.transaction);
+  //     const transaction = data.transaction;
 
-      const {
-        order: {
-          id,
-          originId,
-          store: {
-            user: { id: ownerId },
-          },
-        },
-      } = transaction;
+  //     const {
+  //       order: {
+  //         id,
+  //         originId,
+  //         store: {
+  //           user: { id: ownerId },
+  //         },
+  //       },
+  //     } = transaction;
 
-      if (authUser?.id === originId) {
-        dispatch(
-          addTransaction({
-            transaction,
-            type: "user",
-            playSound: true,
-          })
-        );
+  //     if (authUser?.id === originId) {
+  //       dispatch(
+  //         addTransaction({
+  //           transaction,
+  //           type: "user",
+  //           playSound: true,
+  //         })
+  //       );
 
-        dispatch(deleteOrder({ type: "user", id }));
-      }
+  //       dispatch(deleteOrder({ type: "user", id }));
+  //     }
 
-      if (authUser?.id === ownerId) {
-        dispatch(
-          addTransaction({
-            transaction,
-            type: "seller",
-            playSound: true,
-          })
-        );
-        dispatch(deleteOrder({ type: "seller", id }));
-      }
-    });
-  }, [authUser]);
+  //     if (authUser?.id === ownerId) {
+  //       dispatch(
+  //         addTransaction({
+  //           transaction,
+  //           type: "seller",
+  //           playSound: true,
+  //         })
+  //       );
+  //       dispatch(deleteOrder({ type: "seller", id }));
+  //     }
+  //   });
+  // }, [authUser]);
 
   useEffect(() => {
     dispatch(setNeedToFetch({ needToFetch: true, type: "user" }));
@@ -111,9 +114,9 @@ const Transaction = () => {
 
     let createdMonth,
       createdYear,
-      url = `transactions/type=${type}&query=${query}&page=${currentPage}`;
+      url = `transactions/?type=${type}&query=${query}&page=${currentPage}`;
 
-    console.log(displayPeriod);
+    // console.log(displayPeriod);
 
     if (displayPeriod !== "all") {
       displayPeriod = displayPeriod.split(", ");
@@ -132,8 +135,28 @@ const Transaction = () => {
 
     try {
       const data = await fetcher(url);
-
       console.log(data);
+
+      if (currentPage === 1) {
+        dispatch(setTransactions({ transactions: data.transactions, type }));
+      } else {
+        dispatch(
+          setTransactions({
+            transactions: [
+              ...(type === "user" ? userTransactions : sellerTransactions),
+              ...data.transactions,
+            ],
+            type,
+          })
+        );
+      }
+
+      if (data.transactions.legth < PAGE_SIZE[type]) {
+        dispatch(setNoMoreData({ noMoreData: true, type }));
+      }
+
+      dispatch(setTotalCount({ count: data.totalCount, type }));
+      dispatch(resetPageSize());
     } catch (error) {
       dispatch(setError({ error: error.message, type }));
     } finally {
