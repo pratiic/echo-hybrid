@@ -20,28 +20,30 @@ import ordersReducer from "./slices/orders-slice";
 import deliveryReducer from "./slices/delivery-slice";
 import businessesReducer from "./slices/businesses-slice";
 import reportsReducer from "./slices/reports-slice";
+import transactionsReducer from "./slices/transactions-slice";
 
 export const store = configureStore({
-    reducer: {
-        auth: authReducer,
-        theme: themeReducer,
-        sidebar: sidebarReducer,
-        files: filesReducer,
-        categories: categoriesReducer,
-        modal: modalReducer,
-        alerts: alertsReducer,
-        products: productsReducer,
-        gallery: galleryReducer,
-        filter: filterReducer,
-        comments: commentsReducer,
-        cart: cartReducer,
-        notifications: notificationsReducer,
-        chat: chatReducer,
-        sellers: sellersReducer,
-        orders: ordersReducer,
-        delivery: deliveryReducer,
-        businesses: businessesReducer,
-        reports: reportsReducer,
-    },
-    middleware: [logger],
+  reducer: {
+    auth: authReducer,
+    theme: themeReducer,
+    sidebar: sidebarReducer,
+    files: filesReducer,
+    categories: categoriesReducer,
+    modal: modalReducer,
+    alerts: alertsReducer,
+    products: productsReducer,
+    gallery: galleryReducer,
+    filter: filterReducer,
+    comments: commentsReducer,
+    cart: cartReducer,
+    notifications: notificationsReducer,
+    chat: chatReducer,
+    sellers: sellersReducer,
+    orders: ordersReducer,
+    delivery: deliveryReducer,
+    businesses: businessesReducer,
+    reports: reportsReducer,
+    transactions: transactionsReducer,
+  },
+  middleware: [logger],
 });
