@@ -53,10 +53,6 @@ const Suspensions = () => {
         }
     }, [needToFetch]);
 
-    useEffect(() => {
-        dispatch(setSuspensionsProp({ prop: "needToFetch", value: true }));
-    }, [targetType, query]);
-
     const fetchSuspensions = async () => {
         if (loading) {
             return;

@@ -11,7 +11,7 @@ import Sidebar from "./sidebar";
 import Modal from "./modal";
 import AlertsContainer from "./alerts-container";
 import PopupGallery from "./popup-gallery";
-import Products from "../cache/products";
+import Product from "../cache/product";
 import Notification from "../real-time/notification";
 import Rating from "../real-time/rating";
 import Chat from "../real-time/chat";
@@ -21,6 +21,8 @@ import Business from "../real-time/business";
 import Category from "../real-time/category";
 import Report from "../real-time/report";
 import Transaction from "../real-time/transaction";
+import Suspension from "../cache/suspension";
+import DeliveryPersonnel from "../cache/delivery-personnel";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -135,19 +137,28 @@ const Layout = ({ children }) => {
 
                 {authUser?.isVerified && (
                     <>
-                        {/* fake components for real time  */}
-                        <Notification />
-                        {!authUser?.isDeliveryPersonnel && <Rating />}
-                        <Chat />
-                        <Order />
-                        <Transaction />
+                        {/* fake components for real time and to preserve cache  */}
+                        {!authUser?.isAdmin && (
+                            <React.Fragment>
+                                <Notification />
+                                <Order />
+                            </React.Fragment>
+                        )}
+                        {!authUser?.isAdmin &&
+                            !authUser?.isDeliveryPersonnel && <Transaction />}
                         {authUser?.isDeliveryPersonnel && <Delivery />}
-                        <Business />
+                        {!authUser?.isDeliveryPersonnel && <Business />}
+                        {authUser?.isAdmin && (
+                            <React.Fragment>
+                                <Report />
+                                <Suspension />
+                                <DeliveryPersonnel />
+                            </React.Fragment>
+                        )}
+                        <Rating />
+                        <Chat />
                         <Category />
-                        {authUser?.isAdmin && <Report />}
-
-                        {/* fake components to preserve cache */}
-                        <Products />
+                        <Product />
                     </>
                 )}
 

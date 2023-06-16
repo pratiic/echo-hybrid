@@ -17,6 +17,7 @@ import {
 import { fetcher } from "../lib/fetcher";
 import { deleteCategoryRequest } from "../redux/slices/categories-slice";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
+import { useRouter } from "next/router";
 
 import IconInfo from "./icon-info";
 import Icon from "./icon";
@@ -27,6 +28,7 @@ const CategoryRequest = ({ id, name, user, createdAt }) => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const toggleDropdown = (event) => {
         event.stopPropagation();
@@ -76,6 +78,10 @@ const CategoryRequest = ({ id, name, user, createdAt }) => {
         );
     };
 
+    const handleChatClick = () => {
+        router.push(`/chats/${user?.id}`);
+    };
+
     return (
         <div className="dark-light border border-faint rounded px-3 pt-2 pb-5 relative">
             {/* category name */}
@@ -95,7 +101,7 @@ const CategoryRequest = ({ id, name, user, createdAt }) => {
 
             <div className="absolute -bottom-1 right-0">
                 <Icon toolName="options" onClick={toggleDropdown}>
-                    <MenuAlt4Icon className="icon icon-small" />
+                    <MenuAlt4Icon className="icon" />
                 </Icon>
 
                 <Dropdown show={showDropdown} toggleDropdown={toggleDropdown}>
@@ -110,6 +116,9 @@ const CategoryRequest = ({ id, name, user, createdAt }) => {
                         onClick={() => controlCategoryRequest("reject")}
                     >
                         reject request
+                    </DropdownItem>
+                    <DropdownItem action="chat" onClick={handleChatClick}>
+                        Chat with {user?.firstName}
                     </DropdownItem>
                 </Dropdown>
             </div>

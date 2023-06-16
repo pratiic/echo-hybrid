@@ -10,7 +10,6 @@ const chatSlice = createSlice({
         loadingChats: false,
         chatError: "",
         deleteMode: false,
-        soundCounter: 0,
     },
     reducers: {
         setChats: (state, action) => {

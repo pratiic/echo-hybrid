@@ -36,7 +36,6 @@ const Transaction = () => {
     } = useSelector((state) => state.transactions);
 
     const socket = useSocket();
-
     const dispatch = useDispatch();
 
     // useEffect(() => {
@@ -81,21 +80,19 @@ const Transaction = () => {
 
     useEffect(() => {
         dispatch(setNeedToFetch({ needToFetch: true, type: "user" }));
-    }, [userPage, userDisplayPeriod]);
+    }, [userPage]);
 
     useEffect(() => {
         dispatch(setNeedToFetch({ needToFetch: true, type: "seller" }));
-    }, [sellerPage, sellerDisplayPeriod]);
+    }, [sellerPage]);
 
     useEffect(() => {
         dispatch(setPage({ page: 1, type: "user" }));
-
         dispatch(setNeedToFetch({ needToFetch: true, type: "user" }));
     }, [userQuery, userDisplayPeriod]);
 
     useEffect(() => {
         dispatch(setPage({ page: 1, type: "seller" }));
-
         dispatch(setNeedToFetch({ needToFetch: true, type: "seller" }));
     }, [sellerQuery, sellerDisplayPeriod]);
 
@@ -137,7 +134,6 @@ const Transaction = () => {
         dispatch(setNoMoreData({ type, noMoreData: false }));
 
         try {
-            console.log(url);
             const data = await fetcher(url);
 
             setTimeout(() => {

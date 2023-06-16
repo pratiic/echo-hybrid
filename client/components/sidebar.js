@@ -174,7 +174,7 @@ const Sidebar = () => {
             linkTo: "/delivery-personnel",
             icon: <MdOutlineDeliveryDining className="icon-sidebar" />,
         },
-        ...commonLinks,
+        ...commonLinks.filter((link) => link.name !== "notifications"),
     ];
 
     useEffect(() => {

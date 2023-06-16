@@ -15,7 +15,6 @@ import {
     updateOrder,
 } from "../redux/slices/orders-slice";
 import { updateDelivery } from "../redux/slices/delivery-slice";
-// import useAudio from "../hooks/use-audio-realtime";
 import { fetcher } from "../lib/fetcher";
 import useSocket from "../hooks/use-socket";
 
@@ -29,13 +28,14 @@ const Order = () => {
         userQuery,
         sellerQuery,
         addedOrdersCount,
+        loading,
+        loadingMore,
         PAGE_SIZE,
     } = useSelector((state) => state.orders);
 
     const socket = useSocket();
     const dispatch = useDispatch();
     const { needToFetch, soundCounter } = useSelector((state) => state.orders);
-    // const [play] = useAudio("order", soundCounter);
 
     useEffect(() => {
         socket.on("order", (order) => {
@@ -119,8 +119,12 @@ const Order = () => {
     }, [needToFetch, userPage, sellerPage]);
 
     const getOrders = async (type) => {
-        if (authUser?.isDeliveryPersonnel || authUser?.isAdmin) {
-            // delivery personnel and admin have no need for orders
+        if (authUser?.isDeliveryPersonnel) {
+            // delivery personnel have no need for orders
+            return;
+        }
+
+        if (loading[type] || loadingMore[type]) {
             return;
         }
 

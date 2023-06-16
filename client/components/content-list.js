@@ -47,13 +47,14 @@ const ContentList = ({
                 className={`${(type === "product" ||
                     type === "seller" ||
                     type === "category-request" ||
-                    type === "report") &&
+                    type === "report" ||
+                    type === "suspension") &&
                     "grid"} ${
                     type === "product" || type === "seller"
                         ? "grid-cols-list-xs 600:grid-cols-list"
                         : type === "category-request"
                         ? "grid-cols-list-request"
-                        : type === "report"
+                        : type === "report" || type === "suspension"
                         ? "grid-cols-list-report"
                         : ""
                 } gap-2 600:gap-5 750:gap-7 mb-5`}

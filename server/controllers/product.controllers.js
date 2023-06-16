@@ -231,7 +231,10 @@ export const getProducts = async (request, response, next) => {
         primaryFilter.storeId = storeId;
     }
 
-    if (!storeId || (storeId && storeId !== user.store?.id && !user.isAdmin)) {
+    if (
+        (!storeId && !user.isAdmin) ||
+        (storeId && storeId !== user.store?.id && !user.isAdmin)
+    ) {
         // if stock not set or if a second hand product has been sold -> only show inside the store of the requesting user
         primaryFilter = {
             ...primaryFilter,

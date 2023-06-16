@@ -201,7 +201,7 @@ function getTypeFilter(type, user) {
         };
     } else {
         typeFilter = {
-            storeId: user.store.id,
+            storeId: user.store?.id,
         };
     }
 

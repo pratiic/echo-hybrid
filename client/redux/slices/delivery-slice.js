@@ -49,8 +49,8 @@ export const authSlice = createSlice({
             loading: false,
             error: "",
             needToFetch: true,
+            query: "",
         },
-        personnelQuery: "",
     },
     reducers: {
         setDeliveries: (state, action) => {

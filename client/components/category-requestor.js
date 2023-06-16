@@ -15,7 +15,9 @@ const CategoryRequestor = () => {
 
     const dispatch = useDispatch();
 
-    const requestCategory = async () => {
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
+
         setRequesting(true);
         setErrorMsg("");
 
@@ -32,7 +34,7 @@ const CategoryRequestor = () => {
     };
 
     return (
-        <div>
+        <form onSubmit={handleFormSubmit}>
             <h3 className="text-2xl font-semibold black-white mb-2">
                 Request new category
             </h3>
@@ -49,10 +51,10 @@ const CategoryRequestor = () => {
                 onChange={setCategoryName}
             />
 
-            <Button loading={requesting} onClick={requestCategory}>
+            <Button loading={requesting}>
                 {requesting ? "requesting" : "request"} category
             </Button>
-        </div>
+        </form>
     );
 };
 

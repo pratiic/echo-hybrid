@@ -14,8 +14,7 @@ import GenericSearch from "../components/generic-search";
 
 const DeliveryPersonnel = () => {
     const {
-        personnel: { list: personnelList, loading, error, needToFetch },
-        personnelQuery,
+        personnel: { list: personnelList, loading, error, needToFetch, query },
     } = useSelector((state) => state.delivery);
 
     const dispatch = useDispatch();
@@ -26,23 +25,19 @@ const DeliveryPersonnel = () => {
         }
     }, [needToFetch]);
 
-    useEffect(() => {
-        if (!needToFetch) {
-            setProp("needToFetch", true);
-        }
-    }, [personnelQuery]);
-
     const setProp = (prop, value) => {
         dispatch(setDeliveryPersonnelProp({ prop, value }));
     };
 
     const fetchDeliveryPersonnel = async () => {
+        if (loading) {
+            return;
+        }
+
         setProp("loading", true);
 
         try {
-            const data = await fetcher(
-                `delivery/personnel/?query=${personnelQuery}`
-            );
+            const data = await fetcher(`delivery/personnel/?query=${query}`);
 
             setProp(
                 "list",
@@ -65,7 +60,7 @@ const DeliveryPersonnel = () => {
     };
 
     const renderCountMessage = () => {
-        if (personnelQuery) {
+        if (query) {
             return (
                 <p className="history-message -mt-2">
                     <span className="font-semibold">
@@ -90,7 +85,7 @@ const DeliveryPersonnel = () => {
     };
 
     const renderGenericSearch = () => {
-        if (personnelList.length === 0 && !personnelQuery) {
+        if (personnelList.length === 0 && !query) {
             return;
         }
 
@@ -99,10 +94,8 @@ const DeliveryPersonnel = () => {
                 <GenericSearch
                     show={true}
                     placeholder="Search id, name or email..."
-                    onSubmit={(personnelQuery) =>
-                        setProp("personnelQuery", personnelQuery)
-                    }
-                    clearSearch={() => setProp("personnelQuery", "")}
+                    onSubmit={(query) => setProp("query", query)}
+                    clearSearch={() => setProp("query", "")}
                 />
             </div>
         );

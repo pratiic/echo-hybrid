@@ -13,7 +13,7 @@ import {
 } from "../redux/slices/products-slice";
 import { fetcher } from "../lib/fetcher";
 
-const Products = () => {
+const Product = () => {
     const {
         activeFilter,
         locationFilter,
@@ -92,4 +92,4 @@ const Products = () => {
     return <></>;
 };
 
-export default Products;
+export default Product;

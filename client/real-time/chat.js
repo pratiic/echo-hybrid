@@ -17,10 +17,8 @@ const Chat = () => {
     const socket = useSocket();
 
     useEffect(() => {
-        if (authUser) {
-            fetchChats();
-        }
-    }, [authUser]);
+        fetchChats();
+    }, []);
 
     useEffect(() => {
         socket.on("new-message", (msgInfo) => {
