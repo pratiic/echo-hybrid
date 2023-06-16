@@ -25,10 +25,17 @@ export const categoryRouter = (io) => {
 
     router.get("/", getCategories);
 
-    router.post("/requests", auth, (request, ...op) => {
-        request.io = io;
-        requestCategory(request, ...op);
-    });
+    router.post(
+        "/requests",
+        (request, ...op) => {
+            request.restrictStaff = true;
+            auth(request, ...op);
+        },
+        (request, ...op) => {
+            request.io = io;
+            requestCategory(request, ...op);
+        }
+    );
 
     router.patch(
         "/requests",

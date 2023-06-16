@@ -60,9 +60,6 @@ export const getTransactions = async (request, response, next) => {
         ...monthYearFilter,
         ...searchFilter,
         isDeleted: false,
-        NOT: {
-            deletedFor: user.id,
-        },
     };
 
     try {
@@ -82,7 +79,9 @@ export const getTransactions = async (request, response, next) => {
         ]);
 
         response.json({
-            transactions,
+            transactions: transactions.filter(
+                (transaction) => transaction.deletedFor !== user.id
+            ),
             totalCount,
         });
     } catch (error) {

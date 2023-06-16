@@ -18,6 +18,7 @@ export const orderRouter = (io) => {
     router.post(
         "/:productId",
         (request, ...op) => {
+            request.restrictStaff = true;
             request.select = {
                 cart: {
                     select: {

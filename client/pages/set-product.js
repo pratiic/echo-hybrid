@@ -184,6 +184,10 @@ const SetProduct = () => {
             );
             router.push(`/products/${data.product.id}`);
         } catch (error) {
+            if (error.statusCode === 401) {
+                return dispatch(setErrorAlert(error.message));
+            }
+
             dispatch(setErrorAlert("view the fields for error"));
 
             if (

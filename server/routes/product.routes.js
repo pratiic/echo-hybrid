@@ -30,9 +30,15 @@ export const productRouter = (io) => {
                                 isVerified: true,
                             },
                         },
+                        suspension: {
+                            select: {
+                                id: true,
+                            },
+                        },
                     },
                 },
             };
+            request.checkSellerSuspension = true;
             auth(request, response, next);
         },
         getUpload().array("images"),

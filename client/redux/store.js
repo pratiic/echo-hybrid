@@ -21,6 +21,7 @@ import deliveryReducer from "./slices/delivery-slice";
 import businessesReducer from "./slices/businesses-slice";
 import reportsReducer from "./slices/reports-slice";
 import suspensionsReducer from "./slices/suspensions-slice";
+import transactionsReducer from "./slices/transactions-slice";
 
 export const store = configureStore({
     reducer: {
@@ -44,6 +45,7 @@ export const store = configureStore({
         businesses: businessesReducer,
         reports: reportsReducer,
         suspensions: suspensionsReducer,
+        transactions: transactionsReducer,
     },
     middleware: [logger],
 });

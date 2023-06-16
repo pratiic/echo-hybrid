@@ -6,13 +6,7 @@ import prisma from "../lib/prisma.lib.js";
 const auth = async (request, response, next) => {
     const bearerHeader = request.header("Authorization");
     const errorMsg = "a valid token is required";
-    let checkVerified = true;
-
-    // no verification required if url is related to accounts or users
     const url = request.originalUrl;
-    if (url.includes("accounts") || url.includes("users")) {
-        checkVerified = false;
-    }
 
     if (!bearerHeader) {
         return next(new HttpError(errorMsg, 401));
@@ -35,12 +29,36 @@ const auth = async (request, response, next) => {
                     isVerified: true,
                     isAdmin: true,
                     isDeliveryPersonnel: true,
+                    suspension: {
+                        select: {
+                            id: true,
+                            cause: true,
+                            createdAt: true,
+                        },
+                    },
                     ...(request.select || {}), // fields within user to select
                 },
             });
 
             if (!requestingUser) {
                 return next(new HttpError(404, "user not found"));
+            }
+
+            if (
+                !requestingUser.isVerified &&
+                !(url.includes("accounts") || url.includes("users"))
+            ) {
+                // unverified users can only access their account and profile
+                return next(
+                    new HttpError("your account has not been verified yet", 401)
+                );
+            }
+
+            if (requestingUser.suspension && !url.includes("users")) {
+                // suspended users can only access their profile
+                return next(
+                    new HttpError("your account is currently suspended", 401)
+                );
             }
 
             if (request.validateAdmin && !requestingUser.isAdmin) {
@@ -66,19 +84,27 @@ const auth = async (request, response, next) => {
                 );
             }
 
-            // if (!request.validateAdmin && requestingUser.isAdmin) {
-            //     // cannot be an admin
-            //     return next(
-            //         new HttpError(
-            //             "an admin is not allowed to perform this action",
-            //             401
-            //         )
-            //     );
-            // }
-
-            if (checkVerified && !requestingUser.isVerified) {
+            if (
+                request.checkSellerSuspension &&
+                requestingUser.store?.suspension
+            ) {
                 return next(
-                    new HttpError("your account has not been verified yet", 401)
+                    new HttpError(
+                        "your seller profile is currently suspended",
+                        401
+                    )
+                );
+            }
+
+            if (
+                request.restrictStaff &&
+                (requestingUser.isAdmin || requestingUser.isDeliveryPersonnel)
+            ) {
+                return next(
+                    new HttpError(
+                        "admin and delivery personnel are not allowed to perform this action",
+                        401
+                    )
                 );
             }
 

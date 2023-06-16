@@ -231,7 +231,7 @@ export const getProducts = async (request, response, next) => {
         primaryFilter.storeId = storeId;
     }
 
-    if (!storeId || (storeId && storeId !== user.store?.id)) {
+    if (!storeId || (storeId && storeId !== user.store?.id && !user.isAdmin)) {
         // if stock not set or if a second hand product has been sold -> only show inside the store of the requesting user
         primaryFilter = {
             ...primaryFilter,
@@ -351,6 +351,11 @@ export const getProductDetails = async (request, response, next) => {
                                 address: true,
                             },
                         },
+                        suspension: {
+                            select: {
+                                id: true,
+                            },
+                        },
                     },
                 },
                 variations: true,
@@ -381,11 +386,14 @@ export const updateProduct = async (request, response, next) => {
     const product = request.product;
     const updateInfo = request.body;
 
-    const errorMsg = validateProduct({
-        ...product,
-        category: product.categoryName,
-        ...updateInfo,
-    });
+    const errorMsg = validateProduct(
+        {
+            ...product,
+            category: product.categoryName,
+            ...updateInfo,
+        },
+        product.isSecondHand
+    );
 
     if (errorMsg) {
         return next(new HttpError(errorMsg, 400));

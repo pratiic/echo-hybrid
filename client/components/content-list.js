@@ -9,6 +9,7 @@ import DeliveryCard from "./delivery-card";
 import BusinessRequest from "./business-request";
 import CategoryRequest from "./category-request";
 import ReportCard from "./report-card";
+import TransactionCard from "./transaction-card";
 import SuspensionCard from "./suspension-card";
 import PersonnelCard from "./personnel-card";
 
@@ -46,14 +47,13 @@ const ContentList = ({
                 className={`${(type === "product" ||
                     type === "seller" ||
                     type === "category-request" ||
-                    type === "report" ||
-                    type === "suspension") &&
+                    type === "report") &&
                     "grid"} ${
                     type === "product" || type === "seller"
                         ? "grid-cols-list-xs 600:grid-cols-list"
                         : type === "category-request"
                         ? "grid-cols-list-request"
-                        : type === "report" || type === "suspension"
+                        : type === "report"
                         ? "grid-cols-list-report"
                         : ""
                 } gap-2 600:gap-5 750:gap-7 mb-5`}

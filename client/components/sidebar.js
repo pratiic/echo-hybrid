@@ -103,27 +103,23 @@ const Sidebar = () => {
         {
             name: "orders",
             linkTo: "/orders",
-            // linkTo: "/orders/?show=shop",
             icon: <ClipboardListIcon className="icon-sidebar" />,
             count: 0,
             activePath: "/orders",
         },
-        // {
-        //     name: "transactions",
-        //     linkTo: "/transactions/?show=user",
-
-        //     linkTo: "/transactions",
-        //     icon: <MdOutlineHistory className="icon-sidebar" />,
-        //     count: 0,
-        //     activePath: "/transactions",
-        // },
+        {
+            name: "transactions",
+            linkTo: "/transactions",
+            icon: <MdOutlineHistory className="icon-sidebar" />,
+            count: 0,
+            activePath: "/transactions",
+        },
         {
             name: "seller profile",
             icon: <UserCircleIcon className="icon-sidebar" />,
         },
         {
             name: "profile",
-            // linkTo: "/profile/?show=details",
             linkTo: "/profile",
             icon: <UserIcon className="icon-sidebar" />,
             activePath: "/profile",

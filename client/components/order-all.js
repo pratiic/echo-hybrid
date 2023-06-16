@@ -24,9 +24,7 @@ const GenericChild = ({ removeCartItems, cannotOrder, items }) => {
         <div className="max-w-[350px]">
             <h4 className="heading-generic-modal-thin">Order failed</h4>
             <p className="dark-light -mt-2 mb-3">
-                The requested quantity for items with following Ids are greater
-                than available or the associated product has been sold or
-                deleted.
+                The reason for the failure of each cart item is given below:
             </p>
 
             <div>
@@ -37,6 +35,12 @@ const GenericChild = ({ removeCartItems, cannotOrder, items }) => {
                                 # {orderInfo.id}
                             </span>
                             <span className="dark-light">
+                                {orderInfo.maxQuantity === -3 &&
+                                    "Seller has been suspended"}
+
+                                {orderInfo.maxQuantity === -2 &&
+                                    "Has been suspended"}
+
                                 {orderInfo.maxQuantity === -1 &&
                                     (orderInfo.isSecondHand
                                         ? "Has been sold or deleted"
@@ -58,7 +62,7 @@ const GenericChild = ({ removeCartItems, cannotOrder, items }) => {
                 })}
             </div>
 
-            {items.length > cannotOrder.length && (
+            {items.length >= cannotOrder.length && (
                 <div className="mt-3">
                     <span className="black-white">
                         Would you like to remove{" "}
@@ -229,7 +233,7 @@ const OrderAll = ({ items }) => {
     };
 
     return (
-        <Button type="primary" onClick={handleOrderAllClick}>
+        <Button type="primary" small onClick={handleOrderAllClick}>
             Order All
         </Button>
     );

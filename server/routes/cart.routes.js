@@ -11,11 +11,19 @@ import {
 
 export const router = express.Router();
 
-router.post("/", auth, createUserCart);
+router.post(
+    "/",
+    (request, ...op) => {
+        request.restrictStaff = true;
+        auth(request, ...op);
+    },
+    createUserCart
+);
 
 router.post(
     "/:productId",
     (request, response, next) => {
+        request.restrictStaff = true;
         request.select = {
             cart: {
                 select: {
@@ -31,6 +39,7 @@ router.post(
 router.get(
     "/",
     (request, response, next) => {
+        request.restrictStaff = true;
         request.select = {
             cart: {
                 select: {
@@ -46,6 +55,7 @@ router.get(
 router.delete(
     "/:itemId",
     (request, response, next) => {
+        request.restrictStaff = true;
         request.select = {
             cart: {
                 select: {
@@ -66,6 +76,7 @@ router.delete(
 router.get(
     "/checkout",
     (request, response, next) => {
+        request.restrictStaff = true;
         request.select = {
             cart: {
                 select: {
@@ -83,6 +94,21 @@ router.get(
                                             id: true,
                                             quantity: true,
                                             variants: true,
+                                        },
+                                    },
+                                    suspension: {
+                                        select: {
+                                            id: true,
+                                        },
+                                    },
+                                    store: {
+                                        select: {
+                                            id: true,
+                                            suspension: {
+                                                select: {
+                                                    id: true,
+                                                },
+                                            },
                                         },
                                     },
                                 },

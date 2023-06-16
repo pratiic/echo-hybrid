@@ -41,6 +41,11 @@ export const placeOrder = async (request, response, next) => {
                                 address: true,
                             },
                         },
+                        suspension: {
+                            select: {
+                                id: true,
+                            },
+                        },
                     },
                 },
                 stock: {
@@ -49,12 +54,34 @@ export const placeOrder = async (request, response, next) => {
                         quantity: true,
                     },
                 },
+                suspension: {
+                    select: {
+                        id: true,
+                    },
+                },
             },
         });
 
         if (!product || product.isDeleted) {
             return next(
                 new HttpError("product not found, may have been deleted", 404)
+            );
+        }
+
+        // cannot order a suspended product
+        if (product.suspension) {
+            return next(
+                new HttpError("this product is currently suspended", 400)
+            );
+        }
+
+        // cannot order from a suspended seller
+        if (product.store.suspension) {
+            return next(
+                new HttpError(
+                    "the seller of this product is currently suspended",
+                    400
+                )
             );
         }
 
@@ -240,7 +267,7 @@ export const getOrders = async (request, response, next) => {
     const user = request.user;
     const type = request.query.type; // user, seller or delivery
     const page = parseInt(request.query.page) || 1;
-    let skip = parseInt(request.query.skip);
+    let skip = parseInt(request.query.skip) || -1;
     const searchQuery = request.query.query || "";
     const PAGE_SIZE = 10;
 
@@ -369,7 +396,7 @@ export const controlOrder = async (request, response, next) => {
             return next(
                 new HttpError(
                     "you are unauthorized to perform this action",
-                    400
+                    401
                 )
             );
         }

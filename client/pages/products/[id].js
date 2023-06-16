@@ -25,6 +25,7 @@ const ProductPage = () => {
     const [isMyProduct, setIsMyProduct] = useState(false);
     const [notFound, setNotFound] = useState(false);
     const [isSuspended, setIsSuspended] = useState(false); // in case a product is suspended while in the details page
+    const [isSellerSuspended, setIsSellerSuspended] = useState(false);
 
     const { authUser } = useSelector((state) => state.auth);
     const { activeProduct } = useSelector((state) => state.products);
@@ -57,6 +58,10 @@ const ProductPage = () => {
         socket.on("product-suspension", (id) => {
             setIsSuspended(true);
         });
+    }, [activeProduct]);
+
+    useEffect(() => {
+        setIsSellerSuspended(activeProduct?.store?.suspension);
     }, [activeProduct]);
 
     const getProductInfo = async () => {
@@ -98,10 +103,20 @@ const ProductPage = () => {
         !isMyProduct
     ) {
         return (
-            <p className="status">
-                this product has been suspended and will be accessible once it
-                gets reinstated
-            </p>
+            <Human
+                name="suspended"
+                message="this product has been suspended and will be accessible once it
+                gets reinstated"
+            />
+        );
+    }
+
+    if (isSellerSuspended && !authUser?.isAdmin && !isMyProduct) {
+        return (
+            <Human
+                name="suspended"
+                message="the seller of this product has been suspended"
+            />
         );
     }
 

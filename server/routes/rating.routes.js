@@ -9,10 +9,17 @@ import {
 export const ratingRouter = (io) => {
     const router = express.Router();
 
-    router.post("/:targetType/:targetId", auth, (request, ...op) => {
-        request.io = io;
-        provideRating(request, ...op);
-    });
+    router.post(
+        "/:targetType/:targetId",
+        (request, ...op) => {
+            request.restrictStaff = true;
+            auth(request, ...op);
+        },
+        (request, ...op) => {
+            request.io = io;
+            provideRating(request, ...op);
+        }
+    );
 
     router.delete("/:ratingId", auth, (request, ...op) => {
         request.io = io;

@@ -306,7 +306,15 @@ export const checkOrderAbility = async (request, response, next) => {
         const { product, variant: itemVariant, quantity: itemQuantity } = item;
         let itemInfo = null;
 
-        if (product.isSecondHand) {
+        if (product.suspension) {
+            itemInfo = {
+                maxQuantity: -2,
+            };
+        } else if (product.store.suspension) {
+            itemInfo = {
+                maxQuantity: -3,
+            };
+        } else if (product.isSecondHand) {
             if (!product.storeId) {
                 // product has been sold or deleted
                 itemInfo = {

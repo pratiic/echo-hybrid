@@ -92,13 +92,13 @@ const ContentCard = ({
                     )}
 
                     {/* second hand products do not have a rating */}
-                    {type === "seller" ||
-                        (type === "product" && !isSecondHand && (
-                            <div className="flex items-center">
-                                <Rating rating={rating} onlyStars small />
-                                <span className="text-xs ml-1">{rating}/5</span>
-                            </div>
-                        ))}
+                    {(type === "seller" ||
+                        (type === "product" && !isSecondHand)) && (
+                        <div className="flex items-center">
+                            <Rating rating={rating} onlyStars small />
+                            <span className="text-xs ml-1">{rating}/5</span>
+                        </div>
+                    )}
 
                     {type === "seller" && (
                         // seller address

@@ -12,7 +12,10 @@ export const reviewRouter = (io) => {
 
     router.post(
         "/:targetType/:targetId",
-        auth,
+        (request, ...op) => {
+            request.restrictStaff = true;
+            auth(request, ...op);
+        },
         getUpload().single("image"),
         (request, ...op) => {
             request.io = io;

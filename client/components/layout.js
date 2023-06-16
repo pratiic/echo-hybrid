@@ -20,6 +20,7 @@ import Delivery from "../real-time/delivery";
 import Business from "../real-time/business";
 import Category from "../real-time/category";
 import Report from "../real-time/report";
+import Transaction from "../real-time/transaction";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -139,13 +140,14 @@ const Layout = ({ children }) => {
                         {!authUser?.isDeliveryPersonnel && <Rating />}
                         <Chat />
                         <Order />
+                        <Transaction />
                         {authUser?.isDeliveryPersonnel && <Delivery />}
                         <Business />
                         <Category />
                         {authUser?.isAdmin && <Report />}
 
                         {/* fake components to preserve cache */}
-                        {!authUser?.isDeliveryPersonnel && <Products />}
+                        <Products />
                     </>
                 )}
 

@@ -11,7 +11,14 @@ import {
 export const storeRouter = (io) => {
     const router = express.Router();
 
-    router.post("/", auth, registerStore);
+    router.post(
+        "/",
+        (request, ...op) => {
+            request.restrictStaff = true;
+            auth(request, ...op);
+        },
+        registerStore
+    );
 
     router.get("/:storeId", auth, getStoreDetails);
 

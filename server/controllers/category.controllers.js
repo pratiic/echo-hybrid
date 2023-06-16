@@ -55,6 +55,7 @@ export const getCategories = async (request, response, next) => {
 
         response.json({ categories });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

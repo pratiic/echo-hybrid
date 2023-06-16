@@ -148,10 +148,11 @@ const SellerPage = () => {
 
     if (storeDetails?.suspension && !authUser?.isAdmin && !isMyStore) {
         return (
-            <p className="status">
-                this seller has been suspended and will be accessible once they
-                get reinstated
-            </p>
+            <Human
+                name="suspended"
+                message="this seller has been suspended and will be accessible once they
+                get reinstated"
+            />
         );
     }
 

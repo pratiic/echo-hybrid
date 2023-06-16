@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PlusIcon } from "@heroicons/react/outline";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { capitalizeFirstLetter } from "../lib/strings";
 import { fetcher } from "../lib/fetcher";
@@ -19,10 +19,13 @@ const CategoriesPanel = ({
 }) => {
     const [categories, setCategories] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
+    const [isRestricted, setIsRestricted] = useState(false);
 
+    const { authUser } = useSelector((state) => state.auth);
+
+    const dispatch = useDispatch();
     const categoryStyle = `flex items-center rounded-2xl px-3 py-1 cursor-pointer transition-all duration-200`;
     const countStyle = `text-sm ml-[0.15rem] font-semibold`;
-    const dispatch = useDispatch();
 
     useEffect(() => {
         if (show) {
@@ -38,6 +41,10 @@ const CategoriesPanel = ({
 
         setTotalCount(count);
     }, [categories]);
+
+    useEffect(() => {
+        setIsRestricted(authUser?.isAdmin || authUser?.isDeliveryPersonnel);
+    }, [authUser]);
 
     const getCategories = async () => {
         try {
@@ -106,12 +113,14 @@ const CategoriesPanel = ({
                     );
                 })}
 
-                <Icon
-                    toolName="request category"
-                    onClick={handleCategoryRequest}
-                >
-                    <PlusIcon className="icon-small" />
-                </Icon>
+                {!isRestricted && (
+                    <Icon
+                        toolName="request category"
+                        onClick={handleCategoryRequest}
+                    >
+                        <PlusIcon className="icon-small" />
+                    </Icon>
+                )}
             </div>
         </div>
     );

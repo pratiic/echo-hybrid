@@ -6,7 +6,6 @@ import { provinceOptions, districtOptions } from "../lib/address";
 import { clearErrors, displayError } from "../lib/validation";
 import { fetcher } from "../lib/fetcher";
 import { updateAuthUser } from "../redux/slices/auth-slice";
-import { closeModal, showLoadingModal } from "../redux/slices/modal-slice";
 import { setAlert } from "../redux/slices/alerts-slice";
 
 import Form from "./form";
