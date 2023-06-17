@@ -12,9 +12,9 @@ import {
     setPage,
     setTotalCount,
     setTransactions,
+    setNeedToFetch,
 } from "../redux/slices/transactions-slice";
 import { deleteOrder } from "../redux/slices/orders-slice";
-import { setNeedToFetch } from "../redux/slices/transactions-slice";
 import { monthToNumberMap } from "../lib/date-time";
 import { fetcher } from "../lib/fetcher";
 
@@ -154,7 +154,7 @@ const Transaction = () => {
                 );
             }
 
-            if (data.transactions.legth < PAGE_SIZE[type]) {
+            if (data.transactions.length < PAGE_SIZE[type]) {
                 dispatch(setNoMoreData({ noMoreData: true, type }));
             }
 

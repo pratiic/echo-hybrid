@@ -11,9 +11,15 @@ import useSocket from "../hooks/use-socket";
 import { updateAuthUser } from "../redux/slices/auth-slice";
 
 const Business = () => {
-    const { requests, needToFetch, page } = useSelector(
-        (state) => state.businesses
-    );
+    const {
+        requests,
+        needToFetch,
+        loading,
+        loadingMore,
+        page,
+        addedRequestsCount,
+        PAGE_SIZE,
+    } = useSelector((state) => state.businesses);
     const { authUser } = useSelector((state) => state.auth);
 
     const dispatch = useDispatch();
@@ -24,6 +30,10 @@ const Business = () => {
             fetchBusinessRequests();
         }
     }, [needToFetch]);
+
+    useEffect(() => {
+        setProp("needToFetch", true);
+    }, [page]);
 
     useEffect(() => {
         socket.on("business-request", (business) => {
@@ -68,7 +78,7 @@ const Business = () => {
     };
 
     const fetchBusinessRequests = async () => {
-        if (!authUser?.isAdmin) {
+        if (!authUser?.isAdmin || loading || loadingMore) {
             // non-admin users do not need business registration requests
             return;
         }
@@ -76,12 +86,18 @@ const Business = () => {
         setProp(page === 1 ? "loading" : "loadingMore", true);
 
         try {
-            const data = await fetcher("businesses/requests");
+            const data = await fetcher(
+                `businesses/requests/?page=${page}&skip=${addedRequestsCount}`
+            );
 
             setProp(
                 "requests",
                 page === 1 ? data.requests : [...requests, ...data.requests]
             );
+
+            if (data.requests.length < PAGE_SIZE) {
+                setProp("noMoreData", true);
+            }
 
             if (page === 1) {
                 setProp("totalCount", data.totalCount);

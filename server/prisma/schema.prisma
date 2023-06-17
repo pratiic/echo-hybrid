@@ -110,12 +110,13 @@ model Store {
 }
 
 model Business {
-    id         Int     @id @default(autoincrement())
-    name       String
-    PAN        String?
-    regImage   String?
-    phone      String
-    isVerified Boolean @default(false)
+    id             Int     @id @default(autoincrement())
+    name           String
+    PAN            String?
+    regImage       String?
+    phone          String
+    isVerified     Boolean @default(false)
+    isAcknowledged Boolean @default(false)
 
     store   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
     storeId Int      @unique

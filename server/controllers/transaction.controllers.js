@@ -177,17 +177,15 @@ export const acknowledgeTransactions = async (request, response, next) => {
         await prisma.transaction.updateMany({
             where: {
                 order: getTypeFilter(type, user),
-                NOT: {
-                    completedBy: user.id,
-                },
             },
             data: {
-                acknowledged: true,
+                isAcknowledged: true,
             },
         });
 
-        response.json({ message: "transactions acknowledged" });
+        response.json({});
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

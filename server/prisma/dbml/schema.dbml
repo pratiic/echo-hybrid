@@ -94,6 +94,7 @@ Table Business {
   regImage String
   phone String [not null]
   isVerified Boolean [not null, default: false]
+  isAcknowledged Boolean [not null, default: false]
   store Store [not null]
   storeId Int [unique, not null]
   address Address

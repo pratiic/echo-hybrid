@@ -379,6 +379,13 @@ export const deleteBusiness = async (request, response, next) => {
 
 export const getBusinessRequests = async (request, response, next) => {
     // business registration requests for the admin to accept or reject
+    const page = request.query.page || 1;
+    let skip = parseInt(request.query.skip) || 0;
+    const PAGE_SIZE = 10;
+
+    if (skip < 0) {
+        skip = 0;
+    }
 
     const whereObj = {
         isVerified: false,
@@ -391,10 +398,12 @@ export const getBusinessRequests = async (request, response, next) => {
         const [requests, totalCount] = await Promise.all([
             prisma.business.findMany({
                 where: whereObj,
+                include: businessInclusionFields,
                 orderBy: {
                     updatedAt: "desc",
                 },
-                include: businessInclusionFields,
+                take: PAGE_SIZE,
+                skip: (page - 1) * PAGE_SIZE + skip,
             }),
             prisma.business.count({
                 where: whereObj,
@@ -403,6 +412,25 @@ export const getBusinessRequests = async (request, response, next) => {
 
         response.json({ requests, totalCount });
     } catch (error) {
+        console.log(error);
+        next(new HttpError());
+    }
+};
+
+export const acknowledgedBusinessRequests = async (request, response, next) => {
+    try {
+        await prisma.business.updateMany({
+            where: {
+                isAcknowledged: false,
+            },
+            data: {
+                isAcknowledged: true,
+            },
+        });
+
+        response.json({});
+    } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

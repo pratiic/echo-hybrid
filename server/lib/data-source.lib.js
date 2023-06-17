@@ -48,6 +48,7 @@ export const transactionSelectionFields = {
                     id: true,
                     name: true,
                     images: true,
+                    isSecondHand: true,
                 },
             },
             store: {
@@ -67,6 +68,7 @@ export const transactionSelectionFields = {
                             address: true,
                         },
                     },
+                    storeType: true,
                 },
             },
             origin: true,

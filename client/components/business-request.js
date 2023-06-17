@@ -143,7 +143,7 @@ const BusinessRequest = (props) => {
     };
 
     return (
-        <div className="border border-faint px-4 pt-2 pb-3 rounded w-fit relative">
+        <div className="border border-faint px-4 pt-2 pb-3 rounded w-fit relative mb-5">
             {/* business name */}
             <h3 className="text-lg font-semibold capitalize text-blue-four mb-1">
                 {props.name}
