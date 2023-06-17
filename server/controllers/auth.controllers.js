@@ -10,24 +10,18 @@ import { sendEmail } from "../lib/email.lib.js";
 import { extraUserFields } from "../lib/data-source.lib.js";
 
 export const signUserUp = async (request, response, next) => {
-    let { firstName, lastName, email, password } = request.body;
-    const isDeliveryPersonnel = request.isDeliveryPersonnel;
+    let { firstName, lastName, email, phone, password } = request.body;
+    const isDeliveryPersonnel = request.isDeliveryPersonnel; // admin is adding a new delivery personnel
 
     let errorMsg = validateUser(
-        { firstName, lastName, email, password },
-        "signup"
+        { firstName, lastName, email, phone, password },
+        "signup",
+        isDeliveryPersonnel
     );
 
     if (errorMsg) {
         return next(new HttpError(errorMsg, 400));
     }
-
-    [firstName, lastName, email, password] = trimValues(
-        firstName,
-        lastName,
-        email,
-        password
-    );
 
     // check to see if the email has already been taken
     try {
@@ -43,12 +37,21 @@ export const signUserUp = async (request, response, next) => {
         const salt = await bcrypt.genSalt(9);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        [firstName, lastName, email, phone, password] = trimValues(
+            firstName,
+            lastName,
+            email,
+            phone,
+            password
+        );
+
         // create a new user
         const createdUser = await prisma.user.create({
             data: {
                 firstName,
                 lastName,
                 email,
+                phone: isDeliveryPersonnel ? phone : undefined,
                 password: hashedPassword,
                 avatar: `https://avatars.dicebear.com/api/initials/${firstName[0]}${lastName[0]}.svg`,
                 isDeliveryPersonnel,

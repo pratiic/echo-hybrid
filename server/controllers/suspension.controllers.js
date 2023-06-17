@@ -144,10 +144,7 @@ export const controlSuspension = async (request, response, next) => {
         sendEmail(recipientEmail, subject, text);
 
         if (action === "suspend") {
-            io.emit(`${targetType}-suspension`, {
-                targetType,
-                targetId,
-            });
+            io.emit(`${targetType}-suspension`, targetId);
         }
 
         const res =

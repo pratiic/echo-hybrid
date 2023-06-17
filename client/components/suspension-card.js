@@ -19,6 +19,7 @@ import InfoUnit from "./info-unit";
 import Icon from "./icon";
 import Dropdown from "./dropdown";
 import DropdownItem from "./dropdown-item";
+import { getNotificationData } from "../lib/suspension";
 
 const SuspensionCard = ({
     id,
@@ -79,8 +80,6 @@ const SuspensionCard = ({
                             "POST"
                         );
 
-                        dispatch(deleteSuspension(id));
-
                         // if a delivery personnel was reinstated, update them
                         if (targetType === "user") {
                             dispatch(
@@ -98,6 +97,27 @@ const SuspensionCard = ({
                                 message: `the ${targetTypeMap[targetType]} has been reinstated`,
                             })
                         );
+
+                        if (targetType !== "user") {
+                            // send a notification to the affected user
+                            fetcher(
+                                "notifications",
+                                "POST",
+                                getNotificationData(
+                                    "reinstate",
+                                    targetType === "store"
+                                        ? "seller"
+                                        : targetType,
+                                    targetType === "product"
+                                        ? product?.id
+                                        : store?.id,
+                                    product,
+                                    store
+                                )
+                            );
+                        }
+
+                        dispatch(deleteSuspension(id));
                     } catch (error) {
                         dispatch(setErrorAlert(error.message));
                     } finally {

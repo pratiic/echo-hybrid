@@ -37,8 +37,13 @@ const Sidebar = () => {
     const { sellerOrders } = useSelector((state) => state.orders);
     const { completed } = useSelector((state) => state.delivery);
     const { chats } = useSelector((state) => state.chat);
-    const { requests } = useSelector((state) => state.categories);
+    const { requests: categoryRequests } = useSelector(
+        (state) => state.categories
+    );
     const { reports } = useSelector((state) => state.reports);
+    const { requests: businessRequests } = useSelector(
+        (state) => state.businesses
+    );
 
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [ordersCount, setOrdersCount] = useState(0);
@@ -48,6 +53,7 @@ const Sidebar = () => {
     const [completedDeliveriesCount, setCompletedDeliveriesCount] = useState(0);
     const [categoryRequestsCount, setCategoryRequestsCount] = useState(0);
     const [reportsCount, setReportsCount] = useState(0);
+    const [businessRequestsCount, setBusinessRequestsCount] = useState(0);
     const [activeLink, setActiveLink] = useState("");
     const [linksToRender, setLinksToRender] = useState([]);
 
@@ -240,14 +246,14 @@ const Sidebar = () => {
     useEffect(() => {
         let categoryRequestsCount = 0;
 
-        requests.list.forEach((request) => {
+        categoryRequests.list.forEach((request) => {
             if (!request.isAcknowledged) {
                 categoryRequestsCount++;
             }
         });
 
         setCategoryRequestsCount(categoryRequestsCount);
-    }, [requests.list]);
+    }, [categoryRequests.list]);
 
     useEffect(() => {
         let unacknowledgedCount = 0;
@@ -260,6 +266,10 @@ const Sidebar = () => {
 
         setReportsCount(unacknowledgedCount);
     }, [reports]);
+
+    useEffect(() => {
+        setBusinessRequestsCount(getUnacknowledgedCount(businessRequests));
+    }, [businessRequests]);
 
     useEffect(() => {
         for (let link of linksToRender) {
@@ -276,6 +286,18 @@ const Sidebar = () => {
             setActiveLink("");
         }
     }, [router, linksToRender]);
+
+    const getUnacknowledgedCount = (list) => {
+        let unacknowledgedCount = 0;
+
+        list.forEach((item) => {
+            if (!item.isAcknowledged) {
+                unacknowledgedCount++;
+            }
+        });
+
+        return unacknowledgedCount;
+    };
 
     const handleLinkClick = (name, link) => {
         if (showSidebar) {
@@ -351,6 +373,8 @@ const Sidebar = () => {
                                 ? categoryRequestsCount
                                 : link.name === "reports"
                                 ? reportsCount
+                                : link.name === "businesses"
+                                ? businessRequestsCount
                                 : 0
                         }
                         active={activeLink === link.name}

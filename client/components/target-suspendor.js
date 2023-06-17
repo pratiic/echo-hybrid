@@ -5,15 +5,13 @@ import { capitalizeFirstLetter } from "../lib/strings";
 import { fetcher } from "../lib/fetcher";
 import { setAlert } from "../redux/slices/alerts-slice";
 import { closeModal } from "../redux/slices/modal-slice";
-import {
-    addSuspension,
-    setSuspensionsProp,
-} from "../redux/slices/suspensions-slice";
+import { addSuspension } from "../redux/slices/suspensions-slice";
+import { updateDeliveryPersonnel } from "../redux/slices/delivery-slice";
 
 import OptionsToggle from "./options-toggle";
 import InputGroup from "./input-group";
 import Button from "./button";
-import { updateDeliveryPersonnel } from "../redux/slices/delivery-slice";
+import { getNotificationData } from "../lib/suspension";
 
 const TargetSuspendor = () => {
     const [targetId, setTargetId] = useState(undefined);
@@ -89,7 +87,23 @@ const TargetSuspendor = () => {
                 setAlert({ message: `the ${targetType} has been suspended` })
             );
             dispatch(closeModal());
+
+            if (targetType !== "user") {
+                // send a notification to the affected user
+                fetcher(
+                    "notifications",
+                    "POST",
+                    getNotificationData(
+                        "suspend",
+                        targetType,
+                        targetId,
+                        data.suspension.product,
+                        data.suspension.store
+                    )
+                );
+            }
         } catch (error) {
+            console.log(error);
             setError(error.message);
         } finally {
             setSuspending(false);

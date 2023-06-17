@@ -42,8 +42,8 @@ const transactionsSlice = createSlice({
             seller: 0,
         },
         PAGE_SIZE: {
-            user: 0,
-            seller: 0,
+            user: 10,
+            seller: 10,
         },
     },
     reducers: {

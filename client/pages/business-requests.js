@@ -1,7 +1,13 @@
+import { useEffect } from "react";
 import Head from "next/head";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import { singularOrPluralCount } from "../lib/strings";
+import {
+    acknowledgeRequests,
+    setBusinessesProp,
+} from "../redux/slices/businesses-slice";
+import { fetcher } from "../lib/fetcher";
 
 import PageHeader from "../components/page-header";
 import ContentList from "../components/content-list";
@@ -10,10 +16,32 @@ const BusinessRequests = () => {
     const {
         requests,
         loading,
+        loadingMore,
         error,
+        page,
         totalCount,
         addedRequestsCount,
+        noMoreData,
     } = useSelector((state) => state.businesses);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (requests.find((request) => !request.isAcknowledged)) {
+            acknowledgeBusinessRequests();
+        }
+    }, [requests]);
+
+    const incrementPageNumber = () => {
+        dispatch(setBusinessesProp({ prop: "page", value: page + 1 }));
+    };
+
+    const acknowledgeBusinessRequests = async () => {
+        try {
+            fetcher("businesses/requests/acknowledge", "PATCH");
+            dispatch(acknowledgeRequests());
+        } catch (error) {}
+    };
 
     return (
         <section>
@@ -50,6 +78,8 @@ const BusinessRequests = () => {
                 error={error}
                 emptyMsg="No business requests found"
                 human="no-items"
+                loadingMore={loadingMore}
+                incrementPageNumber={!noMoreData && incrementPageNumber}
             />
         </section>
     );

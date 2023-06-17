@@ -11,86 +11,83 @@ import TransactionsList from "../components/transactions-list";
 import TransactionsFilter from "../components/transactions-filter";
 
 const Transactions = () => {
-  const [options, setOptions] = useState([
-    { name: "purchase history" },
-    { name: "sales history" },
-  ]);
-  const [activeOption, setActiveOption] = useState("purchase history");
-  const [dateLabels, setDateLabels] = useState([]);
-  const [displayOption, setDisplayOption] = useState("");
+    const [options, setOptions] = useState([
+        { name: "purchase history" },
+        { name: "sales history" },
+    ]);
+    const [activeOption, setActiveOption] = useState("purchase history");
+    const [dateLabels, setDateLabels] = useState([]);
+    const [displayOption, setDisplayOption] = useState("");
 
-  const { userTransactions, sellerTransactions } = useSelector(
-    (state) => state.transactions
-  );
+    const { userTransactions, sellerTransactions } = useSelector(
+        (state) => state.transactions
+    );
 
-  const router = useRouter();
+    const router = useRouter();
 
-  useEffect(() => {
-    if (router.query?.show) {
-      const urlMap = {
-        user: "purchase history",
-        seller: "sales history",
-      };
+    useEffect(() => {
+        if (router.query?.show) {
+            const urlMap = {
+                user: "purchase history",
+                seller: "sales history",
+            };
 
-      setActiveOption(urlMap[router.query.show]);
-    } else {
-      router.push(`/transactions/?show=user`);
-    }
-  }, [router]);
+            setActiveOption(urlMap[router.query.show]);
+        } else {
+            router.push(`/transactions/?show=user`);
+        }
+    }, [router]);
 
-  const handleActiveOption = (option) => {
-    const urlMap = {
-      "purchase history": "user",
-      "sales history": "seller",
+    const handleActiveOption = (option) => {
+        const urlMap = {
+            "purchase history": "user",
+            "sales history": "seller",
+        };
+
+        router.push(`/transactions/?show=${urlMap[option]}`);
     };
 
-    router.push(`/transactions/?show=${urlMap[option]}`);
-  };
+    const getOptionMessage = (shortMsg) => {
+        if (shortMsg) {
+            return activeOption === "purchase history" ? "Purchase" : "Sales";
+        }
 
-  const getOptionMessage = (shortMsg) => {
-    if (shortMsg) {
-      return activeOption === "purchase history" ? "Purchase" : "Sales";
-    }
+        return activeOption === "purchase history"
+            ? "purchase history"
+            : "sales history";
+    };
 
-    return activeOption === "purchase history"
-      ? "purchase history"
-      : "sales history";
-  };
+    return (
+        <section>
+            <Head>
+                <title>{capitalizeFirstLetter(getOptionMessage())}</title>
+            </Head>
 
-  return (
-    <section>
-      <Head>
-        <title>
-          {capitalizeFirstLetter(getOptionMessage())} (
-          {activeOption === "purchase history"
-            ? userTransactions.length
-            : sellerTransactions.length}
-          )
-        </title>
-      </Head>
+            <PageHeader heading={getOptionMessage(true)} hasBackArrow>
+                <TransactionsFilter
+                    transactionType={
+                        activeOption === "purchase history" ? "user" : "seller"
+                    }
+                    setDateLabels={setDateLabels}
+                    setDisplayOption={setDisplayOption}
+                />
+            </PageHeader>
 
-      <PageHeader heading={getOptionMessage(true)} hasBackArrow>
-        <TransactionsFilter
-          transactionType={
-            activeOption === "purchase history" ? "user" : "seller"
-          }
-          setDateLabels={setDateLabels}
-          setDisplayOption={setDisplayOption}
-        />
-      </PageHeader>
+            <div className="mb-7 -mt-2">
+                <OptionsToggle
+                    options={options}
+                    active={activeOption}
+                    rounded={false}
+                    onClick={handleActiveOption}
+                />
+            </div>
 
-      <div className="mb-7 -mt-2">
-        <OptionsToggle
-          options={options}
-          active={activeOption}
-          rounded={false}
-          onClick={handleActiveOption}
-        />
-      </div>
-
-      <TransactionsList dateLabels={dateLabels} displayOption={displayOption} />
-    </section>
-  );
+            <TransactionsList
+                dateLabels={dateLabels}
+                displayOption={displayOption}
+            />
+        </section>
+    );
 };
 
 export default Transactions;

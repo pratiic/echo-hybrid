@@ -37,6 +37,14 @@ export const businessesSlice = createSlice({
                 state.addedRequestsCount += 1;
             }
         },
+        acknowledgeRequests: (state, action) => {
+            state.requests = state.requests.map((request) => {
+                return {
+                    ...request,
+                    isAcknowledged: true,
+                };
+            });
+        },
         deleteRequest: (state, action) => {
             if (
                 state.requests.find((request) => request.id === action.payload)
@@ -54,5 +62,6 @@ export default businessesSlice.reducer;
 export const {
     setBusinessesProp,
     addRequest,
+    acknowledgeRequests,
     deleteRequest,
 } = businessesSlice.actions;

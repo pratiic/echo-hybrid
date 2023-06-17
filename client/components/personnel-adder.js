@@ -13,6 +13,7 @@ const PersonnelAdder = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [repeatedPassword, setRepeatedPassword] = useState("");
     const [adding, setAdding] = useState(false);
@@ -35,6 +36,7 @@ const PersonnelAdder = () => {
                 firstName,
                 lastName,
                 email,
+                phone,
                 password,
             });
 
@@ -69,6 +71,13 @@ const PersonnelAdder = () => {
             />
 
             <InputGroup label="email" value={email} onChange={setEmail} />
+
+            <InputGroup
+                placeholder="10-digit phone"
+                label="phone"
+                value={phone}
+                onChange={setPhone}
+            />
 
             <InputGroup
                 label="password"

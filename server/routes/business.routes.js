@@ -2,6 +2,7 @@ import express from "express";
 
 import auth from "../middleware/auth.middleware.js";
 import {
+    acknowledgedBusinessRequests,
     controlBusinessRegistration,
     deleteBusiness,
     getBusinessDetails,
@@ -101,6 +102,15 @@ export const businessRouter = (io) => {
             validateBusiness(request, ...op);
         },
         deleteBusiness
+    );
+
+    router.patch(
+        "/requests/acknowledge",
+        (request, ...op) => {
+            request.validateAdmin = true;
+            auth(request, ...op);
+        },
+        acknowledgedBusinessRequests
     );
 
     return router;
