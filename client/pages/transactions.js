@@ -79,7 +79,7 @@ const Transactions = () => {
         />
       </PageHeader>
 
-      <div>
+      <div className="mb-7 -mt-2">
         <OptionsToggle
           options={options}
           active={activeOption}
