@@ -7,7 +7,7 @@ const auth = async (request, response, next) => {
     const bearerHeader = request.header("Authorization");
     const errorMsg = "a valid token is required";
     const url = request.originalUrl;
-    console.log(url);
+    console.log(request.method, url);
 
     if (!bearerHeader) {
         return next(new HttpError(errorMsg, 401));

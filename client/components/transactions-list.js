@@ -45,18 +45,13 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
     const router = useRouter();
 
     useEffect(() => {
-        if (transactionType === "user") {
-            if (areUnknowledgedTransactions(userTransactions)) {
-                acknowledgeTransactions();
-            }
+        if (
+            transactionType === "seller" &&
+            areUnknowledgedTransactions(sellerTransactions)
+        ) {
+            acknowledgeTransactions();
         }
-
-        if (transactionType === "seller") {
-            if (areUnknowledgedTransactions(sellerTransactions)) {
-                acknowledgeTransactions();
-            }
-        }
-    }, [transactionType, userTransactions, sellerTransactions, authUser]);
+    }, [transactionType, sellerTransactions]);
 
     useEffect(() => {
         if (transactionType === "user") {
@@ -212,24 +207,21 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
     };
 
     const acknowledgeTransactions = async () => {
-        return;
-
         try {
             await fetcher(`transactions/?type=${transactionType}`, "PATCH");
+
             dispatch(
                 acknowledgeTransactionsRedux({
                     type: transactionType,
                 })
             );
-        } catch (error) {}
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const areUnknowledgedTransactions = (transactions) => {
-        return transactions.find(
-            (transaction) =>
-                transaction.completedBy !== authUser?.id &&
-                !transaction.acknowledge
-        );
+        return transactions.find((transaction) => !transaction.isAcknowledged);
     };
 
     const renderChart = () => {

@@ -335,12 +335,13 @@ model Delivery {
 }
 
 model Transaction {
-    id             Int     @id @default(autoincrement())
-    deletedFor     Int?
-    isDeleted      Boolean @default(false)
-    isAcknowledged Boolean @default(false)
-    createdMonth   Int
-    createdYear    Int
+    id               Int     @id @default(autoincrement())
+    deletedForBuyer  Boolean @default(false)
+    deletedForSeller Boolean @default(false)
+    isDeleted        Boolean @default(false)
+    isAcknowledged   Boolean @default(false)
+    createdMonth     Int
+    createdYear      Int
 
     order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
     orderId Int   @unique

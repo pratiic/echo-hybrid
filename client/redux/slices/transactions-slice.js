@@ -139,7 +139,7 @@ const transactionsSlice = createSlice({
                 (transaction) => {
                     return {
                         ...transaction,
-                        acknowledged: true,
+                        isAcknowledged: true,
                     };
                 }
             );

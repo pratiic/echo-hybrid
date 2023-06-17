@@ -55,18 +55,30 @@ export const getTransactions = async (request, response, next) => {
         };
     }
 
-    const whereObj = {
+    let whereObj = {
         order: getTypeFilter(type, user),
         ...monthYearFilter,
         ...searchFilter,
         isDeleted: false,
     };
 
+    if (type === "user") {
+        whereObj = {
+            ...whereObj,
+            deletedForBuyer: false,
+        };
+    } else {
+        whereObj = {
+            ...whereObj,
+            deletedForSeller: false,
+        };
+    }
+
     try {
         const [transactions, totalCount] = await Promise.all([
             prisma.transaction.findMany({
                 where: whereObj,
-                select: { ...transactionSelectionFields, deletedFor: true },
+                select: transactionSelectionFields,
                 orderBy: {
                     createdAt: "desc",
                 },
@@ -79,9 +91,10 @@ export const getTransactions = async (request, response, next) => {
         ]);
 
         response.json({
-            transactions: transactions.filter(
-                (transaction) => transaction.deletedFor !== user.id
-            ),
+            // transactions: transactions.filter(
+            //     (transaction) => transaction.deletedFor !== user.id
+            // ),
+            transactions,
             totalCount,
         });
     } catch (error) {
@@ -114,7 +127,8 @@ export const deleteTransaction = async (request, response, next) => {
                         },
                     },
                 },
-                deletedFor: true,
+                deletedForBuyer: true,
+                deletedForSeller: true,
                 isDeleted: true,
             },
         });
@@ -125,7 +139,8 @@ export const deleteTransaction = async (request, response, next) => {
 
         const {
             isDeleted,
-            deletedFor,
+            deletedForBuyer,
+            deletedForSeller,
             order: { originId, store },
         } = transaction;
 
@@ -138,7 +153,13 @@ export const deleteTransaction = async (request, response, next) => {
             );
         }
 
-        if (isDeleted || deletedFor === user.id) {
+        const isUserBuyer = originId === user.id;
+
+        if (
+            isDeleted ||
+            (isUserBuyer && deletedForBuyer) ||
+            (!isUserBuyer && deletedForSeller)
+        ) {
             return next(
                 new HttpError("the transaction has already been deleted", 400)
             );
@@ -148,9 +169,12 @@ export const deleteTransaction = async (request, response, next) => {
             where: {
                 id: transaction.id,
             },
-            data: deletedFor
-                ? { isDeleted: true, deletedFor: null }
-                : { deletedFor: user.id },
+            data:
+                deletedForBuyer || deletedForSeller
+                    ? { isDeleted: true }
+                    : isUserBuyer
+                    ? { deletedForBuyer: true }
+                    : { deletedForSeller: true },
         });
 
         response.json({ message: "the transaction has been deleted" });
@@ -162,21 +186,14 @@ export const deleteTransaction = async (request, response, next) => {
 
 export const acknowledgeTransactions = async (request, response, next) => {
     const user = request.user;
-    const type = request.query.type;
-
-    if (type !== "user" && type !== "seller") {
-        return next(
-            new HttpError(
-                "invalid type - valid types are 'user' and 'seller'",
-                400
-            )
-        );
-    }
 
     try {
         await prisma.transaction.updateMany({
             where: {
-                order: getTypeFilter(type, user),
+                order: {
+                    storeId: user.store?.id,
+                },
+                isAcknowledged: false,
             },
             data: {
                 isAcknowledged: true,

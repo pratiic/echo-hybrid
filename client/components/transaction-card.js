@@ -10,6 +10,7 @@ import {
     showLoadingModal,
 } from "../redux/slices/modal-slice";
 import { deleteTransaction } from "../redux/slices/transactions-slice";
+import { fetcher } from "../lib/fetcher";
 
 import OrderHead from "./order-head";
 import OrderRest from "./order-rest";
@@ -70,8 +71,9 @@ const TransactionCard = ({
 
         dispatch(
             showConfirmationModal({
+                title: "transaction deletion",
                 message: "Are you sure you want to delete this transaction?",
-                handleer: async () => {
+                handler: async () => {
                     dispatch(showLoadingModal("deleting your transaction..."));
 
                     try {
@@ -85,7 +87,9 @@ const TransactionCard = ({
                         );
 
                         dispatch(
-                            setAlert({ message: "the transaction was deleted" })
+                            setAlert({
+                                message: "the transaction has been deleted",
+                            })
                         );
                     } catch (error) {
                         dispatch(setErrorAlert(error.message));

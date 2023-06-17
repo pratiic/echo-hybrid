@@ -31,7 +31,9 @@ export const transactionRouter = (io) => {
         (request, ...op) => {
             request.select = {
                 store: {
-                    id: true,
+                    select: {
+                        id: true,
+                    },
                 },
             };
             auth(request, ...op);

@@ -292,7 +292,8 @@ Table Delivery {
 
 Table Transaction {
   id Int [pk, increment]
-  deletedFor Int
+  deletedForBuyer Boolean [not null, default: false]
+  deletedForSeller Boolean [not null, default: false]
   isDeleted Boolean [not null, default: false]
   isAcknowledged Boolean [not null, default: false]
   createdMonth Int [not null]
