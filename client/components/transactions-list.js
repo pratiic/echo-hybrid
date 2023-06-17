@@ -12,6 +12,7 @@ import { getSubtotal } from "../lib/order";
 import {
   setQuery as setQueryRedux,
   acknowledgeTransactions as acknowledgeTransactionsRedux,
+  setPage,
 } from "../redux/slices/transactions-slice";
 
 import ContentList from "./content-list";
@@ -130,11 +131,11 @@ const TransactionsList = ({ dateLabels, displayOption }) => {
     return (
       <p className="history-message">
         You {displayPeriod === "all" && "have"}{" "}
-        {transactionType === "user" ? "purchased" : "sold"}
+        {transactionType === "user" ? "purchased" : "sold"}{" "}
         <span className="font-semibold">
           {totalCount[transactionType] +
             addedTransactionsCount[transactionType]}
-        </span>
+        </span>{" "}
         {singularOrPlural(
           transactionType === "user" ? userTransactions : sellerTransactions,
           "product",
@@ -217,8 +218,6 @@ const TransactionsList = ({ dateLabels, displayOption }) => {
         transaction.completedBy !== authUser?.id && !transaction.acknowledge
     );
   };
-
-  // console.log(userTransactions);
 
   return (
     <div
