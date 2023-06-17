@@ -795,9 +795,7 @@ export const handleCompletionRequest = async (request, response, next) => {
             });
 
             if (createdTransaction) {
-                io.emit("new-transaction", {
-                    ...createdTransaction,
-                });
+                io.emit("new-transaction", createdTransaction);
             }
 
             if (createdDelivery) {

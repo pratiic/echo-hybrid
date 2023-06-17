@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { DotsVerticalIcon, ChatAlt2Icon } from "@heroicons/react/outline";
+import { ChatAlt2Icon, MenuAlt4Icon } from "@heroicons/react/outline";
 
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 import {
@@ -120,8 +120,8 @@ const TransactionCard = ({
             />
 
             <div className="absolute bottom-0 right-0">
-                <DotsVerticalIcon
-                    className="icon-small"
+                <MenuAlt4Icon
+                    className="icon"
                     onClick={(event) => toggleDropdown(event)}
                 />
 
@@ -132,9 +132,10 @@ const TransactionCard = ({
                 >
                     <DropdownItem
                         icon={<ChatAlt2Icon className="icon-no-bg" />}
+                        textAsIs
                         onClick={handleChatClick}
                     >
-                        chat now
+                        Chat with {isUserTransaction ? "seller" : "buyer"}
                     </DropdownItem>
                     <DropdownItem
                         action="delete"

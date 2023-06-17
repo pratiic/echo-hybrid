@@ -39,43 +39,35 @@ const Transaction = () => {
     const dispatch = useDispatch();
 
     // useEffect(() => {
-    //   socket.on("new-transaction", (data) => {
-    //     // console.log(data.transaction);
-    //     const transaction = data.transaction;
+    //     socket.on("new-transaction", (transaction) => {
+    //         const {
+    //             order: {
+    //                 id,
+    //                 originId,
+    //                 store: {
+    //                     user: { id: ownerId },
+    //                 },
+    //             },
+    //         } = transaction;
+    //         const userTransaction = authUser?.id === originId;
+    //         const sellerTransaction = authUser?.id === ownerId;
 
-    //     const {
-    //       order: {
-    //         id,
-    //         originId,
-    //         store: {
-    //           user: { id: ownerId },
-    //         },
-    //       },
-    //     } = transaction;
+    //         if (userTransaction || sellerTransaction) {
+    //             dispatch(
+    //                 addTransaction({
+    //                     transaction,
+    //                     type: userTransaction ? "user" : "seller",
+    //                 })
+    //             );
 
-    //     if (authUser?.id === originId) {
-    //       dispatch(
-    //         addTransaction({
-    //           transaction,
-    //           type: "user",
-    //           playSound: true,
-    //         })
-    //       );
-
-    //       dispatch(deleteOrder({ type: "user", id }));
-    //     }
-
-    //     if (authUser?.id === ownerId) {
-    //       dispatch(
-    //         addTransaction({
-    //           transaction,
-    //           type: "seller",
-    //           playSound: true,
-    //         })
-    //       );
-    //       dispatch(deleteOrder({ type: "seller", id }));
-    //     }
-    //   });
+    //             dispatch(
+    //                 deleteOrder({
+    //                     type: userTransaction ? "user" : "seller",
+    //                     id,
+    //                 })
+    //             );
+    //         }
+    //     });
     // }, [authUser]);
 
     useEffect(() => {
@@ -163,7 +155,6 @@ const Transaction = () => {
         } catch (error) {
             dispatch(setError({ error: error.message, type }));
         } finally {
-            return;
             dispatch(setLoading({ value: false, type }));
             dispatch(setLoadingMore({ loadingMore: false, type }));
         }

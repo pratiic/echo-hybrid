@@ -63,7 +63,7 @@ const Transactions = () => {
                 <title>{capitalizeFirstLetter(getOptionMessage())}</title>
             </Head>
 
-            <PageHeader heading={getOptionMessage(true)} hasBackArrow>
+            <PageHeader heading={getOptionMessage(false)} hasBackArrow>
                 <TransactionsFilter
                     transactionType={
                         activeOption === "purchase history" ? "user" : "seller"

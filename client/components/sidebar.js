@@ -108,14 +108,14 @@ const Sidebar = () => {
         },
         {
             name: "orders",
-            linkTo: "/orders",
+            linkTo: "/orders/?show=seller",
             icon: <ClipboardListIcon className="icon-sidebar" />,
             count: 0,
             activePath: "/orders",
         },
         {
             name: "transactions",
-            linkTo: "/transactions",
+            linkTo: "/transactions/?show=user",
             icon: <MdOutlineHistory className="icon-sidebar" />,
             count: 0,
             activePath: "/transactions",

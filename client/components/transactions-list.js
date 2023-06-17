@@ -17,10 +17,10 @@ import {
 
 import ContentList from "./content-list";
 import GenericSearch from "./generic-search";
+import Visualizer from "./visualizer";
 
 const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
     const [displayPeriod, setDisplayPeriod] = useState("all");
-    const [query, setQuery] = useState("");
 
     const {
         userTransactions,
@@ -66,10 +66,6 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
         }
     }, [userDisplayPeriod, sellerDisplayPeriod, transactionType]);
 
-    useEffect(() => {
-        setQuery(transactionType === "user" ? userQuery : sellerQuery);
-    }, [userQuery, sellerQuery]);
-
     const incrementPageNumber = (transactionType) => {
         dispatch(
             setPage({
@@ -103,16 +99,20 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
     };
 
     const getTransactionMessage = () => {
+        const query = transactionType === "user" ? userQuery : sellerQuery;
+
         if (query) {
             return (
                 <p className="history-message">
                     <span className="font-semibold">
                         {totalCount[transactionType]}
-                    </span>
+                    </span>{" "}
                     {singularOrPlural(
                         transactionType === "user"
                             ? userTransactions
-                            : sellerTransactions
+                            : sellerTransactions,
+                        "transaction",
+                        "transactions"
                     )}{" "}
                     found
                 </p>
@@ -153,7 +153,7 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
         );
     };
 
-    const renderGenericSearch = () => {
+    const renderGenericSearch = (searchValue) => {
         if (
             (transactionType === "user" &&
                 userTransactions.length === 0 &&
@@ -162,27 +162,29 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
                 sellerTransactions.length === 0 &&
                 !sellerQuery)
         ) {
-            setTimeout(() => {
-                console.log("pratiic");
-            }, 1000);
             return null;
         }
 
         return (
             <GenericSearch
                 show="true"
-                placeholder={"product name"}
+                placeholder={"Product name..."}
+                value={searchValue}
                 onSubmit={(query) =>
                     dispatch(setQueryRedux({ type: transactionType, query }))
                 }
-                clearSearch={dispatch(
-                    setQueryRedux({ type: transactionType, query: "" })
-                )}
+                clearSearch={() =>
+                    dispatch(
+                        setQueryRedux({ type: transactionType, query: "" })
+                    )
+                }
             />
         );
     };
 
     const getTotalAmount = (transactions) => {
+        const query = transactionType === "user" ? userQuery : sellerQuery;
+
         if (transactions.length === 0 || query) {
             return;
         }
@@ -230,28 +232,56 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
         );
     };
 
+    const renderChart = () => {
+        if (
+            userQuery ||
+            sellerQuery ||
+            displayOption !== "all" ||
+            (transactionType === "user" && userTransactions.length === 0) ||
+            (transactionType === "shop" && sellerTransactions.length === 0)
+        ) {
+            return;
+        }
+
+        return (
+            <div className="pb-5">
+                <Visualizer
+                    dataItems={
+                        transactionType === "user"
+                            ? userTransactions
+                            : sellerTransactions
+                    }
+                    labels={dateLabels}
+                />
+            </div>
+        );
+    };
+
     return (
         <div
             className={`-mt-4 ${((transactionType === "user" &&
                 userTransactions.length > 0) ||
                 (transactionType === "seller" &&
                     sellerTransactions.length > 0)) &&
-                !query &&
+                !userQuery &&
+                !sellerQuery &&
                 "750:w-fit"}`}
         >
-            <p>{loading[transactionType] ? "true" : "false"}</p>
-            <p>{transactionType}</p>
-
             {getTransactionMessage()}
 
             <div className="flex flex-col 750:flex-row mb-4">
-                {renderGenericSearch()}
+                {renderGenericSearch(
+                    transactionType === "user" ? userQuery : sellerQuery
+                )}
+
                 {getTotalAmount(
                     transactionType === "user"
                         ? userTransactions
                         : sellerTransactions
                 )}
             </div>
+
+            {renderChart()}
 
             <ContentList
                 list={
@@ -261,7 +291,7 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
                 }
                 type="transaction"
                 loadingMsg={
-                    loading[transactionType] && "loading transactions..."
+                    loading[transactionType] && `loading transactions...`
                 }
                 error={error[transactionType]}
                 emptyMsg="No transactions found"
