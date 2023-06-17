@@ -18,8 +18,7 @@ import {
 import ContentList from "./content-list";
 import GenericSearch from "./generic-search";
 
-const TransactionsList = ({ dateLabels, displayOption }) => {
-    const [transactionType, setTransactionType] = useState("");
+const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
     const [displayPeriod, setDisplayPeriod] = useState("all");
     const [query, setQuery] = useState("");
 
@@ -44,12 +43,6 @@ const TransactionsList = ({ dateLabels, displayOption }) => {
 
     const dispatch = useDispatch();
     const router = useRouter();
-
-    useEffect(() => {
-        if (router.query?.show) {
-            setTransactionType(router.query.show);
-        }
-    }, [router.query]);
 
     useEffect(() => {
         if (transactionType === "user") {
@@ -130,9 +123,6 @@ const TransactionsList = ({ dateLabels, displayOption }) => {
             (transactionType === "user" && userTransactions.length === 0) ||
             (transactionType === "seller" && sellerTransactions.length === 0)
         ) {
-            setTimeout(() => {
-                console.log("pratiic");
-            }, 1000);
             return null;
         }
 
@@ -249,6 +239,9 @@ const TransactionsList = ({ dateLabels, displayOption }) => {
                 !query &&
                 "750:w-fit"}`}
         >
+            <p>{loading[transactionType] ? "true" : "false"}</p>
+            <p>{transactionType}</p>
+
             {getTransactionMessage()}
 
             <div className="flex flex-col 750:flex-row mb-4">

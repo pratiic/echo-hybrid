@@ -85,6 +85,9 @@ const Transactions = () => {
             <TransactionsList
                 dateLabels={dateLabels}
                 displayOption={displayOption}
+                transactionType={
+                    activeOption === "purchase history" ? "user" : "seller"
+                }
             />
         </section>
     );

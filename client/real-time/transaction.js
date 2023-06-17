@@ -80,11 +80,11 @@ const Transaction = () => {
 
     useEffect(() => {
         dispatch(setNeedToFetch({ needToFetch: true, type: "user" }));
-    }, [userPage]);
+    }, [userPage, userDisplayPeriod]);
 
     useEffect(() => {
         dispatch(setNeedToFetch({ needToFetch: true, type: "seller" }));
-    }, [sellerPage]);
+    }, [sellerPage, sellerDisplayPeriod]);
 
     useEffect(() => {
         dispatch(setPage({ page: 1, type: "user" }));
@@ -128,7 +128,7 @@ const Transaction = () => {
         if (currentPage === 1) {
             dispatch(setLoading({ value: true, type }));
         } else {
-            dispatch(setLoadingMore({ value: true, type }));
+            dispatch(setLoadingMore({ loadingMore: true, type }));
         }
 
         dispatch(setNoMoreData({ type, noMoreData: false }));
@@ -163,6 +163,7 @@ const Transaction = () => {
         } catch (error) {
             dispatch(setError({ error: error.message, type }));
         } finally {
+            return;
             dispatch(setLoading({ value: false, type }));
             dispatch(setLoadingMore({ loadingMore: false, type }));
         }
