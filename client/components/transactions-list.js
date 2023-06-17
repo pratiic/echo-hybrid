@@ -17,6 +17,7 @@ import {
 
 import ContentList from "./content-list";
 import GenericSearch from "./generic-search";
+import Visualizer from "./visualizer";
 
 const TransactionsList = ({ dateLabels, displayOption }) => {
   const [transactionType, setTransactionType] = useState("");
@@ -219,6 +220,29 @@ const TransactionsList = ({ dateLabels, displayOption }) => {
     );
   };
 
+  const renderChart = () => {
+    if (
+      userQuery ||
+      sellerQuery ||
+      displayOption !== "all" ||
+      (transactionType === "user" && userTransactions.length === 0) ||
+      (transactionType === "shop" && sellerTransactions.length === 0)
+    ) {
+      return;
+    }
+
+    return (
+      <div className="pb-5">
+        <Visualizer
+          dataItems={
+            transactionType === "user" ? userTransactions : sellerTransactions
+          }
+          labels={dateLabels}
+        />
+      </div>
+    );
+  };
+
   return (
     <div
       className={`-mt-4 ${((transactionType === "user" &&
@@ -231,10 +255,13 @@ const TransactionsList = ({ dateLabels, displayOption }) => {
 
       <div className="flex flex-col 750:flex-row mb-4">
         {renderGenericSearch()}
+
         {getTotalAmount(
           transactionType === "user" ? userTransactions : sellerTransactions
         )}
       </div>
+
+      {renderChart()}
 
       <ContentList
         list={
