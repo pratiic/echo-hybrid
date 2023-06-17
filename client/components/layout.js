@@ -135,7 +135,7 @@ const Layout = ({ children }) => {
                 <Modal />
                 <Header />
 
-                {authUser?.isVerified && (
+                {authUser?.isVerified && !authUser?.suspension && (
                     <>
                         {/* fake components for real time and to preserve cache  */}
                         {!authUser?.isAdmin && (

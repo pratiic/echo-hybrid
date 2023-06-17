@@ -136,10 +136,6 @@ const Transaction = () => {
         try {
             const data = await fetcher(url);
 
-            setTimeout(() => {
-                console.log(data);
-            }, 1000);
-
             if (currentPage === 1) {
                 dispatch(
                     setTransactions({ transactions: data.transactions, type })

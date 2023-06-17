@@ -2,7 +2,6 @@ import { HttpError } from "../models/http-error.models.js";
 import prisma from "../lib/prisma.lib.js";
 import {
     deliveryInclusionFields,
-    extraUserFields,
     genericUserFields,
 } from "../lib/data-source.lib.js";
 import { sendEmail } from "../lib/email.lib.js";
@@ -151,6 +150,7 @@ export const getDeliveryPersonnel = async (request, response, next) => {
             where: whereObj,
             select: {
                 ...genericUserFields,
+                phone: true,
                 address: true,
                 _count: {
                     select: {

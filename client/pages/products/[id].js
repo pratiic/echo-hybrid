@@ -56,7 +56,9 @@ const ProductPage = () => {
         });
 
         socket.on("product-suspension", (id) => {
-            setIsSuspended(true);
+            if (activeProduct?.id === id) {
+                setIsSuspended(true);
+            }
         });
     }, [activeProduct]);
 
@@ -126,7 +128,7 @@ const ProductPage = () => {
                 <title>{capitalizeFirstLetter(activeProduct?.name)}</title>
             </Head>
 
-            {activeProduct?.suspension && (
+            {(activeProduct?.suspension || isSuspended) && (
                 <InfoBanner liftUp={false}>
                     <p>
                         This product has been suspended and is only accessible

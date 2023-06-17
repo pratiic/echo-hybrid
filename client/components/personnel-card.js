@@ -5,6 +5,7 @@ import {
     MailIcon,
     MenuAlt4Icon,
     UserIcon,
+    PhoneIcon,
 } from "@heroicons/react/outline";
 import { MdOutlineDeliveryDining } from "react-icons/md";
 import { useRouter } from "next/router";
@@ -31,7 +32,7 @@ const PersonnelCard = ({
     id,
     fullName,
     avatar,
-    email,
+    phone,
     address,
     deliveriesCount,
     isVerified,
@@ -82,18 +83,18 @@ const PersonnelCard = ({
     };
 
     return (
-        <div className="flex relative space-x-5 w-fit border-b border-faint pb-5 mb-5 max-w-[500px]">
+        <div className="flex relative space-x-5 border-b border-faint pb-5 mb-5 max-w-[500px]">
             <img
                 src={avatar}
                 className="image max-w-[100px] max-h-[100px] rounded"
             />
 
             <div className="-mt-1">
-                <h3 className="capitalize text-lg font-semibold dark-light">
+                <h3 className="capitalize text-lg font-semibold dark-light mb-1 text-blue-four">
                     {fullName}
                 </h3>
 
-                <div className="absolute right-0 top-0">
+                <div className="absolute right-0 -top-2">
                     <Icon toolName="options" onClick={toggleDropdown}>
                         <MenuAlt4Icon className="icon" />
                     </Icon>
@@ -129,8 +130,8 @@ const PersonnelCard = ({
                         </span>
                     </IconInfo>
 
-                    <IconInfo icon={<MailIcon className="icon-no-bg" />}>
-                        <span>{email}</span>
+                    <IconInfo icon={<PhoneIcon className="icon-no-bg" />}>
+                        <span>{phone}</span>
                     </IconInfo>
 
                     <IconInfo icon={<CalendarIcon className="icon-no-bg" />}>

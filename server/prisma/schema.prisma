@@ -20,6 +20,7 @@ model User {
     lastName            String
     email               String  @unique
     avatar              String?
+    phone               String? // only for delivery personnel
     password            String
     isVerified          Boolean @default(false)
     isAdmin             Boolean @default(false)
