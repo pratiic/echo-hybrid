@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
 import {
   TrashIcon,
   DotsVerticalIcon,
   ChatAlt2Icon,
 } from "@heroicons/react/outline";
-import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
 
-import { fetcher } from "../lib/fetcher";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 import {
   closeModal,
@@ -37,7 +36,7 @@ const TransactionCard = ({
   createdAt,
 }) => {
   const [isUserTransaction, setUserTransaction] = useState(false);
-  const [isStoreTransaction, setStoreTransaction] = useState(false);
+  const [isSellerTransaction, setSellerTransaction] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const { authUser } = useSelector((state) => state.auth);
@@ -47,43 +46,11 @@ const TransactionCard = ({
 
   useEffect(() => {
     setUserTransaction(origin?.id === authUser?.id);
-    setStoreTransaction(store?.user?.id === authUser?.id);
+    setSellerTransaction(store?.user?.id === authUser?.id);
   }, [origin, store, authUser]);
 
   const handleTransactionClick = () => {
     router.push(`/products/${product?.id}`);
-  };
-
-  const handleTransactionDeletion = (event) => {
-    event.stopPropagation();
-
-    dispatch(
-      showConfirmationModal({
-        message: "Are you sure you want to delete this transaction?",
-        handler: async () => {
-          dispatch(showLoadingModal("deleting your transaction..."));
-
-          try {
-            await fetcher(`transactions/${id}`, "DELETE");
-            dispatch(
-              deleteTransaction({
-                type: isUserTransaction ? "user" : "shop",
-                id,
-              })
-            );
-            dispatch(
-              setAlert({
-                message: "the transaction was deleted",
-              })
-            );
-          } catch (error) {
-            dispatch(setErrorAlert(error.message));
-          } finally {
-            dispatch(closeModal());
-          }
-        },
-      })
-    );
   };
 
   const toggleDropdown = (event) => {
@@ -97,14 +64,45 @@ const TransactionCard = ({
   const handleChatClick = (event) => {
     event.stopPropagation();
 
-    router.push(`/chats/${isUserTransaction ? store?.user?.id : origin.id}`);
+    router.push(`/chats/${isUserTransaction ? store?.user?.id : origin?.id}`);
+  };
+
+  const handleTransactionDeletion = (event) => {
+    event.stopPropagation();
+
+    dispatch(
+      showConfirmationModal({
+        message: "Are you sure you want to delete this transaction?",
+        handleer: async () => {
+          dispatch(showLoadingModal("deleting your transaction..."));
+
+          try {
+            await fetcher(`transactions/${id}`, "DELETE");
+
+            dispatch(
+              deleteTransaction({
+                type: isUserTransaction ? "user" : "seller",
+                id,
+              })
+            );
+
+            dispatch(setAlert({ message: "the transaction was deleted" }));
+          } catch (error) {
+            dispatch(setErrorAlert(error.message));
+          } finally {
+            dispatch(closeModal());
+          }
+        },
+      })
+    );
   };
 
   return (
     <div className="card-transparent" onClick={handleTransactionClick}>
-      <OrderHead product={product} quantity={quantity} variant={variant} />
+      <OrderHead product={product} variant={variant} quantity={quantity} />
+
       <OrderRest
-        isSellerItem={isStoreTransaction}
+        isSellerItem={isSellerTransaction}
         isUserItem={isUserTransaction}
         user={origin}
         store={store}
@@ -135,7 +133,7 @@ const TransactionCard = ({
             chat now
           </DropdownItem>
           <DropdownItem action="delete" onClick={handleTransactionDeletion}>
-            Delete Transaction
+            delete transaction
           </DropdownItem>
         </Dropdown>
       </div>
