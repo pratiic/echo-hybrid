@@ -9,10 +9,12 @@ const statsSlice = createSlice({
   reducers: {
     setAppStats: (state, action) => {
       state.appStats = action.payload;
+
+      state.needToFetch = false;
     },
-    updateAppStats: (state, action) => {
-      state.appStats = { ...appStats, ...action.payload };
-    },
+    //  updateAppStats: (state, action) => {
+    //    state.appStats = { ...appStats, ...action.payload };
+    //  },
     setNeedToFetch: (state, action) => {
       state.needToFetch = action.payload;
     },

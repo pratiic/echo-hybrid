@@ -3,8 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import Head from "next/head";
 
 import {
-    acknowledgeReports as acknowledgeReportsRedux,
-    setReportsProp,
+  acknowledgeReports as acknowledgeReportsRedux,
+  setReportsProp,
 } from "../redux/slices/reports-slice";
 import { capitalizeFirstLetter, singularOrPluralCount } from "../lib/strings";
 import { fetcher } from "../lib/fetcher";
@@ -14,88 +14,89 @@ import ContentList from "../components/content-list";
 import OptionsToggle from "../components/options-toggle";
 
 const Reports = () => {
-    const { reports, loading, error, targetType } = useSelector(
-        (state) => state.reports
-    );
+  const { reports, loading, error, targetType } = useSelector(
+    (state) => state.reports
+  );
 
-    const dispatch = useDispatch();
-    const targetOptions = [
-        { name: "all", value: "all reports" },
-        { name: "product", value: "product reports" },
-        { name: "seller", value: "seller reports" },
-        { name: "user", value: "user reports" },
-    ];
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-        if (reports.find((report) => !report.isAcknowledged)) {
-            acknowledgeReports();
-        }
-    }, [reports]);
+  const targetOptions = [
+    { name: "all", value: "all reports" },
+    { name: "product", value: "product reports" },
+    { name: "seller", value: "seller reports" },
+    { name: "user", value: "user reports" },
+  ];
 
-    useEffect(() => {
-        return () => {
-            // reset the targetType leave this page is left
-            dispatch(setReportsProp({ prop: "targetType", value: "all" }));
-        };
-    }, []);
+  useEffect(() => {
+    if (reports.find((report) => !report.isAcknowledged)) {
+      acknowledgeReports();
+    }
+  }, [reports]);
 
-    const acknowledgeReports = async () => {
-        try {
-            fetcher("reports/acknowledge", "PATCH");
-            dispatch(acknowledgeReportsRedux());
-        } catch (error) {}
+  useEffect(() => {
+    return () => {
+      // reset the targetType leave this page is left
+      dispatch(setReportsProp({ prop: "targetType", value: "all" }));
     };
+  }, []);
 
-    return (
-        <section>
-            <Head>
-                <title>{capitalizeFirstLetter(targetType)} reports</title>
-            </Head>
+  const acknowledgeReports = async () => {
+    try {
+      fetcher("reports/acknowledge", "PATCH");
+      dispatch(acknowledgeReportsRedux());
+    } catch (error) {}
+  };
 
-            <PageHeader heading={`${targetType} reports`} hasBackArrow>
-                <OptionsToggle
-                    options={targetOptions}
-                    active={targetType}
-                    type="dropdown"
-                    onClick={(targetType) =>
-                        dispatch(
-                            setReportsProp({
-                                prop: "targetType",
-                                value: targetType,
-                            })
-                        )
-                    }
-                />
-            </PageHeader>
+  return (
+    <section>
+      <Head>
+        <title>{capitalizeFirstLetter(targetType)} reports</title>
+      </Head>
 
-            {reports.length > 0 && (
-                <p className="history-message -mt-2">
-                    There {singularOrPluralCount(reports.length, "is", "are")}{" "}
-                    <span className="font-semibold">{reports.length}</span>{" "}
-                    {targetType === "all"
-                        ? `${singularOrPluralCount(
-                              reports.length,
-                              "report",
-                              "reports"
-                          )} in total`
-                        : ` ${targetType.split(" ")[0]} ${singularOrPluralCount(
-                              reports.length,
-                              "report",
-                              "reports"
-                          )}`}{" "}
-                </p>
-            )}
+      <PageHeader heading={`${targetType} reports`} hasBackArrow>
+        <OptionsToggle
+          options={targetOptions}
+          active={targetType}
+          type="dropdown"
+          onClick={(targetType) =>
+            dispatch(
+              setReportsProp({
+                prop: "targetType",
+                value: targetType,
+              })
+            )
+          }
+        />
+      </PageHeader>
 
-            <ContentList
-                list={reports}
-                type="report"
-                loadingMsg={loading && "Loading reports..."}
-                error={error}
-                emptyMsg="No reports found"
-                human="no-items"
-            />
-        </section>
-    );
+      {reports.length > 0 && (
+        <p className="history-message -mt-2">
+          There {singularOrPluralCount(reports.length, "is", "are")}{" "}
+          <span className="font-semibold">{reports.length}</span>{" "}
+          {targetType === "all"
+            ? `${singularOrPluralCount(
+                reports.length,
+                "report",
+                "reports"
+              )} in total`
+            : ` ${targetType.split(" ")[0]} ${singularOrPluralCount(
+                reports.length,
+                "report",
+                "reports"
+              )}`}{" "}
+        </p>
+      )}
+
+      <ContentList
+        list={reports}
+        type="report"
+        loadingMsg={loading && "Loading reports..."}
+        error={error}
+        emptyMsg="No reports found"
+        human="no-items"
+      />
+    </section>
+  );
 };
 
 export default Reports;

@@ -135,15 +135,6 @@ export const getAppStats = async (request, response, next) => {
                 verified: verifiedUserCount,
                 unverified: userCount - verifiedUserCount,
             },
-            orders: {
-                total: orderCount,
-                placed: placedOrderCount,
-                cancelled: cancelledOrderCount,
-                confirmed: confirmedOrderCount,
-                rejected: rejectedOrderCount,
-                packaged: packagedOrderCount,
-                completed: completedOrderCount,
-            },
             transactions: {
                 total: transactionCount,
                 "brand new": transactionCount - secondHandTransactionCount,
@@ -158,6 +149,15 @@ export const getAppStats = async (request, response, next) => {
                 product: productSuspensionCount,
                 seller: sellerSuspensionCount,
                 user: userSuspensionCount,
+            },
+            orders: {
+                total: orderCount,
+                placed: placedOrderCount,
+                cancelled: cancelledOrderCount,
+                confirmed: confirmedOrderCount,
+                rejected: rejectedOrderCount,
+                packaged: packagedOrderCount,
+                completed: completedOrderCount,
             },
         });
     } catch (error) {
