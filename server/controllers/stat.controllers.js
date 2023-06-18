@@ -2,8 +2,6 @@ import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 
 export const getAppStats = async (request, response, next) => {
-    // statistics regarding products, sellers, sales, users and so on
-
     const getOrderFilter = (status) => {
         if (!status) {
             return {};
@@ -21,7 +19,6 @@ export const getAppStats = async (request, response, next) => {
             secondHandProductCount,
             sellerCount,
             busSellerCount,
-            verifiedBusSellerCount,
             userCount,
             verifiedUserCount,
             deliveryPersonnelCount,
@@ -36,6 +33,9 @@ export const getAppStats = async (request, response, next) => {
             secondHandTransactionCount,
             pendingDeliveryCount,
             completedDeliveryCount,
+            productSuspensionCount,
+            sellerSuspensionCount,
+            userSuspensionCount,
         ] = await Promise.all([
             prisma.product.count({
                 where: {
@@ -59,15 +59,6 @@ export const getAppStats = async (request, response, next) => {
                 where: {
                     isDeleted: false,
                     storeType: "BUS",
-                },
-            }),
-            prisma.store.count({
-                where: {
-                    isDeleted: false,
-                    storeType: "BUS",
-                    business: {
-                        isVerified: true,
-                    },
                 },
             }),
             prisma.user.count({
@@ -119,13 +110,20 @@ export const getAppStats = async (request, response, next) => {
             prisma.delivery.count({
                 where: {},
             }),
+            ...["product", "store", "user"].map((targetType) => {
+                return prisma.suspension.count({
+                    where: {
+                        targetType,
+                    },
+                });
+            }),
         ]);
 
         response.json({
             products: {
                 total: productCount,
-                secondHand: secondHandProductCount,
-                brandNew: productCount - secondHandProductCount,
+                "brand new": productCount - secondHandProductCount,
+                "second hand": secondHandProductCount,
             },
             sellers: {
                 total: sellerCount,
@@ -136,7 +134,6 @@ export const getAppStats = async (request, response, next) => {
                 total: userCount,
                 verified: verifiedUserCount,
                 unverified: userCount - verifiedUserCount,
-                deliveryPersonnel: deliveryPersonnelCount,
             },
             orders: {
                 total: orderCount,
@@ -149,11 +146,18 @@ export const getAppStats = async (request, response, next) => {
             },
             transactions: {
                 total: transactionCount,
-                secondHand: secondHandTransactionCount,
+                "brand new": transactionCount - secondHandTransactionCount,
+                "second hand": secondHandTransactionCount,
             },
             deliveries: {
-                pending: pendingDeliveryCount,
                 completed: completedDeliveryCount,
+                pending: pendingDeliveryCount,
+                personnel: deliveryPersonnelCount,
+            },
+            suspensions: {
+                product: productSuspensionCount,
+                seller: sellerSuspensionCount,
+                user: userSuspensionCount,
             },
         });
     } catch (error) {
