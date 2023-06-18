@@ -45,8 +45,11 @@ const Layout = ({ children }) => {
         "/notifications",
         "/chats",
         "/chats/[id]",
+        "/sellers",
         "/sellers/[id]",
+        "/products",
         "/products/[id]",
+        "/reset-password",
         ...unprotectedPaths,
         ...unverifiedAccessiblePaths,
     ];

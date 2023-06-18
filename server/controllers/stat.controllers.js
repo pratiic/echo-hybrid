@@ -19,7 +19,6 @@ export const getAppStats = async (request, response, next) => {
         const [
             productCount,
             secondHandProductCount,
-            activeProductCount,
             sellerCount,
             busSellerCount,
             verifiedBusSellerCount,
@@ -32,6 +31,11 @@ export const getAppStats = async (request, response, next) => {
             confirmedOrderCount,
             rejectedOrderCount,
             packagedOrderCount,
+            completedOrderCount,
+            transactionCount,
+            secondHandTransactionCount,
+            pendingDeliveryCount,
+            completedDeliveryCount,
         ] = await Promise.all([
             prisma.product.count({
                 where: {
@@ -43,15 +47,6 @@ export const getAppStats = async (request, response, next) => {
                     isDeleted: false,
                     store: {
                         storeType: "IND",
-                    },
-                },
-            }),
-            prisma.product.count({
-                where: {
-                    isDeleted: false,
-                    stockType: "varied",
-                    NOT: {
-                        stock: null,
                     },
                 },
             }),
@@ -91,44 +86,74 @@ export const getAppStats = async (request, response, next) => {
             prisma.order.count({
                 where: {},
             }),
-            ...["placed", "cancelled", "confirmed", "rejected", "packaged"].map(
-                (status) => {
-                    return prisma.order.count({
-                        where: getOrderFilter(status),
-                    });
-                }
-            ),
+            ...[
+                "placed",
+                "cancelled",
+                "confirmed",
+                "rejected",
+                "packaged",
+                "completed",
+            ].map((status) => {
+                return prisma.order.count({
+                    where: getOrderFilter(status),
+                });
+            }),
+            prisma.transaction.count({
+                where: {},
+            }),
+            prisma.transaction.count({
+                where: {
+                    order: {
+                        product: {
+                            isSecondHand: true,
+                        },
+                    },
+                },
+            }),
+            prisma.order.count({
+                where: {
+                    status: "PACKAGED",
+                    isDelivered: true,
+                },
+            }),
+            prisma.delivery.count({
+                where: {},
+            }),
         ]);
 
         response.json({
-            product: {
+            products: {
                 total: productCount,
                 secondHand: secondHandProductCount,
                 brandNew: productCount - secondHandProductCount,
-                active: activeProductCount,
             },
-            seller: {
+            sellers: {
                 total: sellerCount,
-                business: {
-                    total: busSellerCount,
-                    verified: verifiedBusSellerCount,
-                    unverified: busSellerCount - verifiedBusSellerCount,
-                },
+                business: busSellerCount,
                 individual: sellerCount - busSellerCount,
             },
-            user: {
+            users: {
                 total: userCount,
                 verified: verifiedUserCount,
                 unverified: userCount - verifiedUserCount,
                 deliveryPersonnel: deliveryPersonnelCount,
             },
-            order: {
+            orders: {
                 total: orderCount,
                 placed: placedOrderCount,
                 cancelled: cancelledOrderCount,
                 confirmed: confirmedOrderCount,
                 rejected: rejectedOrderCount,
                 packaged: packagedOrderCount,
+                completed: completedOrderCount,
+            },
+            transactions: {
+                total: transactionCount,
+                secondHand: secondHandTransactionCount,
+            },
+            deliveries: {
+                pending: pendingDeliveryCount,
+                completed: completedDeliveryCount,
             },
         });
     } catch (error) {

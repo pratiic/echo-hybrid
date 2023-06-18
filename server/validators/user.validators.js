@@ -19,7 +19,7 @@ const passwordSchema = Joi.string()
     .required();
 
 const getUserSignUpSchema = (isDeliveryPersonnel) => {
-    const schemaObj = {
+    let schemaObj = {
         firstName: firstNameSchema,
         lastName: lastNameSchema,
         email: emailSchema,
@@ -27,21 +27,24 @@ const getUserSignUpSchema = (isDeliveryPersonnel) => {
     };
 
     if (isDeliveryPersonnel) {
-        schemaObj.phone = Joi.string()
-            .length(10)
-            .pattern(/^[0-9]+$/)
-            .required();
+        schemaObj = attachPhoneSchema(schemaObj);
     }
 
     return Joi.object(schemaObj);
 };
 
-const userSignUpSchema = Joi.object({
-    firstName: firstNameSchema,
-    lastName: lastNameSchema,
-    email: emailSchema,
-    password: passwordSchema,
-});
+const getUserUpdateSchema = (isDeliveryPersonnel) => {
+    let schemaObj = {
+        firstName: firstNameSchema,
+        lastName: lastNameSchema,
+    };
+
+    if (isDeliveryPersonnel) {
+        schemaObj = attachPhoneSchema(schemaObj);
+    }
+
+    return Joi.object(schemaObj);
+};
 
 const userSignInSchema = Joi.object({
     email: emailSchema,
@@ -50,10 +53,15 @@ const userSignInSchema = Joi.object({
         .pattern(/^[a-zA-Z]/),
 });
 
-const userUpdateSchema = Joi.object({
-    firstName: firstNameSchema,
-    lastName: lastNameSchema,
-});
+const attachPhoneSchema = (schemaObj) => {
+    return {
+        ...schemaObj,
+        phone: Joi.string()
+            .length(10)
+            .pattern(/^[0-9]+$/)
+            .required(),
+    };
+};
 
 export const validateUser = (
     userInfo,
@@ -63,7 +71,7 @@ export const validateUser = (
     const schemaMap = {
         signin: userSignInSchema,
         signup: getUserSignUpSchema(isDeliveryPersonnel),
-        update: userUpdateSchema,
+        update: getUserUpdateSchema(isDeliveryPersonnel),
     };
 
     // type may be "signin", "signup" or "update"
