@@ -270,7 +270,7 @@ textarea {
   }
 
   .seller-icon {
-	@apply h-7 w-7;
+    @apply h-7 w-7;
   }
 
   .modal-title {
@@ -315,13 +315,13 @@ textarea {
 }
 
 .filter-info-container {
-    @apply -mt-3 mb-4 ml-1;
+  @apply -mt-3 mb-4 ml-1;
 }
 
 .filter-info-text {
-    @apply dark-light text-sm;
+  @apply dark-light text-sm;
 }
 
 .filter-info-highlight {
-    @apply font-semibold text-blue-three;
+  @apply font-semibold text-blue-three;
 }
