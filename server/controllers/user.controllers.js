@@ -9,11 +9,15 @@ import prisma from "../lib/prisma.lib.js";
 import { prepareImageData } from "../lib/image.lib.js";
 
 export const updateUser = async (request, response, next) => {
-    // only username and avatar can be updated directly
+    // only username, avatar and phone (delivery personnel) can be updated directly
     const user = request.user;
     const updateInfo = request.body;
 
-    const errorMsg = validateUser({ ...user, ...updateInfo }, "update");
+    const errorMsg = validateUser(
+        { ...user, ...updateInfo },
+        "update",
+        user.isDeliveryPersonnel
+    );
 
     if (errorMsg) {
         return next(new HttpError(errorMsg, 400));
@@ -39,6 +43,7 @@ export const updateUser = async (request, response, next) => {
             data: {
                 firstName: updateInfo.firstName,
                 lastName: updateInfo.lastName,
+                phone: user.isDeliveryPersonnel ? updateInfo.phone : undefined,
                 avatar: newAvatar || user.avatar,
             },
         });
