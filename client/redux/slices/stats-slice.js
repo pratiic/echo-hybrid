@@ -12,12 +12,6 @@ const statsSlice = createSlice({
 
       state.needToFetch = false;
     },
-    //  updateAppStats: (state, action) => {
-    //    state.appStats = { ...appStats, ...action.payload };
-    //  },
-    setNeedToFetch: (state, action) => {
-      state.needToFetch = action.payload;
-    },
   },
 });
 
