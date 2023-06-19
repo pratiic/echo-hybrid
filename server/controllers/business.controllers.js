@@ -77,6 +77,7 @@ export const registerBusiness = async (request, response, next) => {
                 PAN,
                 phone,
                 storeId: store.id,
+                isVerified: true,
             },
         });
 
@@ -101,7 +102,7 @@ export const registerBusiness = async (request, response, next) => {
             }),
         ]);
 
-        response.json({
+        response.status(201).json({
             business: updatedBusiness,
         });
     } catch (error) {

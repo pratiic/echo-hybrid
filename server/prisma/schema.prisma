@@ -95,8 +95,9 @@ model Store {
     rating    Float     @default(0)
     isDeleted Boolean   @default(false)
 
-    user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId     Int?        @unique
+    user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId     Int         @unique
+    business   Business?
     product    Product[]
     reviews    Review[]
     ratings    Rating[]
@@ -104,9 +105,8 @@ model Store {
     reports    Report[]
     suspension Suspension?
 
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @default(now()) @updatedAt
-    Business  Business?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Business {

@@ -73,7 +73,7 @@ export const setCartItem = async (request, response, next) => {
             },
         });
 
-        if (!product) {
+        if (!product || product.isDeleted) {
             return next(new HttpError("product not found", 404));
         }
 
@@ -107,7 +107,7 @@ export const setCartItem = async (request, response, next) => {
                 },
             });
 
-            response.json({ item: cartItem });
+            response.status(201).json({ item: cartItem });
         } else {
             // cannot buy a product if its stock has not been set yet
             if (!stock) {

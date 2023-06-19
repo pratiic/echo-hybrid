@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">88.88% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/9</span>
+                <span class='fraction'>8/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>3/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">88.88% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/9</span>
+                <span class='fraction'>8/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -113,19 +113,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Joi from "joi";
 &nbsp;
@@ -133,7 +133,7 @@ import { validate } from "./base.validators.js";
 &nbsp;
 const priceSchema = Joi.number().positive().required();
 const productSchema = Joi.object({
-    name: Joi.string().min(5).max(50).required().trim(),
+    name: Joi.string().min(5).max(100).required().trim(),
     description: Joi.string().min(50).max(200).required().trim(),
     price: priceSchema,
     per: Joi.string().max(20).allow("").allow(null).trim(),
@@ -144,20 +144,20 @@ const productSchema = Joi.object({
     subCategory: Joi.string().min(3).max(15).required(),
 });
 &nbsp;
-export const validateProduct = <span class="fstat-no" title="function not covered" >(p</span>roductInfo, isSecondHand) =&gt; {
-    const stockTypeSchema = <span class="cstat-no" title="statement not covered" >Joi.object({</span>
+export const validateProduct = (productInfo, isSecondHand) =&gt; {
+    const stockTypeSchema = Joi.object({
         stockType: Joi.string().valid("flat", "varied").required().trim(),
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!isSecondHand) {</span>
-        const errorMsg = <span class="cstat-no" title="statement not covered" >validate(productInfo, stockTypeSchema);</span>
+    if (!isSecondHand) {
+        const errorMsg = validate(productInfo, stockTypeSchema);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        if (errorMsg) {</span>
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (errorMsg) {
 <span class="cstat-no" title="statement not covered" >            return errorMsg;</span>
         }
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return validate(productInfo, productSchema);</span>
+    return validate(productInfo, productSchema);
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -166,7 +166,7 @@ export const validateProduct = <span class="fstat-no" title="function not covere
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-06-10T15:30:12.044Z
+                at 2023-06-19T13:41:29.458Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -74,8 +74,8 @@ Table Store {
   storeType StoreType [not null]
   rating Float [not null, default: 0]
   isDeleted Boolean [not null, default: false]
-  user User
-  userId Int [unique]
+  user User [not null]
+  userId Int [unique, not null]
   business Business
   product Product [not null]
   reviews Review [not null]
