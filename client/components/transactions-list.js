@@ -230,7 +230,7 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
             sellerQuery ||
             displayOption !== "all" ||
             (transactionType === "user" && userTransactions.length === 0) ||
-            (transactionType === "shop" && sellerTransactions.length === 0)
+            (transactionType === "seller" && sellerTransactions.length === 0)
         ) {
             return;
         }

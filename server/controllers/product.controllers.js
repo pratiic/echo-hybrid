@@ -171,6 +171,9 @@ export const getProducts = async (request, response, next) => {
         "second hand": {
             isSecondHand: true,
         },
+        "brand new": {
+            isSecondHand: false,
+        },
         province: getAddressFilter("province"),
         city: getAddressFilter("city"),
         area: getAddressFilter("area"),

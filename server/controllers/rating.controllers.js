@@ -7,14 +7,8 @@ export const provideRating = async (request, response, next) => {
     const targetId = parseInt(request.params.targetId);
     const targetType = request.params.targetType;
     const stars = request.body.stars;
+    const target = request.target;
     const io = request.io;
-    const selectionFilter =
-        targetType === "product"
-            ? {
-                  isSecondHand: true,
-                  store: { select: { id: true, userId: true } },
-              }
-            : { userId: true };
 
     const errorMsg = validateRating({ targetId, targetType, stars });
 
@@ -23,38 +17,6 @@ export const provideRating = async (request, response, next) => {
     }
 
     try {
-        // target -> product or store to be rated
-        const target = await prisma[targetType].findUnique({
-            where: {
-                id: targetId,
-            },
-            select: {
-                id: true,
-                rating: true,
-                ratings: true,
-                ...selectionFilter,
-            },
-        });
-
-        if (!target) {
-            return next(new HttpError(`${targetType} not found`));
-        }
-
-        if (targetType === "product" && target.isSecondHand) {
-            return next(new HttpError("a second hand product cannot be rated"));
-        }
-
-        if (
-            (targetType === "product" && target.store.userId === user.id) ||
-            (targetType === "store" && target.userId === user.id)
-        ) {
-            return next(
-                new HttpError(
-                    `you cannot provide a rating to your own ${targetType}`
-                )
-            );
-        }
-
         const alreadyRated = target.ratings.find(
             (rating) => rating.userId === user.id
         )
@@ -125,6 +87,7 @@ export const provideRating = async (request, response, next) => {
                 targetType === "product" ? target.store.userId : target.userId,
         });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

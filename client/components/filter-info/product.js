@@ -30,8 +30,7 @@ const ProductFilterInfo = ({ activeCategory, showingShopProducts, count }) => {
 
         return (
             <React.Fragment>
-                ,<span className="filter-info-highlight"> {count}</span>{" "}
-                {singularOrPluralCount(count, "product", "products")} found
+                ,<span className="font-semibold"> {count}</span> found
             </React.Fragment>
         );
     };

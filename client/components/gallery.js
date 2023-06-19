@@ -55,7 +55,7 @@ const Gallery = ({ images = [], isMyProduct, onDelete }) => {
     };
 
     return (
-        <div className="mt-3 500:mt-0 overflow-x-hidden max-w-[15rem] 500:max-w-[11rem] 550:max-w-[13rem] 750:max-w-[15rem]">
+        <div className="mt-3 500:mt-0 overflow-x-hidden max-w-[15rem] 500:min-w-[10rem] 500:max-w-[15rem] 650:min-w-[12rem] 650:max-w-[15rem]">
             <div className="relative">
                 {onDelete && (
                     <XCircleIcon
