@@ -2,7 +2,7 @@ import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 
 export const validateBusiness = async (request, response, next) => {
-    const businessId = parseInt(request.params.businessId);
+    const businessId = parseInt(request.params.businessId) || -1;
 
     try {
         const business = await prisma.business.findUnique({
@@ -28,6 +28,7 @@ export const validateBusiness = async (request, response, next) => {
         request.business = business;
         next();
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

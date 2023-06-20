@@ -13,5 +13,12 @@ export const buyProduct = async (app, buyerToken, sellerToken, productId) => {
     ).body.order;
     await packageOrder(app, sellerToken, order.id);
     await requestCompletion(app, sellerToken, order.id);
-    await handleCompletionRequest(app, buyerToken, order.id, "accept");
+    const response = await handleCompletionRequest(
+        app,
+        buyerToken,
+        order.id,
+        "accept"
+    );
+
+    return response;
 };

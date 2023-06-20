@@ -143,6 +143,15 @@ export const deleteTransaction = async (request, response, next) => {
             deletedForSeller,
             order: { originId, store },
         } = transaction;
+        const isUserBuyer = originId === user.id;
+
+        if (
+            isDeleted ||
+            (isUserBuyer && deletedForBuyer) ||
+            (!isUserBuyer && deletedForSeller)
+        ) {
+            return next(new HttpError("transaction not found", 404));
+        }
 
         if (originId !== user.id && store.userId !== user.id) {
             return next(
@@ -153,19 +162,7 @@ export const deleteTransaction = async (request, response, next) => {
             );
         }
 
-        const isUserBuyer = originId === user.id;
-
-        if (
-            isDeleted ||
-            (isUserBuyer && deletedForBuyer) ||
-            (!isUserBuyer && deletedForSeller)
-        ) {
-            return next(
-                new HttpError("the transaction has already been deleted", 400)
-            );
-        }
-
-        await prisma.transaction.update({
+        const updatedTransaction = await prisma.transaction.update({
             where: {
                 id: transaction.id,
             },
@@ -175,9 +172,15 @@ export const deleteTransaction = async (request, response, next) => {
                     : isUserBuyer
                     ? { deletedForBuyer: true }
                     : { deletedForSeller: true },
+            select: {
+                id: true,
+                isDeleted: true,
+                deletedForBuyer: true,
+                deletedForSeller: true,
+            },
         });
 
-        response.json({ message: "the transaction has been deleted" });
+        response.json({ transaction: updatedTransaction });
     } catch (error) {
         console.log(error);
         next(new HttpError());
