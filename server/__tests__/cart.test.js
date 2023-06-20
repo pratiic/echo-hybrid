@@ -382,6 +382,141 @@ describe("POST /api/carts/:productId SET CART ITEM", () => {
     });
 });
 
+describe("DELETE /api/carts/itemId REMOVE CART ITEM", () => {
+    let createdUser, createdSeller, createdProduct;
+
+    beforeAll(async () => {
+        const cartElements = await prepareCartElements();
+        createdUser = cartElements.createdUser;
+        createdSeller = cartElements.createdSeller;
+        createdProduct = cartElements.createdProduct;
+    });
+
+    it("should return 400 status code if the requesting user does not have a shopping cart", async () => {
+        const response = await supertest(app)
+            .delete(`/api/carts/1`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("you do not have a shopping cart");
+    });
+
+    it("should return 400 status code if itemId is non-existing", async () => {
+        await supertest(app)
+            .post("/api/carts")
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        const response = await supertest(app)
+            .delete(`/api/carts/-1`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body.error).toBe(
+            "cart item not found in your shopping cart"
+        );
+    });
+
+    it("should remove the cart item if provided valid data", async () => {
+        const cartItemResponse = await setCartItem(
+            app,
+            createdUser.token,
+            createdProduct.id,
+            {
+                variantId: "red",
+                quantity: 1,
+            },
+            true,
+            "varied",
+            createdSeller.token
+        );
+
+        const response = await supertest(app)
+            .delete(`/api/carts/${cartItemResponse.body.item.id}`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    afterAll(async () => {
+        await deleteCreatedUser(app, createdUser.id);
+        await deleteCreatedUser(app, createdSeller.id);
+    });
+});
+
+describe("GET /api/carts/checkout CHECK ORDER ABILITY", () => {
+    let createdUser, createdSeller, createdProduct;
+
+    beforeAll(async () => {
+        const cartElements = await prepareCartElements();
+        createdUser = cartElements.createdUser;
+        createdSeller = cartElements.createdSeller;
+        createdProduct = cartElements.createdProduct;
+    });
+
+    it("should return 400 status code if the requesting user does not have a shopping cart", async () => {
+        const response = await supertest(app)
+            .get("/api/carts/checkout")
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("you do not have a shopping cart");
+    });
+
+    it("should return 400 status code if the shopping cart is empty", async () => {
+        await supertest(app)
+            .post("/api/carts")
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        const response = await supertest(app)
+            .get("/api/carts/checkout")
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "there are no items in your shopping cart"
+        );
+    });
+
+    it("should return an array of items that cannot be ordered", async () => {
+        await setCartItem(
+            app,
+            createdUser.token,
+            createdProduct.id,
+            {
+                variantId: "red",
+                quantity: 1,
+            },
+            true,
+            "varied",
+            createdSeller.token
+        );
+
+        const response = await supertest(app)
+            .get("/api/carts/checkout")
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("cannotOrder");
+    });
+
+    afterAll(async () => {
+        await deleteCreatedUser(app, createdUser.id);
+        await deleteCreatedUser(app, createdSeller.id);
+    });
+});
+
+async function prepareCartElements() {
+    const createdUser = await createNewUser(app);
+
+    const createdSeller = await createNewUser(app);
+    await createBusiness(app, createdSeller.token);
+    const createdProduct = (
+        await createProduct(app, createdSeller.token, false)
+    ).body.product;
+
+    return { createdUser, createdSeller, createdProduct };
+}
+
 async function setCartItem(
     app,
     token,

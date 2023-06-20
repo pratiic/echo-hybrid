@@ -486,7 +486,7 @@ Ref: Message.chatId > Chat.id [delete: Cascade]
 
 Ref: Message.userId > User.id [delete: Cascade]
 
-Ref: Cart.userId - User.id
+Ref: Cart.userId - User.id [delete: Cascade]
 
 Ref: CartItem.cartId > Cart.id [delete: Cascade]
 

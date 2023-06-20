@@ -292,71 +292,83 @@ export const removeCartItem = async (request, response, next) => {
 
 export const checkOrderAbility = async (request, response, next) => {
     // some cart items cannot be ordered -> available quantity / availability (second hand) of corresponding product / variant may have changed
-    const cartItems = request.user.cart.items;
+    try {
+        if (!request.user.cart) {
+            return next(new HttpError("you do not have a shopping cart", 400));
+        }
 
-    if (cartItems.length === 0) {
-        return next(
-            new HttpError("there are no items in your shopping cart", 400)
-        );
-    }
+        const cartItems = request.user.cart.items;
 
-    let cannotOrder = []; // info about items that cannot be ordered
+        if (cartItems.length === 0) {
+            return next(
+                new HttpError("there are no items in your shopping cart", 400)
+            );
+        }
 
-    cartItems.forEach((item) => {
-        const { product, variant: itemVariant, quantity: itemQuantity } = item;
-        let itemInfo = null;
+        let cannotOrder = []; // info about items that cannot be ordered
 
-        if (product.suspension) {
-            itemInfo = {
-                maxQuantity: -2,
-            };
-        } else if (product.store.suspension) {
-            itemInfo = {
-                maxQuantity: -3,
-            };
-        } else if (product.isSecondHand) {
-            if (!product.storeId) {
-                // product has been sold or deleted
+        cartItems.forEach((item) => {
+            const {
+                product,
+                variant: itemVariant,
+                quantity: itemQuantity,
+            } = item;
+            let itemInfo = null;
+
+            if (product.suspension) {
                 itemInfo = {
-                    maxQuantity: -1,
-                    isSecondHand: true,
+                    maxQuantity: -2,
                 };
-            }
-        } else {
-            if (!product.storeId) {
-                // product has been deleted
+            } else if (product.store.suspension) {
                 itemInfo = {
-                    maxQuantity: -1,
+                    maxQuantity: -3,
                 };
-            } else if (itemVariant) {
-                // stock type is varied
-                const productVariant = product.stock.variants.find(
-                    (variant) => variant.id === itemVariant.id
-                );
-
-                if (itemQuantity > productVariant.quantity) {
+            } else if (product.isSecondHand) {
+                if (!product.storeId) {
+                    // product has been sold or deleted
                     itemInfo = {
-                        maxQuantity: productVariant.quantity,
+                        maxQuantity: -1,
+                        isSecondHand: true,
                     };
                 }
             } else {
-                // stock type is flat
-                const productQuantity = product.stock.quantity;
-
-                if (itemQuantity > productQuantity) {
+                if (!product.storeId) {
+                    // product has been deleted
                     itemInfo = {
-                        maxQuantity: productQuantity,
+                        maxQuantity: -1,
                     };
+                } else if (itemVariant) {
+                    // stock type is varied
+                    const productVariant = product.stock.variants.find(
+                        (variant) => variant.id === itemVariant.id
+                    );
+
+                    if (itemQuantity > productVariant.quantity) {
+                        itemInfo = {
+                            maxQuantity: productVariant.quantity,
+                        };
+                    }
+                } else {
+                    // stock type is flat
+                    const productQuantity = product.stock.quantity;
+
+                    if (itemQuantity > productQuantity) {
+                        itemInfo = {
+                            maxQuantity: productQuantity,
+                        };
+                    }
                 }
             }
-        }
 
-        if (itemInfo) {
-            cannotOrder.push({ ...itemInfo, id: item.id });
-        }
-    });
+            if (itemInfo) {
+                cannotOrder.push({ ...itemInfo, id: item.id });
+            }
+        });
 
-    response.json({
-        cannotOrder,
-    });
+        response.json({
+            cannotOrder,
+        });
+    } catch (error) {
+        next(new HttpError());
+    }
 };

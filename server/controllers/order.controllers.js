@@ -92,6 +92,10 @@ export const placeOrder = async (request, response, next) => {
             );
         }
 
+        if (product.stockType === "varied" && !product.stock) {
+            return next(new HttpError("this product is not active yet", 400));
+        }
+
         // check if the product is delivered for handling address
         const isDelivered = checkDelivery(
             orderInfo.address,
@@ -155,7 +159,7 @@ export const placeOrder = async (request, response, next) => {
                     return next(
                         new HttpError(
                             "the requested variant does not exist",
-                            400
+                            404
                         )
                     );
                 }
@@ -410,7 +414,8 @@ export const controlOrder = async (request, response, next) => {
         ) {
             return next(
                 new HttpError(
-                    `the order has already been ${order.status}`.toLowerCase()
+                    `the order has already been ${order.status}`.toLowerCase(),
+                    400
                 )
             );
         }
@@ -418,7 +423,7 @@ export const controlOrder = async (request, response, next) => {
         // can package only if status -> CONFIRMED
         if (action === "package" && order.status !== "CONFIRMED") {
             return next(
-                new HttpError(`an order must be confirmed to be packaged`)
+                new HttpError(`an order must be confirmed to be packaged`, 400)
             );
         }
 
@@ -596,8 +601,15 @@ export const acknowledgeOrders = async (request, response, next) => {
 };
 
 export const deleteOrder = async (request, response, next) => {
+    // order cancelled -> can be deleted by product owner
+    // order rejected -> can be deleted by originator
+
     const user = request.user;
     const order = request.order;
+
+    if (order.originId !== user.id && order.store.userId !== user.id) {
+        return next(new HttpError("unauthorized to delete this order", 400));
+    }
 
     if (order.status !== "REJECTED" && order.status !== "CANCELLED") {
         return next(
@@ -606,15 +618,6 @@ export const deleteOrder = async (request, response, next) => {
                 400
             )
         );
-    }
-
-    if (
-        (order.status === "REJECTED" && order.originId !== user.id) ||
-        (order.status === "CANCELLED" && order.store.userId !== user.id)
-    ) {
-        // order cancelled -> can be deleted by product owner
-        // order rejected -> can be deleted by originator
-        return next(new HttpError("unauthorized to delete this order", 400));
     }
 
     try {
