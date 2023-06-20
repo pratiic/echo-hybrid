@@ -21,6 +21,7 @@ export const ratingRouter = (io) => {
                 rating: true,
                 ratings: true,
             };
+            request.action = "rate";
             validateFeedback(request, ...op);
         },
         (request, ...op) => {

@@ -18,7 +18,10 @@ export const reviewRouter = (io) => {
             auth(request, ...op);
         },
         getUpload().single("image"),
-        validateFeedback,
+        (request, ...op) => {
+            request.action = "review";
+            validateFeedback(request, ...op);
+        },
         (request, ...op) => {
             request.io = io;
             postReview(request, ...op);

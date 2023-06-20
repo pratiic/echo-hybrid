@@ -607,10 +607,6 @@ export const deleteOrder = async (request, response, next) => {
     const user = request.user;
     const order = request.order;
 
-    if (order.originId !== user.id && order.store.userId !== user.id) {
-        return next(new HttpError("unauthorized to delete this order", 400));
-    }
-
     if (order.status !== "REJECTED" && order.status !== "CANCELLED") {
         return next(
             new HttpError(
@@ -620,10 +616,20 @@ export const deleteOrder = async (request, response, next) => {
         );
     }
 
+    if (
+        (order.status === "REJECTED" && order.originId !== user.id) ||
+        (order.status === "CANCELLED" && order.store.userId !== user.id)
+    ) {
+        return next(new HttpError("unauthorized to delete this order", 401));
+    }
+
     try {
-        await prisma.order.delete({
+        await prisma.order.update({
             where: {
                 id: order.id,
+            },
+            data: {
+                isDeleted: true,
             },
         });
 
@@ -713,7 +719,7 @@ export const handleCompletionRequest = async (request, response, next) => {
         return next(
             new HttpError(
                 "you are unauthorized to handle the completion request of this order",
-                400
+                401
             )
         );
     }

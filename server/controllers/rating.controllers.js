@@ -105,12 +105,12 @@ export const deleteRating = async (request, response, next) => {
         });
 
         if (!rating) {
-            return next(new HttpError("rating not found", 400));
+            return next(new HttpError("rating not found", 404));
         }
 
         if (rating.userId !== user.id) {
             return next(
-                new HttpError("you are unauthorized to delete this rating", 400)
+                new HttpError("you are unauthorized to delete this rating", 401)
             );
         }
 

@@ -6,12 +6,12 @@ import { validateReply } from "../validators/reply.validators.js";
 
 export const replyToReview = async (request, response, next) => {
     const user = request.user;
-    const reviewId = parseInt(request.params.reviewId);
+    const reviewId = parseInt(request.params.reviewId) || -1;
     const { text } = request.body;
     const io = request.io;
 
     // validate reply
-    const errorMsg = validateReply({ reviewId, text });
+    const errorMsg = validateReply({ text });
 
     if (errorMsg) {
         return next(new HttpError(errorMsg, 400));

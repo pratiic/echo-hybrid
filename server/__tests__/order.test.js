@@ -1,5 +1,3 @@
-import supertest from "supertest";
-
 import { app } from "../index.js";
 import {
     createBusiness,
@@ -10,7 +8,14 @@ import {
     signInAsAdmin,
     signInAsDeliveryPersonnel,
 } from "./utils.js";
-import { controlOrder, placeOrder } from "./utils/order.utils.js";
+import {
+    controlOrder,
+    deleteOrder,
+    handleCompletionRequest,
+    packageOrder,
+    placeOrder,
+    requestCompletion,
+} from "./utils/order.utils.js";
 
 describe("POST /api/orders/:productId PLACE ORDER", () => {
     let createdUser,
@@ -560,6 +565,392 @@ describe("PATCH /api/orders/:orderId CONTROL ORDER", () => {
     });
 });
 
+describe("DELETE /api/orders/:orderId DELETE ORDER", () => {
+    let createdUser,
+        indSeller,
+        busSeller,
+        secondHandProduct,
+        flatProduct,
+        variedProduct,
+        secondHandOrder,
+        secondHandOrderTwo,
+        flatOrder,
+        variedOrder;
+
+    beforeAll(async () => {
+        const orderElements = await prepareOrderElements();
+        createdUser = orderElements.createdUser;
+        indSeller = orderElements.indSeller;
+        busSeller = orderElements.busSeller;
+        secondHandProduct = orderElements.secondHandProduct;
+        flatProduct = orderElements.flatProduct;
+        variedProduct = orderElements.variedProduct;
+
+        secondHandOrder = (
+            await placeOrder(app, createdUser.token, secondHandProduct.id)
+        ).body.order;
+
+        secondHandOrderTwo = (
+            await placeOrder(app, createdUser.token, secondHandProduct.id)
+        ).body.order;
+
+        flatOrder = (
+            await placeOrder(app, createdUser.token, flatProduct.id, {
+                quantity: 1,
+            })
+        ).body.order;
+
+        variedOrder = (
+            await placeOrder(app, createdUser.token, variedProduct.id, {
+                quantity: 1,
+                variantId: "red",
+            })
+        ).body.order;
+    });
+
+    it("should return 404 status code if the order does not exist", async () => {
+        const response = await deleteOrder(app, createdUser.token, -1);
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body.error).toBe("order not found");
+    });
+
+    it("should return 400 status code if the status is not 'cancelled' or 'rejected'", async () => {
+        const response = await deleteOrder(
+            app,
+            createdUser.token,
+            secondHandOrder.id
+        );
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "an order must have been rejected or cancelled to be deleted"
+        );
+    });
+
+    it("should return 401 status code if the status is 'cancelled' and the requesting user is not the seller", async () => {
+        await controlOrder(
+            app,
+            createdUser.token,
+            secondHandOrder.id,
+            "cancel"
+        );
+
+        const response = await deleteOrder(
+            app,
+            createdUser.token,
+            secondHandOrder.id
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body.error).toBe("unauthorized to delete this order");
+    });
+
+    it("should return 401 status code if the status is 'rejected' and the requesting user is not the seller", async () => {
+        await controlOrder(app, busSeller.token, flatOrder.id, "reject");
+
+        const response = await deleteOrder(app, busSeller.token, flatOrder.id);
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body.error).toBe("unauthorized to delete this order");
+    });
+
+    it("should delete an order if the status is 'rejected' and the requesting user is the originator", async () => {
+        await controlOrder(app, busSeller.token, variedOrder.id, "reject");
+
+        const response = await deleteOrder(
+            app,
+            createdUser.token,
+            flatOrder.id
+        );
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    it("should delete an order if the status is 'cancelled' and the requesting user is the seller", async () => {
+        await controlOrder(
+            app,
+            createdUser.token,
+            secondHandOrderTwo.id,
+            "cancel"
+        );
+
+        const response = await deleteOrder(
+            app,
+            indSeller.token,
+            secondHandOrderTwo.id
+        );
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    afterAll(async () => {
+        await deleteCreatedUser(app, createdUser.id);
+        await deleteCreatedUser(app, indSeller.id);
+        await deleteCreatedUser(app, busSeller.id);
+    });
+});
+
+describe("POST /api/orders/:orderId/completion REQUEST COMPLETION", () => {
+    let createdUser,
+        deliveryToken,
+        indSeller,
+        secondHandProduct,
+        deliveredOrder,
+        undeliveredOrder;
+
+    beforeAll(async () => {
+        const orderElements = await prepareOrderElements();
+        createdUser = orderElements.createdUser;
+        indSeller = orderElements.indSeller;
+        secondHandProduct = orderElements.secondHandProduct;
+
+        deliveryToken = await signInAsDeliveryPersonnel(app);
+
+        const orders = await prepareOrders(createdUser, secondHandProduct);
+        deliveredOrder = orders.deliveredOrder;
+        undeliveredOrder = orders.undeliveredOrder;
+    });
+
+    it("should return 404 status code if the order does not exist", async () => {
+        const response = await deleteOrder(app, createdUser.token, -1);
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body.error).toBe("order not found");
+    });
+
+    it("should return 401 status code if the order is delivered and the requesting user is not delivery personnel - tried with buyer", async () => {
+        const response = await requestCompletion(
+            app,
+            createdUser.token,
+            deliveredOrder.id
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body.error).toBe(
+            "you are unauthorized to request the completion of this order"
+        );
+    });
+
+    it("should return 401 status code if the order is delivered and the requesting user is not delivery personnel - tried with seller", async () => {
+        const response = await requestCompletion(
+            app,
+            indSeller.token,
+            deliveredOrder.id
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body.error).toBe(
+            "you are unauthorized to request the completion of this order"
+        );
+    });
+
+    it("should return 401 status code if the order is not delivered and the requesting user is not the seller - tried with buyer", async () => {
+        const response = await requestCompletion(
+            app,
+            createdUser.token,
+            undeliveredOrder.id
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body.error).toBe(
+            "you are unauthorized to request the completion of this order"
+        );
+    });
+
+    it("should return 401 status code if the order is not delivered and the requesting user is not the seller - tried with delivery personnel", async () => {
+        const response = await requestCompletion(
+            app,
+            deliveryToken,
+            undeliveredOrder.id
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body.error).toBe(
+            "you are unauthorized to request the completion of this order"
+        );
+    });
+
+    it("should return 400 status code if the order is not packaged", async () => {
+        const response = await requestCompletion(
+            app,
+            deliveryToken,
+            deliveredOrder.id
+        );
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "the order needs to be packaged first"
+        );
+    });
+
+    it("should create order completion request if provided valid data - UNDELIVERED", async () => {
+        await packageOrder(app, indSeller.token, undeliveredOrder.id);
+
+        const response = await requestCompletion(
+            app,
+            indSeller.token,
+            undeliveredOrder.id
+        );
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    it("should create order completion request if provided valid data - DELIVERED", async () => {
+        await packageOrder(app, indSeller.token, deliveredOrder.id);
+
+        const response = await requestCompletion(
+            app,
+            deliveryToken,
+            deliveredOrder.id
+        );
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    it("should return 400 status code if a completion request already exists", async () => {
+        await packageOrder(app, indSeller.token, deliveredOrder.id);
+        await requestCompletion(app, deliveryToken, deliveredOrder.id);
+
+        const response = await requestCompletion(
+            app,
+            deliveryToken,
+            deliveredOrder.id
+        );
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "a completion request has already been made"
+        );
+    });
+
+    afterAll(async () => {
+        await deleteCreatedUser(app, createdUser.id);
+        await deleteCreatedUser(app, indSeller.id);
+    });
+});
+
+describe("PATCH /api/orders/:orderId/completion HANDLE COMPLETION REQUEST", () => {
+    let createdUser,
+        deliveryToken,
+        indSeller,
+        secondHandProduct,
+        deliveredOrder,
+        undeliveredOrder;
+
+    beforeAll(async () => {
+        const orderElements = await prepareOrderElements();
+        createdUser = orderElements.createdUser;
+        indSeller = orderElements.indSeller;
+        secondHandProduct = orderElements.secondHandProduct;
+
+        deliveryToken = await signInAsDeliveryPersonnel(app);
+
+        const orders = await prepareOrders(createdUser, secondHandProduct);
+        deliveredOrder = orders.deliveredOrder;
+        undeliveredOrder = orders.undeliveredOrder;
+    });
+
+    it("should return 404 status code if the order does not exist", async () => {
+        const response = await handleCompletionRequest(
+            app,
+            createdUser.token,
+            -1
+        );
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body.error).toBe("order not found");
+    });
+
+    it("should return 400 status code if the action is not provided", async () => {
+        const response = await handleCompletionRequest(
+            app,
+            createdUser.token,
+            deliveredOrder.id
+        );
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("invalid action");
+    });
+
+    it("should return 400 status code if the action is invalid", async () => {
+        const response = await handleCompletionRequest(
+            app,
+            createdUser.token,
+            deliveredOrder.id,
+            "invalid action"
+        );
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("invalid action");
+    });
+
+    it("should return 400 status code if completion request does not exist", async () => {
+        const response = await handleCompletionRequest(
+            app,
+            createdUser.token,
+            deliveredOrder.id,
+            "accept"
+        );
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "a request to complete the order does not exist"
+        );
+    });
+
+    it("should return 401 status code if the requesting user is not the originator", async () => {
+        await packageOrder(app, indSeller.token, deliveredOrder.id);
+        await requestCompletion(app, deliveryToken, deliveredOrder.id);
+
+        const response = await handleCompletionRequest(
+            app,
+            indSeller.token,
+            deliveredOrder.id,
+            "accept"
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body.error).toBe(
+            "you are unauthorized to handle the completion request of this order"
+        );
+    });
+
+    it("should handle the completion request if provided valid data - ACCEPT", async () => {
+        await packageOrder(app, indSeller.token, deliveredOrder.id);
+        await requestCompletion(app, deliveryToken, deliveredOrder.id);
+
+        const response = await handleCompletionRequest(
+            app,
+            createdUser.token,
+            deliveredOrder.id,
+            "accept"
+        );
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("transaction");
+    });
+
+    it("should handle the completion request if provided valid data - REJECT", async () => {
+        await packageOrder(app, indSeller.token, undeliveredOrder.id);
+        await requestCompletion(app, indSeller.token, undeliveredOrder.id);
+
+        const response = await handleCompletionRequest(
+            app,
+            createdUser.token,
+            undeliveredOrder.id,
+            "reject"
+        );
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    afterAll(async () => {
+        await deleteCreatedUser(app, createdUser.id);
+        await deleteCreatedUser(app, indSeller.id);
+    });
+});
+
 async function prepareOrderElements() {
     const createdUser = await createNewUser(app, true, true);
 
@@ -603,4 +994,28 @@ async function prepareOrderElements() {
         flatProduct,
         variedProduct,
     };
+}
+
+async function prepareOrders(createdUser, product) {
+    const deliveredOrder = (
+        await placeOrder(app, createdUser.token, product.id, {
+            address: createdUser.address,
+        })
+    ).body.order;
+
+    const undeliveredOrderRes = await placeOrder(
+        app,
+        createdUser.token,
+        product.id,
+        {
+            address: {
+                bagmati: "province no 1",
+                city: "jhapa",
+                area: "birtamode",
+            },
+        }
+    );
+    const undeliveredOrder = undeliveredOrderRes.body.order;
+
+    return { deliveredOrder, undeliveredOrder };
 }

@@ -12,7 +12,7 @@ export const validateOrder = async (request, response, next) => {
             select: request.select,
         });
 
-        if (!order) {
+        if (!order || order.isDeleted) {
             return next(new HttpError("order not found", 404));
         }
 

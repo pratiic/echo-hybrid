@@ -472,7 +472,7 @@ Ref: OrderCompletion.orderId - Order.id [delete: Cascade]
 
 Ref: OrderCompletion.requestorId > User.id [delete: Cascade]
 
-Ref: Delivery.orderId - Order.id
+Ref: Delivery.orderId - Order.id [delete: Cascade]
 
 Ref: Delivery.madeById > User.id [delete: Set Null]
 

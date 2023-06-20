@@ -1,10 +1,18 @@
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
+import { validateTargetType } from "../validators/feedback.validators.js";
 
 export const validateFeedback = async (request, response, next) => {
     const user = request.user;
-    const targetId = parseInt(request.params.targetId);
+    const targetId = parseInt(request.params.targetId) || -1;
     const targetType = request.params.targetType;
+    const action = request.action;
+
+    const errorMsg = validateTargetType(targetType);
+
+    if (errorMsg) {
+        return next(new HttpError(errorMsg, 400));
+    }
 
     const selectionMap = {
         product: {
@@ -39,20 +47,28 @@ export const validateFeedback = async (request, response, next) => {
             return next(new HttpError(`${targetType} not found`, 404));
         }
 
-        // cannot review a second-hand product
+        // cannot review or rate a second-hand product
         if (targetType === "product" && target.isSecondHand) {
             return next(
-                new HttpError("a second-hand product cannot be reviewed", 400)
+                new HttpError(
+                    `a second-hand product cannot be ${
+                        action === "review" ? "reviewed" : "rated"
+                    }`,
+                    400
+                )
             );
         }
 
-        // cannot review one's own product or seller profile
+        // cannot review or rate one's own product or seller profile
         if (
             (targetType === "product" && target.store.userId === user.id) ||
-            (targetType === "seller" && target.userId === user.id)
+            (targetType === "store" && target.userId === user.id)
         ) {
             return next(
-                new HttpError(`you cannot review your own ${targetType}`, 400)
+                new HttpError(
+                    `you cannot ${action} your own ${targetType}`,
+                    400
+                )
             );
         }
 
@@ -76,9 +92,10 @@ export const validateFeedback = async (request, response, next) => {
                         targetType === "product"
                             ? "this product"
                             : "from this seller"
-                    } before reviewing ${
+                    } before ${action === "review" ? "reviewing" : "rating"} ${
                         targetType === "product" ? "it" : "them"
-                    }`
+                    }`,
+                    400
                 )
             );
         }

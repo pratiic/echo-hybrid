@@ -4,8 +4,8 @@ import { validate } from "./base.validators.js";
 import { idSchema } from "./utils.js";
 
 const reviewSchema = Joi.object({
-    targetId: idSchema,
     targetType: Joi.string().allow("product", "store").required().trim(),
+    targetId: idSchema,
     text: Joi.string().min(5).max(200).required().trim(),
 });
 
