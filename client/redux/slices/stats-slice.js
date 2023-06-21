@@ -3,22 +3,21 @@ import { createSlice } from "@reduxjs/toolkit";
 const statsSlice = createSlice({
     name: "stats",
     initialState: {
-        appStats: {},
-        needToFetch: true,
+        appStats: null,
+        loading: true,
+        error: "",
     },
     reducers: {
         setAppStats: (state, action) => {
             state.appStats = action.payload;
-
-            state.needToFetch = false;
+        },
+        setProp: (state, action) => {
+            const { prop, value } = action.payload;
+            state[prop] = value;
         },
     },
 });
 
-export const {
-    setAppStats,
-    updateAppStats,
-    setNeedToFetch,
-} = statsSlice.actions;
+export const { setAppStats, setProp } = statsSlice.actions;
 
 export default statsSlice.reducer;

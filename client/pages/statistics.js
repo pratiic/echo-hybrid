@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head";
 
 import { fetcher } from "../lib/fetcher";
-import { setAppStats } from "../redux/slices/stats-slice";
+import { setAppStats, setProp } from "../redux/slices/stats-slice";
 
 import PageHeader from "../components/page-header";
 import StatCard from "../components/stat-card";
 
 const Statistics = () => {
-    const [loadingStats, setLoadingStats] = useState(false);
-    const [errorMsg, setErrorMsg] = useState("");
-
-    const { appStats } = useSelector((state) => state.stats);
+    const { appStats, loading, error } = useSelector((state) => state.stats);
 
     const dispatch = useDispatch();
 
@@ -22,7 +19,7 @@ const Statistics = () => {
 
     const getAppStatistics = async () => {
         if (!appStats) {
-            setLoadingStats(true);
+            dispatch(setProp({ prop: "loading", value: true }));
         }
 
         try {
@@ -30,22 +27,22 @@ const Statistics = () => {
 
             dispatch(setAppStats(data));
         } catch (error) {
-            setErrorMsg(error.message);
+            dispatch(setProp({ prop: "error", value: error.message }));
         } finally {
-            setLoadingStats(false);
+            dispatch(setProp({ prop: "loading", value: false }));
         }
     };
 
-    if (loadingStats) {
+    if (loading) {
         return <p className="status">Loading statistics...</p>;
     }
 
-    if (errorMsg) {
-        return <p className="status">{errorMsg}</p>;
+    if (error) {
+        return <p className="status">{error}</p>;
     }
 
     return (
-        <section className="pb-7">
+        <section>
             <Head>
                 <title>Statistics</title>
             </Head>
