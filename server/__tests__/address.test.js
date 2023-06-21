@@ -124,6 +124,7 @@ describe("GET /api/addresses SET ADDRESS", () => {
         });
 
         expect(response.statusCode).toBe(400);
+    });
 
     afterAll(async () => {
         const adminToken = await signInAsAdmin(app);

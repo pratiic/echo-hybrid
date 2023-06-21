@@ -1,7 +1,12 @@
 import supertest from "supertest";
 
 import { app } from "../index.js";
-import { createNewUser, deleteCreatedUser, signInAsAdmin } from "./utils.js";
+import {
+    createNewUser,
+    deleteCreatedStore,
+    deleteCreatedUser,
+    signInAsAdmin,
+} from "./utils.js";
 
 describe("POST /api/stores REGISTER STORE", () => {
     let createdUser;
@@ -17,7 +22,7 @@ describe("POST /api/stores REGISTER STORE", () => {
 
         expect(response.statusCode).toBe(201);
 
-        await deleteStore(app, createdUser.token);
+        await deleteCreatedStore(app, createdUser.token);
     });
 
     it("should register a business store if provided valid data", async () => {
@@ -27,7 +32,7 @@ describe("POST /api/stores REGISTER STORE", () => {
 
         expect(response.statusCode).toBe(201);
 
-        await deleteStore(app, createdUser.token);
+        await deleteCreatedStore(app, createdUser.token);
     });
 
     it("should return 400 status code if type is not provided", async () => {
@@ -68,7 +73,7 @@ describe("DELETE /api/stores DELETE STORE", () => {
             .post(`/api/stores/?type=IND`)
             .set("Authorization", `Bearer ${createdUser.token}`);
 
-        const response = await deleteStore(app, createdUser.token);
+        const response = await deleteCreatedStore(app, createdUser.token);
 
         expect(response.statusCode).toBe(200);
         expect(response.body.message).toBe("the store has been deleted");
@@ -88,11 +93,3 @@ describe("DELETE /api/stores DELETE STORE", () => {
         await deleteCreatedUser(app, createdUser.id, adminToken);
     });
 });
-
-async function deleteStore(app, token) {
-    const response = await supertest(app)
-        .delete(`/api/stores`)
-        .set("Authorization", `Bearer ${token}`);
-
-    return response;
-}

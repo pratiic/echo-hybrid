@@ -35,23 +35,6 @@ export const postReview = async (request, response, next) => {
     };
 
     try {
-        const target = await prisma[targetType].findUnique({
-            where: {
-                id: targetId,
-            },
-        });
-
-        if (!target) {
-            return next(new HttpError(`${targetType} not found`, 404));
-        }
-
-        // cannot review a second-hand product
-        if (targetType === "product" && target.isSecondHand) {
-            return next(
-                new HttpError("a second-hand product cannot be reviewed", 400)
-            );
-        }
-
         const createdReview = await prisma.review.upsert({
             where: {
                 [`user_${targetType}`]: {

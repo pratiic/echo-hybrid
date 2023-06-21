@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">13.63% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/22</span>
+                <span class='fraction'>22/22</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">14.28% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/21</span>
+                <span class='fraction'>21/21</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -124,48 +124,48 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Joi from "joi";
 &nbsp;
@@ -175,49 +175,49 @@ export const quantitySchema = Joi.object({
     quantity: Joi.number().integer().min(0).required(),
 });
 &nbsp;
-export const validateSingularStock = <span class="fstat-no" title="function not covered" >(q</span>uantity) =&gt; {
-<span class="cstat-no" title="statement not covered" >    return validate({ quantity }, quantitySchema);</span>
+export const validateSingularStock = (quantity) =&gt; {
+    return validate({ quantity }, quantitySchema);
 };
 &nbsp;
-export const validateProductVariants = <span class="fstat-no" title="function not covered" >(v</span>ariants, variations) =&gt; {
+export const validateProductVariants = (variants, variations) =&gt; {
     // variants -&gt; array of atleast one variant
-<span class="cstat-no" title="statement not covered" >    if (!Array.isArray(variants) || variants.length === 0) {</span>
-<span class="cstat-no" title="statement not covered" >        return "provide an array of variants";</span>
+    if (!Array.isArray(variants) || variants.length === 0) {
+        return "provide an array of variants";
     }
 &nbsp;
-    const variationLabels = <span class="cstat-no" title="statement not covered" >variations.map(<span class="fstat-no" title="function not covered" >(v</span>ariation) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        return variation.label;</span>
+    const variationLabels = variations.map((variation) =&gt; {
+        return variation.label;
     });
 &nbsp;
-    let errorMsg = <span class="cstat-no" title="statement not covered" >"";</span>
+    let errorMsg = "";
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    variants.forEach(<span class="fstat-no" title="function not covered" >(v</span>ariant) =&gt; {</span>
+    variants.forEach((variant) =&gt; {
         // validate variation quantity
-<span class="cstat-no" title="statement not covered" >        errorMsg = validate({ quantity: variant.quantity }, quantitySchema);</span>
+        errorMsg = validate({ quantity: variant.quantity }, quantitySchema);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        if (errorMsg) {</span>
-<span class="cstat-no" title="statement not covered" >            return (errorMsg = errorMsg);</span>
+        if (errorMsg) {
+            return (errorMsg = errorMsg);
         }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        variationLabels.forEach(<span class="fstat-no" title="function not covered" >(l</span>abel) =&gt; {</span>
+        variationLabels.forEach((label) =&gt; {
             // check if each label is provided -&gt; color, size, etc
-<span class="cstat-no" title="statement not covered" >            if (!variant[label]) {</span>
-<span class="cstat-no" title="statement not covered" >                return (errorMsg = `${label} is required`);</span>
+            if (!variant[label]) {
+                return (errorMsg = `${label} is required`);
             }
 &nbsp;
             // validate provided option for each label
             // label -&gt; color, then option may be red, blue, etc
-            const options = <span class="cstat-no" title="statement not covered" >variations.find(</span>
-<span class="fstat-no" title="function not covered" >                (v</span>ariation) =&gt; <span class="cstat-no" title="statement not covered" >variation.label === label</span>
+            const options = variations.find(
+                (variation) =&gt; variation.label === label
             )["options"];
 &nbsp;
-<span class="cstat-no" title="statement not covered" >            if (!options.find(<span class="fstat-no" title="function not covered" >(o</span>ption) =&gt; <span class="cstat-no" title="statement not covered" >option === variant[label])</span>) {</span>
-<span class="cstat-no" title="statement not covered" >                return (errorMsg = `the value for ${label} is invalid`);</span>
+            if (!options.find((option) =&gt; option === variant[label])) {
+                return (errorMsg = `the value for ${label} is invalid`);
             }
         });
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return errorMsg;</span>
+    return errorMsg;
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -226,7 +226,7 @@ export const validateProductVariants = <span class="fstat-no" title="function no
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-06-10T15:30:12.044Z
+                at 2023-06-19T13:41:29.458Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

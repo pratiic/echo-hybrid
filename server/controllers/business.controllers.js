@@ -20,6 +20,15 @@ export const registerBusiness = async (request, response, next) => {
         return next(new HttpError(errorMsg, 400));
     }
 
+    if (!request.file) {
+        return next(
+            new HttpError(
+                "business registration certificate must be provided",
+                400
+            )
+        );
+    }
+
     try {
         const store = await prisma.store.findUnique({
             where: { userId: user.id },
@@ -59,15 +68,6 @@ export const registerBusiness = async (request, response, next) => {
             );
         }
 
-        if (!request.file) {
-            return next(
-                new HttpError(
-                    "business registration certificate must be provided",
-                    400
-                )
-            );
-        }
-
         let { name, PAN, phone } = businessInfo;
         [name, PAN, phone] = trimValues(name, PAN, phone);
 
@@ -77,6 +77,7 @@ export const registerBusiness = async (request, response, next) => {
                 PAN,
                 phone,
                 storeId: store.id,
+                // isVerified: true,
             },
         });
 
@@ -101,7 +102,7 @@ export const registerBusiness = async (request, response, next) => {
             }),
         ]);
 
-        response.json({
+        response.status(201).json({
             business: updatedBusiness,
         });
     } catch (error) {
@@ -152,12 +153,6 @@ export const controlBusinessRegistration = async (request, response, next) => {
     const { cause } = request.body;
     const io = request.io;
 
-    const errorMsg = validateBusinessRegistrationControl({ action, cause });
-
-    if (errorMsg) {
-        return next(new HttpError(errorMsg), 400);
-    }
-
     if (business.isVerified) {
         return next(
             new HttpError("the business has already been verified", 400)
@@ -171,6 +166,12 @@ export const controlBusinessRegistration = async (request, response, next) => {
                 400
             )
         );
+    }
+
+    const errorMsg = validateBusinessRegistrationControl({ action, cause });
+
+    if (errorMsg) {
+        return next(new HttpError(errorMsg, 400));
     }
 
     let operation = null;

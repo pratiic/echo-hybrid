@@ -6,6 +6,7 @@ import {
     postReview,
 } from "../controllers/review.controllers.js";
 import { getUpload } from "../middleware/multer.middleware.js";
+import { validateFeedback } from "../middleware/feedback.middleware.js";
 
 export const reviewRouter = (io) => {
     const router = express.Router();
@@ -17,6 +18,10 @@ export const reviewRouter = (io) => {
             auth(request, ...op);
         },
         getUpload().single("image"),
+        (request, ...op) => {
+            request.action = "review";
+            validateFeedback(request, ...op);
+        },
         (request, ...op) => {
             request.io = io;
             postReview(request, ...op);

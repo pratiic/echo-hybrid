@@ -10,5 +10,6 @@ export const getFilterMap = (
         }`,
         delivered: "products that are delivered to your location",
         "second hand": "second hand products",
+        "brand new": "brand new products",
     };
 };

@@ -74,8 +74,8 @@ Table Store {
   storeType StoreType [not null]
   rating Float [not null, default: 0]
   isDeleted Boolean [not null, default: false]
-  user User
-  userId Int [unique]
+  user User [not null]
+  userId Int [unique, not null]
   business Business
   product Product [not null]
   reviews Review [not null]
@@ -472,7 +472,7 @@ Ref: OrderCompletion.orderId - Order.id [delete: Cascade]
 
 Ref: OrderCompletion.requestorId > User.id [delete: Cascade]
 
-Ref: Delivery.orderId - Order.id
+Ref: Delivery.orderId - Order.id [delete: Cascade]
 
 Ref: Delivery.madeById > User.id [delete: Set Null]
 
@@ -486,7 +486,7 @@ Ref: Message.chatId > Chat.id [delete: Cascade]
 
 Ref: Message.userId > User.id [delete: Cascade]
 
-Ref: Cart.userId - User.id
+Ref: Cart.userId - User.id [delete: Cascade]
 
 Ref: CartItem.cartId > Cart.id [delete: Cascade]
 

@@ -3,7 +3,7 @@ import { HttpError } from "../models/http-error.models.js";
 
 export const validateProduct = async (request, response, next) => {
     const user = request.user;
-    const productId = parseInt(request.params.productId);
+    const productId = parseInt(request.params.productId) || -1;
 
     try {
         // check if the product exists

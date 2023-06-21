@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/outline";
 import { FaCity } from "react-icons/fa";
 import { MdDeliveryDining, MdTransferWithinAStation } from "react-icons/md";
+import { TbCertificate } from "react-icons/tb";
 
 import { setFilterOptions } from "../redux/slices/filter-slice";
 import { closeModal } from "../redux/slices/modal-slice";
@@ -75,6 +76,10 @@ const ProductFilter = ({ isGlobal }) => {
         {
             name: "second hand",
             icon: <MdTransferWithinAStation className="icon-no-bg" />,
+        },
+        {
+            name: "brand new",
+            icon: <TbCertificate className="icon-no-bg" />,
         },
     ];
     const locationOptions = [

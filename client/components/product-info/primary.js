@@ -46,7 +46,7 @@ const PrimaryInfo = ({
 
                 <div className="max-w-[350px]">
                     {/* product name */}
-                    <h2 className="text-2xl 500:text-xl 650:text-2xl font-semibold mb-1 dark:text-gray-100 leading-tight">
+                    <h2 className="text-lg 650:text-xl 750:text-[1.4rem] font-semibold mb-1 black-white leading-tight">
                         {capitalizeFirstLetter(name)}
                     </h2>
 
@@ -70,14 +70,12 @@ const PrimaryInfo = ({
                     </div>
 
                     {/* product price  */}
-                    <h3 className="flex items-center text-xl font-bold mb-1">
-                        <span className="text-blue-three">
+                    <h3 className="flex items-center mb-1">
+                        <span className="text-blue-three font-semibold text-lg 650:text-xl">
                             Rs. {addCommas(price)}
                         </span>{" "}
                         {per && (
-                            <span className="dark-light font-normal text-base ml-2">
-                                (per {per})
-                            </span>
+                            <span className="dark-light ml-2">(per {per})</span>
                         )}
                     </h3>
 

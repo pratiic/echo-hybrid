@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>4/7</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>4/7</span>
             </div>
         
             
@@ -92,16 +92,23 @@
 <a name='L27'></a><a href='#L27'>27</a>
 <a name='L28'></a><a href='#L28'>28</a>
 <a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -120,36 +127,44 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import express from "express";
 &nbsp;
 import auth from "../middleware/auth.middleware.js";
 import { setAddress } from "../controllers/address.controllers.js";
 &nbsp;
-export const router = express.Router();
+export const addressRouter = (io) =&gt; {
+    const router = express.Router();
 &nbsp;
-router.post(
-    "/:targetType",
-<span class="fstat-no" title="function not covered" >    (r</span>equest, response, next) =&gt; {
-<span class="cstat-no" title="statement not covered" >        request.select = {</span>
-            store: {
-                select: {
-                    id: true,
-                    storeType: true,
-                    business: {
-                        select: {
-                            id: true,
-                            address: true,
+    router.post(
+        "/:targetType",
+<span class="fstat-no" title="function not covered" >        (r</span>equest, response, next) =&gt; {
+<span class="cstat-no" title="statement not covered" >            request.io = io;</span>
+<span class="cstat-no" title="statement not covered" >            request.select = {</span>
+                store: {
+                    select: {
+                        id: true,
+                        storeType: true,
+                        business: {
+                            select: {
+                                id: true,
+                                address: true,
+                            },
                         },
                     },
                 },
-            },
-            address: true,
-        };
-<span class="cstat-no" title="statement not covered" >        auth(request, response, next);</span>
-    },
-    setAddress
-);
+                address: true,
+            };
+<span class="cstat-no" title="statement not covered" >            auth(request, response, next);</span>
+        },
+        setAddress
+    );
+&nbsp;
+    return router;
+};
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -157,7 +172,7 @@ router.post(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-06-10T15:30:12.044Z
+                at 2023-06-19T13:41:29.458Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

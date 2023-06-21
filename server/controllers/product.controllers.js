@@ -104,7 +104,7 @@ export const postProduct = async (request, response, next) => {
             }),
         ]);
 
-        response.json({
+        response.status(201).json({
             product: updatedProduct,
         });
     } catch (error) {
@@ -115,7 +115,10 @@ export const postProduct = async (request, response, next) => {
                 .includes("foreign key constraint failed")
         ) {
             return next(
-                new HttpError("the provided product category does not exist")
+                new HttpError(
+                    "the provided product category does not exist",
+                    400
+                )
             );
         }
 
@@ -170,6 +173,9 @@ export const getProducts = async (request, response, next) => {
         all: {},
         "second hand": {
             isSecondHand: true,
+        },
+        "brand new": {
+            isSecondHand: false,
         },
         province: getAddressFilter("province"),
         city: getAddressFilter("city"),

@@ -18,7 +18,7 @@ const SellerFilterInfo = () => {
 
         return (
             <React.Fragment>
-                , <span className="filter-info-highlight">{totalCount} </span>
+                , <span className="font-semibold">{totalCount} </span>
                 {singularOrPluralCount(totalCount, "seller", "sellers")} found
             </React.Fragment>
         );

@@ -15,7 +15,7 @@ const Statistics = () => {
 
   const { appStats } = useSelector((state) => state.stats);
 
-  console.log(appStats);
+  // console.log(appStats);
 
   const dispatch = useDispatch();
 

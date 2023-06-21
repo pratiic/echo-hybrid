@@ -233,7 +233,7 @@ const SetProduct = () => {
             >
                 <InputGroup
                     label="product name"
-                    placeholder="min 5 chars, max 50 chars"
+                    placeholder="min 5 chars, max 100 chars"
                     value={name}
                     error={nameError}
                     onChange={setName}

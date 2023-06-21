@@ -23,7 +23,6 @@ import { orderRouter } from "./routes/order.routes.js";
 import { chatRouter } from "./routes/chat.routes.js";
 import { messageRouter } from "./routes/message.routes.js";
 import { router as cartRouter } from "./routes/cart.routes.js";
-import { router as receiptRouter } from "./routes/receipt.routes.js";
 import { notificationRouter } from "./routes/notification.routes.js";
 import { statRouter } from "./routes/stat.routes.js";
 import { reportRouter } from "./routes/report.routes.js";
@@ -65,7 +64,6 @@ app.use("/api/suspensions", suspensionRouter(io));
 app.use("/api/delivery", deliveryRouter(io));
 app.use("/api/transactions", transactionRouter());
 app.use("/api/rec", recRouter());
-app.use("/receipts", receiptRouter);
 
 // error handler middleware
 app.use(errorHandler);

@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">4.62% </span>
+                <span class="strong">4.46% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/108</span>
+                <span class='fraction'>5/112</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/56</span>
+                <span class='fraction'>0/62</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">4.67% </span>
+                <span class="strong">4.5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/107</span>
+                <span class='fraction'>5/111</span>
             </div>
         
             
@@ -417,7 +417,15 @@
 <a name='L352'></a><a href='#L352'>352</a>
 <a name='L353'></a><a href='#L353'>353</a>
 <a name='L354'></a><a href='#L354'>354</a>
-<a name='L355'></a><a href='#L355'>355</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -724,6 +732,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -846,7 +862,7 @@ export const setCartItem = <span class="fstat-no" title="function not covered" >
             },
         });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        if (!product) {</span>
+<span class="cstat-no" title="statement not covered" >        if (!product || product.isDeleted) {</span>
 <span class="cstat-no" title="statement not covered" >            return next(new HttpError("product not found", 404));</span>
         }
 &nbsp;
@@ -880,7 +896,7 @@ export const setCartItem = <span class="fstat-no" title="function not covered" >
                 },
             });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >            response.json({ item: cartItem });</span>
+<span class="cstat-no" title="statement not covered" >            response.status(201).json({ item: cartItem });</span>
         } else {
             // cannot buy a product if its stock has not been set yet
 <span class="cstat-no" title="statement not covered" >            if (!stock) {</span>
@@ -1079,7 +1095,15 @@ export const checkOrderAbility = <span class="fstat-no" title="function not cove
         const { product, variant: itemVariant, quantity: itemQuantity } = <span class="cstat-no" title="statement not covered" >item;</span>
         let itemInfo = <span class="cstat-no" title="statement not covered" >null;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        if (product.isSecondHand) {</span>
+<span class="cstat-no" title="statement not covered" >        if (product.suspension) {</span>
+<span class="cstat-no" title="statement not covered" >            itemInfo = {</span>
+                maxQuantity: -2,
+            };
+        } else <span class="cstat-no" title="statement not covered" >if (product.store.suspension) {</span>
+<span class="cstat-no" title="statement not covered" >            itemInfo = {</span>
+                maxQuantity: -3,
+            };
+        } else <span class="cstat-no" title="statement not covered" >if (product.isSecondHand) {</span>
 <span class="cstat-no" title="statement not covered" >            if (!product.storeId) {</span>
                 // product has been sold or deleted
 <span class="cstat-no" title="statement not covered" >                itemInfo = {</span>
@@ -1132,7 +1156,7 @@ export const checkOrderAbility = <span class="fstat-no" title="function not cove
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-06-10T15:30:12.044Z
+                at 2023-06-19T13:41:29.458Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

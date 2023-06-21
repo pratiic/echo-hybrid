@@ -146,6 +146,10 @@ export const getAppStats = async (request, response, next) => {
                 personnel: deliveryPersonnelCount,
             },
             suspensions: {
+                total:
+                    productSuspensionCount +
+                    sellerSuspensionCount +
+                    userSuspensionCount,
                 product: productSuspensionCount,
                 seller: sellerSuspensionCount,
                 user: userSuspensionCount,
