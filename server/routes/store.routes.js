@@ -15,6 +15,9 @@ export const storeRouter = (io) => {
         "/",
         (request, ...op) => {
             request.restrictStaff = true;
+            request.select = {
+                address: true,
+            };
             auth(request, ...op);
         },
         registerStore

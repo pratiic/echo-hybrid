@@ -66,6 +66,20 @@ const Sell = () => {
                             })
                         );
                     } catch (error) {
+                        if (
+                            error.message.includes(
+                                "you need to set your address first"
+                            )
+                        ) {
+                            dispatch(
+                                setAlert({
+                                    type: "info",
+                                    message: error.message,
+                                })
+                            );
+                            return router.push("/profile/?show=address");
+                        }
+
                         dispatch(setErrorAlert(error.message));
                     } finally {
                         setLoading(false);

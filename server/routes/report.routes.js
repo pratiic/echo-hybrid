@@ -15,6 +15,7 @@ export const reportRouter = (io) => {
         "/:targetType/:targetId",
         (request, ...op) => {
             request.io = io;
+            request.restrictStaff = true;
             request.select = {
                 store: {
                     select: {

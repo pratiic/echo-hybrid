@@ -2,7 +2,6 @@ import {
     genericUserFields,
     productDeletionFields,
 } from "../lib/data-source.lib.js";
-import { notFoundHandler } from "../lib/errors.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import { validateStoreType } from "../validators/store.validators.js";
@@ -15,6 +14,10 @@ export const registerStore = async (request, response, next) => {
 
     if (errorMsg) {
         return next(new HttpError(errorMsg, 400));
+    }
+
+    if (!user.address) {
+        return next(new HttpError("you need to set your address first", 400));
     }
 
     try {
@@ -260,7 +263,6 @@ export const deleteStore = async (request, response, next) => {
 
         response.json({ message: "the store has been deleted" });
     } catch (error) {
-        console.log(error);
         next(new HttpError());
     }
 };

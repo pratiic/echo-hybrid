@@ -79,14 +79,16 @@ export const reportTarget = async (request, response, next) => {
     // cannot report oneself
     if (targetType === "user") {
         if (user.id === target.id) {
-            return next(new HttpError("you cannot report yourself"));
+            return next(new HttpError("you cannot report yourself", 400));
         }
     }
 
     // cannot report one's own review
     if (targetType === "review") {
         if (user.id === target.user.id) {
-            return next(new HttpError("you cannot report your own review"));
+            return next(
+                new HttpError("you cannot report your own review", 400)
+            );
         }
     }
 
@@ -108,7 +110,7 @@ export const reportTarget = async (request, response, next) => {
             report: createdReport,
         });
 
-        response.json({ report: createdReport });
+        response.status(201).json({ report: createdReport });
     } catch (error) {
         console.log(error);
 
@@ -184,7 +186,7 @@ export const deleteReport = async (request, response, next) => {
                 .toLowerCase()
                 .includes("record to delete does not exist")
         ) {
-            return next(new HttpError("the report does not exist", 400));
+            return next(new HttpError("the report does not exist", 404));
         }
 
         next(new HttpError());

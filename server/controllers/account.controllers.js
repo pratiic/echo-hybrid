@@ -50,7 +50,7 @@ export const verifyAccount = async (request, response, next) => {
     const code = request.query.code;
 
     if (user.isVerified) {
-        return next(new HttpError(errorMsg, 400));
+        return next(new HttpError("the user is already verified", 400));
     }
 
     if (!code) {

@@ -6,33 +6,35 @@ import {
     deleteCreatedStore,
     deleteCreatedUser,
     signInAsAdmin,
+    signInAsDeliveryPersonnel,
 } from "./utils.js";
+import { setAddress } from "./utils/address.utils.js";
 
 describe("POST /api/stores REGISTER STORE", () => {
     let createdUser;
 
     beforeAll(async () => {
-        createdUser = await createNewUser(app);
+        createdUser = await createNewUser(app, false);
     });
 
-    it("should register an individual store if provided valid data", async () => {
+    it("should return 401 status code if requested by admin", async () => {
+        const adminToken = await signInAsAdmin(app);
+
         const response = await supertest(app)
             .post(`/api/stores/?type=IND`)
-            .set("Authorization", `Bearer ${createdUser.token}`);
+            .set("Authorization", `Bearer ${adminToken}`);
 
-        expect(response.statusCode).toBe(201);
-
-        await deleteCreatedStore(app, createdUser.token);
+        expect(response.statusCode).toBe(401);
     });
 
-    it("should register a business store if provided valid data", async () => {
+    it("should return 401 status code if requested by delivery personnel", async () => {
+        const deliveryToken = await signInAsDeliveryPersonnel(app);
+
         const response = await supertest(app)
-            .post(`/api/stores/?type=BUS`)
-            .set("Authorization", `Bearer ${createdUser.token}`);
+            .post(`/api/stores/?type=IND`)
+            .set("Authorization", `Bearer ${deliveryToken}`);
 
-        expect(response.statusCode).toBe(201);
-
-        await deleteCreatedStore(app, createdUser.token);
+        expect(response.statusCode).toBe(401);
     });
 
     it("should return 400 status code if type is not provided", async () => {
@@ -55,9 +57,69 @@ describe("POST /api/stores REGISTER STORE", () => {
         );
     });
 
+    it("should return 400 status code if the address is not set - IND", async () => {
+        const response = await supertest(app)
+            .post(`/api/stores/?type=IND`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("you need to set your address first");
+    });
+
+    it("should return 400 status code if the address is not set - BUS", async () => {
+        const response = await supertest(app)
+            .post(`/api/stores/?type=BUS`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("you need to set your address first");
+    });
+
+    it("should register an individual store if provided valid data", async () => {
+        await setAddress(app, createdUser.token);
+
+        const response = await supertest(app)
+            .post(`/api/stores/?type=IND`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        await deleteCreatedUser(app, createdUser.id);
+        createdUser = await createNewUser(app, true, true);
+
+        expect(response.statusCode).toBe(201);
+    });
+
+    it("should register a business store if provided valid data", async () => {
+        const response = await supertest(app)
+            .post(`/api/stores/?type=BUS`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(201);
+    });
+
+    it("should return 400 status code if the user is already registered as a seller - IND", async () => {
+        const response = await supertest(app)
+            .post(`/api/stores/?type=IND`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "a store is already associated with your account"
+        );
+    });
+
+    it("should return 400 status code if the user is already registered as a seller - BUS", async () => {
+        const response = await supertest(app)
+            .post(`/api/stores/?type=BUS`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "a store is already associated with your account"
+        );
+    });
+
     afterAll(async () => {
-        const adminToken = await signInAsAdmin(app);
-        await deleteCreatedUser(app, createdUser.id, adminToken);
+        await deleteCreatedUser(app, createdUser.id);
     });
 });
 
@@ -65,12 +127,23 @@ describe("DELETE /api/stores DELETE STORE", () => {
     let createdUser;
 
     beforeAll(async () => {
-        createdUser = await createNewUser(app);
+        createdUser = await createNewUser(app, true, true);
     });
 
-    it("should delete the store of the user if it is registered", async () => {
+    it("should delete the store of the user if it is registered - IND", async () => {
         await supertest(app)
             .post(`/api/stores/?type=IND`)
+            .set("Authorization", `Bearer ${createdUser.token}`);
+
+        const response = await deleteCreatedStore(app, createdUser.token);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.message).toBe("the store has been deleted");
+    });
+
+    it("should delete the store of the user if it is registered - BUS", async () => {
+        await supertest(app)
+            .post(`/api/stores/?type=BUS`)
             .set("Authorization", `Bearer ${createdUser.token}`);
 
         const response = await deleteCreatedStore(app, createdUser.token);
@@ -89,7 +162,6 @@ describe("DELETE /api/stores DELETE STORE", () => {
     });
 
     afterAll(async () => {
-        const adminToken = await signInAsAdmin(app);
-        await deleteCreatedUser(app, createdUser.id, adminToken);
+        await deleteCreatedUser(app, createdUser.id);
     });
 });

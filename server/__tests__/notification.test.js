@@ -67,6 +67,32 @@ describe("POST /api/notifications SEND NOTIFICATION", () => {
         expect(response.body.error).toBe("destinationId cannot be empty");
     });
 
+    it("should return 400 status code if destinationId is not a number", async () => {
+        const response = await supertest(app)
+            .post(`/api/notifications`)
+            .set("Authorization", `Bearer ${userOne.token}`)
+            .send({
+                ...validNotification,
+                destinationId: "string",
+            });
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe('"destinationId" must be a number');
+    });
+
+    it("should return 400 status code if destinationId is not an integer", async () => {
+        const response = await supertest(app)
+            .post(`/api/notifications`)
+            .set("Authorization", `Bearer ${userOne.token}`)
+            .send({
+                ...validNotification,
+                destinationId: 1.5,
+            });
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe('"destinationId" must be an integer');
+    });
+
     it("should return 400 status code if linkTo is invalid (not string)", async () => {
         const response = await supertest(app)
             .post(`/api/notifications`)
@@ -127,7 +153,7 @@ describe("DELETE /api/notificatios/:notificationId DELETE NOTIFICATION", () => {
         expect(response.statusCode).toBe(200);
     });
 
-    it("should return 404 status code if provided non-existing notification id", async () => {
+    it("should return 404 status code if the notification does not exist", async () => {
         const response = await supertest(app)
             .delete(`/api/notifications/${notificationId}`)
             .set("Authorization", `Bearer ${userTwo.token}`);

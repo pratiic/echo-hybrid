@@ -367,7 +367,7 @@ describe("PATCH /api/businesses/registration/:businessId CONTROL BUSINESS REGIST
 
         await deleteCreatedUser(app, createdUser.id);
         createdUser = await createNewUser(app);
-        regBusiness = await createBusiness(app, createdUser.token, true);
+        regBusiness = await createBusiness(app, createdUser.token, true, false);
 
         expect(response.statusCode).toBe(400);
         expect(response.body.error).toBe(

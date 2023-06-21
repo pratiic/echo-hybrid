@@ -74,8 +74,8 @@ Table Store {
   storeType StoreType [not null]
   rating Float [not null, default: 0]
   isDeleted Boolean [not null, default: false]
-  user User [not null]
-  userId Int [unique, not null]
+  user User
+  userId Int [unique]
   business Business
   product Product [not null]
   reviews Review [not null]
@@ -454,7 +454,7 @@ Ref: Reply.userId > User.id [delete: Cascade]
 
 Ref: Reply.reviewId > Review.id [delete: Cascade]
 
-Ref: Address.userId - User.id
+Ref: Address.userId - User.id [delete: Cascade]
 
 Ref: Address.businessId - Business.id [delete: Cascade]
 

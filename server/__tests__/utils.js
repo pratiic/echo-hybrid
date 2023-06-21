@@ -8,14 +8,22 @@ const genericUserData = {
     password: "prat123!",
 };
 
-export const createNewUser = async (app, createAddress, withinDelivery) => {
+export const createNewUser = async (
+    app,
+    createAddress = true,
+    withinDelivery,
+    verifyU = true
+) => {
     const response = await supertest(app)
         .post("/api/auth/signup")
         .send({
             ...genericUserData,
             email: `johndoe${getVerificationCode()}@gmail.com`,
         });
-    await verifyUser(app, response.body.user?.id);
+
+    if (verifyU) {
+        await verifyUser(app, response.body.user?.id);
+    }
 
     if (createAddress) {
         const addressResponse = await setAddress(
@@ -87,7 +95,12 @@ export const deleteCreatedStore = async (app, token) => {
     return response;
 };
 
-export const createBusiness = async (app, token, withinDelivery) => {
+export const createBusiness = async (
+    app,
+    token,
+    withinDelivery,
+    verifyBusiness = true
+) => {
     await supertest(app)
         .post("/api/stores/?type=BUS")
         .set("Authorization", `Bearer ${token}`);
@@ -101,12 +114,6 @@ export const createBusiness = async (app, token, withinDelivery) => {
         .attach("image", "images/profile.jpeg");
 
     const adminToken = await signInAsAdmin(app);
-    await supertest(app)
-        .patch(
-            `/api/businesses/registration/${response.body.business.id}/?action=accept`
-        )
-        .set("Authorization", `Bearer ${adminToken}`)
-        .send({ cause: "this is not necessary" });
 
     const addressResponse = await setAddress(
         app,
@@ -115,6 +122,14 @@ export const createBusiness = async (app, token, withinDelivery) => {
         withinDelivery
     );
     response.body.business.address = addressResponse.body.address;
+
+    if (verifyBusiness) {
+        await supertest(app)
+            .patch(
+                `/api/businesses/registration/${response.body.business.id}/?action=accept`
+            )
+            .set("Authorization", `Bearer ${adminToken}`);
+    }
 
     return response.body.business;
 };

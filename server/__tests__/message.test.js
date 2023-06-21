@@ -11,13 +11,35 @@ describe("POST /api/messages/:chatId SEND MESSAGE", () => {
         userTwo = await createNewUser(app);
     });
 
-    it("should send a message to a chat if provided valid data", async () => {
+    it("should send a message to a chat if provided valid data - TEXT AND IMAGE", async () => {
         chatId = await setupChat(userOne, userTwo);
 
         const response = await supertest(app)
             .post(`/api/messages/${chatId}`)
             .set("Authorization", `Bearer ${userOne.token}`)
             .field("text", "this is a message")
+            .attach("image", "images/chat-image.jpeg");
+
+        expect(response.statusCode).toBe(201);
+    });
+
+    it("should send a message to a chat if provided valid data - TEXT", async () => {
+        chatId = await setupChat(userOne, userTwo);
+
+        const response = await supertest(app)
+            .post(`/api/messages/${chatId}`)
+            .set("Authorization", `Bearer ${userOne.token}`)
+            .field("text", "this is a message");
+
+        expect(response.statusCode).toBe(201);
+    });
+
+    it("should send a message to a chat if provided valid data - IMAGE", async () => {
+        chatId = await setupChat(userOne, userTwo);
+
+        const response = await supertest(app)
+            .post(`/api/messages/${chatId}`)
+            .set("Authorization", `Bearer ${userOne.token}`)
             .attach("image", "images/chat-image.jpeg");
 
         expect(response.statusCode).toBe(201);
@@ -32,7 +54,7 @@ describe("POST /api/messages/:chatId SEND MESSAGE", () => {
         expect(response.body.error).toBe("text cannot be empty");
     });
 
-    it("should return 404 status code if a non-existing chat id is provided", async () => {
+    it("should return 404 status code if the chat does not exist", async () => {
         const msgResponse = await supertest(app)
             .post(`/api/messages/nonexisting-id`)
             .set("Authorization", `Bearer ${userOne.token}`);

@@ -63,11 +63,17 @@ export const prepareOrderElements = async (app) => {
 
     const busSeller = await createNewUser(app, true, false);
     await createBusiness(app, busSeller.token, true);
-    const flatProduct = (
-        await createProduct(app, busSeller.token, false, 2, "flat")
-    ).body.product;
-    const variedProduct = (await createProduct(app, busSeller.token, false))
-        .body.product;
+    const flatProductRes = await createProduct(
+        app,
+        busSeller.token,
+        false,
+        2,
+        "flat"
+    );
+    const flatProduct = flatProductRes.body.product;
+    console.log("pratiic", flatProductRes.body);
+    const variedProductRes = await createProduct(app, busSeller.token, false);
+    const variedProduct = variedProductRes.body.product;
 
     await setStock(app, busSeller.token, flatProduct.id, { quantity: 3 });
     await setStock(

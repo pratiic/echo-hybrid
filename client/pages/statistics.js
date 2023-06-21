@@ -45,7 +45,7 @@ const Statistics = () => {
     }
 
     return (
-        <section>
+        <section className="pb-7">
             <Head>
                 <title>Statistics</title>
             </Head>

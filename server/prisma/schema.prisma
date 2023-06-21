@@ -95,8 +95,8 @@ model Store {
     rating    Float     @default(0)
     isDeleted Boolean   @default(false)
 
-    user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId     Int         @unique
+    user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId     Int?        @unique
     business   Business?
     product    Product[]
     reviews    Review[]
@@ -246,7 +246,7 @@ model Address {
     area        String
     description String? @default("")
 
-    user       User?     @relation(fields: [userId], references: [id])
+    user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId     Int?      @unique
     business   Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
     businessId Int?      @unique

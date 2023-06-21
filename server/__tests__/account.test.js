@@ -4,24 +4,33 @@ import { app } from "../index.js";
 import { createNewUser, deleteCreatedUser, signInAsAdmin } from "./utils.js";
 
 describe("GET /api/accounts/verification CREATE ACCOUNT VERIFICATION", () => {
-    let createdUser, adminToken;
+    let unverifiedUser, verifiedUser;
 
     beforeAll(async () => {
-        // sign up and get a JWT token to use in the tests
-        createdUser = await createNewUser(app);
+        unverifiedUser = await createNewUser(app, false, false, false);
+        verifiedUser = await createNewUser(app);
     });
 
     it("should create an account verification if the user has not already been verified", async () => {
         const response = await supertest(app)
             .get(`/api/accounts/verification`)
-            .set("Authorization", `Bearer ${createdUser.token}`);
+            .set("Authorization", `Bearer ${unverifiedUser.token}`);
 
         expect(response.statusCode).toBe(200);
+    });
 
-        // sign in as admin to delete the created user
-        adminToken = await signInAsAdmin(app);
+    it("should return 400 status code if the user is already verified", async () => {
+        const response = await supertest(app)
+            .get(`/api/accounts/verification`)
+            .set("Authorization", `Bearer ${verifiedUser.token}`);
 
-        await deleteCreatedUser(app, createdUser.id, adminToken);
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("the account is already verified");
+    });
+
+    afterAll(async () => {
+        await deleteCreatedUser(app, unverifiedUser.id);
+        await deleteCreatedUser(app, verifiedUser.id);
     });
 });
 
@@ -29,8 +38,7 @@ describe("POST /api/accounts/verification VERIFY ACCOUNT", () => {
     let createdUser;
 
     beforeAll(async () => {
-        // sign up and create an account verification record
-        createdUser = await createNewUser(app);
+        createdUser = await createNewUser(app, false, false, false);
     });
 
     // it("should verify the account of the user if the verification code is correct", async () => {
@@ -41,12 +49,24 @@ describe("POST /api/accounts/verification VERIFY ACCOUNT", () => {
     //     expect(response.statusCode).toBe(200);
     // });
 
+    it("should return 400 status code if the account is already verified", async () => {
+        const verifiedUser = await createNewUser(app);
+
+        const response = await supertest(app)
+            .post(`/api/accounts/verification/?code=sO2ZXFzF`)
+            .set("Authorization", `Bearer ${verifiedUser.token}`);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("the user is already verified");
+    });
+
     it("should return 400 status code if the code is not provided", async () => {
         const response = await supertest(app)
             .post(`/api/accounts/verification/`)
             .set("Authorization", `Bearer ${createdUser.token}`);
 
         expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("provide a verification code");
     });
 
     it("should return 400 status code if the code is incorrect", async () => {
@@ -55,13 +75,11 @@ describe("POST /api/accounts/verification VERIFY ACCOUNT", () => {
             .set("Authorization", `Bearer ${createdUser.token}`);
 
         expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("the verification code is incorrect");
     });
 
     afterAll(async () => {
-        // sign in as admin and delete the created user
-        const adminToken = await signInAsAdmin(app);
-
-        deleteCreatedUser(app, createdUser.id, adminToken);
+        deleteCreatedUser(app, createdUser.id);
     });
 });
 
@@ -86,21 +104,22 @@ describe("POST /api/accounts/recovery CREATE ACCOUNT RECOVERY", () => {
         const response = await supertest(app).post(`/api/accounts/recovery`);
 
         expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("email is required");
     });
 
-    it("should return 404 status code if the email is invalid", async () => {
+    it("should return 404 status code if the user does not exist", async () => {
         const response = await supertest(app)
             .post(`/api/accounts/recovery`)
             .send({
-                email: "invalidemail",
+                email: "test@gmail.com",
             });
 
         expect(response.statusCode).toBe(404);
+        expect(response.body.error).toBe("user not found");
     });
 
     afterAll(async () => {
-        const adminToken = await signInAsAdmin(app);
-        await deleteCreatedUser(app, createdUser.id, adminToken);
+        await deleteCreatedUser(app, createdUser.id);
     });
 });
 
@@ -131,12 +150,12 @@ describe("PATCH /api/accounts/recovery RECOVER ACCOUNT", () => {
     it("should return 400 status code if the email is not provided", async () => {
         const response = await supertest(app)
             .patch(`/api/accounts/recovery`)
-            .send({
-                code: "9Ujt1k0f",
-                password: "prat123!",
-            });
+            .send({});
 
         expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "provide the email to the account to be recovered"
+        );
     });
 
     it("should return 400 status code if the code is not provided", async () => {
@@ -144,10 +163,12 @@ describe("PATCH /api/accounts/recovery RECOVER ACCOUNT", () => {
             .patch(`/api/accounts/recovery`)
             .send({
                 email: createdUser.email,
-                password: "newpassword123",
             });
 
         expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "you need to provide the recovery code"
+        );
     });
 
     it("should return 400 status code if the password is not provided", async () => {
@@ -159,9 +180,10 @@ describe("PATCH /api/accounts/recovery RECOVER ACCOUNT", () => {
             });
 
         expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("password cannot be empty");
     });
 
-    it("should return 400 status code if the password is invalid (less than 7 characters)", async () => {
+    it("should return 400 status code if the password is less than 7 characters", async () => {
         const response = await supertest(app)
             .patch(`/api/accounts/recovery`)
             .send({
@@ -171,6 +193,35 @@ describe("PATCH /api/accounts/recovery RECOVER ACCOUNT", () => {
             });
 
         expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe(
+            "password must be atleast 7 characters long"
+        );
+    });
+
+    it("should return 404 status code if the user does not exist", async () => {
+        const response = await supertest(app)
+            .patch(`/api/accounts/recovery`)
+            .send({
+                email: "test@gmail.com",
+                code: "incorrect-code",
+                password: "prat123!",
+            });
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body.error).toBe("user not found");
+    });
+
+    it("should return 400 status code if the code is incorrect", async () => {
+        const response = await supertest(app)
+            .patch(`/api/accounts/recovery`)
+            .send({
+                email: createdUser.email,
+                code: "incorrect-code",
+                password: "prat123!",
+            });
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.error).toBe("the verification code is incorrect");
     });
 
     afterAll(async () => {

@@ -159,11 +159,18 @@ export const deleteUser = async (request, response, next) => {
     const userId = parseInt(request.params.userId) || -1;
 
     try {
-        await prisma.user.delete({
-            where: {
-                id: userId,
-            },
-        });
+        await Promise.all([
+            prisma.user.delete({
+                where: {
+                    id: userId,
+                },
+            }),
+            prisma.store.deleteMany({
+                where: {
+                    userId,
+                },
+            }),
+        ]);
 
         response.json({});
     } catch (error) {
@@ -182,9 +189,8 @@ export const verifyUser = async (request, response, next) => {
             data: {
                 isVerified: true,
             },
-        });
-
-        response.json({});
+        }),
+            response.json({});
     } catch (error) {
         next(new HttpError());
     }
