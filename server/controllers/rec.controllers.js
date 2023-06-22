@@ -1,39 +1,47 @@
 import { createObjectCsvWriter } from "csv-writer";
+import path from "path";
+import os from "os";
 
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 
 export const exportRecDataset = async (request, response, next) => {
     try {
-        // const [searchHistory, orderHistory, products] = await Promise.all([
-        //     prisma.search.findMany({}),
-        //     prisma.order.findMany({}),
-        //     prisma.product.findMany({}),
-        // ]);
-        const orderHistory = await prisma.order.findMany({});
-
-        const interactions = orderHistory.map((order) => {
-            return {
-                userId: order.originId,
-                itemId: order.productId,
-                interactionStrength: order.quantity || 1,
-            };
+        const products = await prisma.product.findMany({
+            where: {
+                isDeleted: false,
+                NOT: {
+                    name: "new product",
+                },
+            },
         });
 
-        const csvFilePath = "data-set.csv";
+        const fileName = "data-set.csv";
+        const destinationPath = path.join(
+            os.homedir(),
+            "Desktop",
+            "product-recommendation"
+        );
+        const csvFilePath = path.join(destinationPath, fileName);
         const csvWriter = createObjectCsvWriter({
             path: csvFilePath,
             header: [
-                { id: "userId", title: "userId" },
-                { id: "itemId", title: "itemId" },
-                { id: "interactionStrength", title: "interactionStrength" },
+                { id: "id", title: "id" },
+                { id: "name", title: "name" },
+                { id: "categoryName", title: "categoryName" },
+                { id: "subCategory", title: "subCategory" },
+                { id: "brand", title: "brand" },
+                { id: "price", title: "price" },
             ],
         });
 
-        const csvRecords = interactions.map((interaction) => ({
-            userId: interaction.userId,
-            itemId: interaction.itemId,
-            interactionStrength: interaction.interactionStrength,
+        const csvRecords = products.map((product) => ({
+            id: product.id,
+            name: product.name,
+            categoryName: product.categoryName,
+            subCategory: product.subCategory,
+            brand: product.brand,
+            price: product.price,
         }));
 
         await csvWriter.writeRecords(csvRecords);

@@ -30,16 +30,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
@@ -109,28 +109,22 @@
 <a name='L44'></a><a href='#L44'>44</a>
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -142,6 +136,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -156,41 +172,49 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { createObjectCsvWriter } from "csv-writer";
+import path from "path";
+import os from "os";
 &nbsp;
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 &nbsp;
 export const exportRecDataset = <span class="fstat-no" title="function not covered" >as</span>ync (request, response, next) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-        // const [searchHistory, orderHistory, products] = await Promise.all([
-        //     prisma.search.findMany({}),
-        //     prisma.order.findMany({}),
-        //     prisma.product.findMany({}),
-        // ]);
-        const orderHistory = <span class="cstat-no" title="statement not covered" >await prisma.order.findMany({});</span>
-&nbsp;
-        const interactions = <span class="cstat-no" title="statement not covered" >orderHistory.map(<span class="fstat-no" title="function not covered" >(o</span>rder) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >            return {</span>
-                userId: order.originId,
-                itemId: order.productId,
-                interactionStrength: order.quantity || 1,
-            };
+        const products = <span class="cstat-no" title="statement not covered" >await prisma.product.findMany({</span>
+            where: {
+                isDeleted: false,
+                NOT: {
+                    name: "new product",
+                },
+            },
         });
 &nbsp;
-        const csvFilePath = <span class="cstat-no" title="statement not covered" >"data-set.csv";</span>
+        const fileName = <span class="cstat-no" title="statement not covered" >"data-set.csv";</span>
+        const destinationPath = <span class="cstat-no" title="statement not covered" >path.join(</span>
+            os.homedir(),
+            "Desktop",
+            "product-recommendation"
+        );
+        const csvFilePath = <span class="cstat-no" title="statement not covered" >path.join(destinationPath, fileName);</span>
         const csvWriter = <span class="cstat-no" title="statement not covered" >createObjectCsvWriter({</span>
             path: csvFilePath,
             header: [
-                { id: "userId", title: "userId" },
-                { id: "itemId", title: "itemId" },
-                { id: "interactionStrength", title: "interactionStrength" },
+                { id: "id", title: "id" },
+                { id: "name", title: "name" },
+                { id: "categoryName", title: "categoryName" },
+                { id: "subCategory", title: "subCategory" },
+                { id: "brand", title: "brand" },
+                { id: "price", title: "price" },
             ],
         });
 &nbsp;
-        const csvRecords = <span class="cstat-no" title="statement not covered" >interactions.map(<span class="fstat-no" title="function not covered" >(i</span>nteraction) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
-            userId: interaction.userId,
-            itemId: interaction.itemId,
-            interactionStrength: interaction.interactionStrength,
+        const csvRecords = <span class="cstat-no" title="statement not covered" >products.map(<span class="fstat-no" title="function not covered" >(p</span>roduct) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+            id: product.id,
+            name: product.name,
+            categoryName: product.categoryName,
+            subCategory: product.subCategory,
+            brand: product.brand,
+            price: product.price,
         }));
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        await csvWriter.writeRecords(csvRecords);</span>
@@ -208,7 +232,7 @@ export const exportRecDataset = <span class="fstat-no" title="function not cover
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-06-19T13:41:29.458Z
+                at 2023-06-22T07:47:19.318Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { notFoundHandler } from "../lib/errors.lib.js";
 import { buildProductImages, getUniqueStr } from "../lib/image.lib.js";
 import prisma from "../lib/prisma.lib.js";
@@ -385,8 +387,23 @@ export const getProductDetails = async (request, response, next) => {
             return next(new HttpError("this product has been deleted", 404));
         }
 
+        // get product recommendations
+        try {
+            const recommendations = (
+                await axios({
+                    method: "GET",
+                    url: `http://127.0.0.1:8080/recommendations/${productId}`,
+                })
+            ).data;
+
+            console.log(recommendations);
+        } catch (error) {
+            console.log(error);
+        }
+
         response.json({ product });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

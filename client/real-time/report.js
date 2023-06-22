@@ -32,7 +32,6 @@ const Report = () => {
             const { targetType: targetT, report } = reportInfo;
 
             if (targetType === "all" || targetType === targetT) {
-                console.log("pratiic");
                 dispatch(addReport(report));
             }
         });

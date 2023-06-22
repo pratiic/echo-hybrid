@@ -54,7 +54,6 @@ describe("POST /api/carts/:productId SET CART ITEM", () => {
         individualSeller = await createNewUser(app);
         secondHandProduct = (await createProduct(app, individualSeller.token))
             .body.product;
-        console.log("pratiic", secondHandProduct);
 
         businessSeller = await createNewUser(app);
         await createBusiness(app, businessSeller.token);

@@ -2,7 +2,6 @@ import supertest from "supertest";
 
 import { app } from "../index.js";
 import {
-    createNewUser,
     deleteCreatedUser,
     signInAsAdmin,
     signInAsDeliveryPersonnel,
@@ -318,10 +317,8 @@ describe("DELETE /api/reviews/:reviewId DELETE REVIEW", () => {
     });
 
     it("should return 401 status code if the review does not belong to the requesting user", async () => {
-        const anotherUser = await createNewUser(app);
-        const response = await deleteReview(app, anotherUser.token, reviewId);
+        const response = await deleteReview(app, indSeller.token, reviewId);
 
-        await deleteCreatedUser(app, anotherUser.id);
 
         expect(response.statusCode).toBe(401);
         expect(response.body.error).toBe(

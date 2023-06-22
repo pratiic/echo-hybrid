@@ -71,7 +71,6 @@ export const prepareOrderElements = async (app) => {
         "flat"
     );
     const flatProduct = flatProductRes.body.product;
-    console.log("pratiic", flatProductRes.body);
     const variedProductRes = await createProduct(app, busSeller.token, false);
     const variedProduct = variedProductRes.body.product;
 
