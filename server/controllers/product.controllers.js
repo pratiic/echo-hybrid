@@ -9,8 +9,10 @@ import { validateProduct } from "../validators/product.validators.js";
 import {
     genericUserFields,
     productDeletionFields,
+    productSelectionFields,
 } from "../lib/data-source.lib.js";
 import { checkDeliverySingle } from "../lib/delivery.lib.js";
+import { fetcher } from "../lib/http.lib.js";
 
 const MAX_IMAGES = 5;
 
@@ -105,6 +107,23 @@ export const postProduct = async (request, response, next) => {
                 data: { images: imageSources },
             }),
         ]);
+
+        try {
+            // send the created product data to the recommender
+            const data = await axios({
+                method: "POST",
+                url: `http://127.0.0.1:8080/products`,
+                data: {
+                    id: updatedProduct.id,
+                    name,
+                    categoryName: category,
+                    subCategory,
+                    brand,
+                },
+            });
+        } catch (error) {
+            console.log(error);
+        }
 
         response.status(201).json({
             product: updatedProduct,
@@ -232,6 +251,9 @@ export const getProducts = async (request, response, next) => {
 
     let primaryFilter = {
         isDeleted: false,
+        NOT: {
+            name: "new product",
+        },
     };
 
     if (storeId) {
@@ -304,17 +326,7 @@ export const getProducts = async (request, response, next) => {
         const [products, totalCount] = await Promise.all([
             prisma.product.findMany({
                 where: whereObj,
-                include: {
-                    store: {
-                        include: {
-                            user: {
-                                include: {
-                                    address: true,
-                                },
-                            },
-                        },
-                    },
-                },
+                select: productSelectionFields,
                 orderBy: [
                     {
                         [sortBy]: sortType,
@@ -341,43 +353,48 @@ export const getProductDetails = async (request, response, next) => {
     const productId = parseInt(request.params.productId) || 0;
 
     try {
-        const product = await prisma.product.findUnique({
-            where: {
-                id: productId,
-            },
-            include: {
-                stock: true,
-                store: {
-                    include: {
-                        user: {
-                            select: {
-                                ...genericUserFields,
-                                address: true,
+        // get product details and similar product Ids parallelly for efficiency
+        // if the product is not found, similar products will also be empty
+        const [product, similarProductIds] = await Promise.all([
+            prisma.product.findUnique({
+                where: {
+                    id: productId,
+                },
+                include: {
+                    stock: true,
+                    store: {
+                        include: {
+                            user: {
+                                select: {
+                                    ...genericUserFields,
+                                    address: true,
+                                },
                             },
-                        },
-                        business: {
-                            select: {
-                                id: true,
-                                name: true,
-                                address: true,
+                            business: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    address: true,
+                                },
                             },
-                        },
-                        suspension: {
-                            select: {
-                                id: true,
+                            suspension: {
+                                select: {
+                                    id: true,
+                                },
                             },
                         },
                     },
-                },
-                variations: true,
-                ratings: true,
-                suspension: {
-                    select: {
-                        id: true,
+                    variations: true,
+                    ratings: true,
+                    suspension: {
+                        select: {
+                            id: true,
+                        },
                     },
                 },
-            },
-        });
+            }),
+            fetcher(`similar/${productId}`),
+        ]);
 
         if (!product) {
             return next(new HttpError("product not found", 404));
@@ -387,21 +404,23 @@ export const getProductDetails = async (request, response, next) => {
             return next(new HttpError("this product has been deleted", 404));
         }
 
-        // get product recommendations
-        try {
-            const recommendations = (
-                await axios({
-                    method: "GET",
-                    url: `http://127.0.0.1:8080/recommendations/${productId}`,
-                })
-            ).data;
+        // get similar products
+        let similarProducts = [];
 
-            console.log(recommendations);
+        try {
+            similarProducts = await prisma.product.findMany({
+                where: {
+                    id: {
+                        in: similarProductIds,
+                    },
+                },
+                select: productSelectionFields,
+            });
         } catch (error) {
-            console.log(error);
+            console.log(error.message);
         }
 
-        response.json({ product });
+        response.json({ product: { ...product, similar: similarProducts } });
     } catch (error) {
         console.log(error);
         next(new HttpError());
@@ -452,6 +471,17 @@ export const updateProduct = async (request, response, next) => {
             },
         });
 
+        // update the product in the recommender as well
+        try {
+            await fetcher("similar/products", "POST", {
+                id: updatedProduct.id,
+                name: updatedProduct.name,
+                categoryName: updatedProduct.categoryName,
+                subCategory: updatedProduct.subCategory,
+                brand: updatedProduct.brand,
+            });
+        } catch (error) {}
+
         response.json({ product: updatedProduct });
     } catch (error) {
         next(new HttpError());
@@ -464,12 +494,12 @@ export const deleteProduct = async (request, response, next) => {
 
     try {
         await prisma.$transaction(async (prisma) => {
-            await prisma.product.update({
+            prisma.product.update({
                 where: { id: product.id },
                 data: productDeletionFields,
             });
 
-            await Promise.all(
+            Promise.all(
                 ["review", "rating", "productVariation", "stock"].map(
                     (model) => {
                         return prisma[model].deleteMany({
@@ -480,6 +510,8 @@ export const deleteProduct = async (request, response, next) => {
                     }
                 )
             );
+
+            await fetcher(`products/${product.id}`, "DELETE");
         });
 
         io.emit("product-delete", product.id);

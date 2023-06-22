@@ -1,22 +1,27 @@
 import { PieChart, PieArcSeries } from "reaviz";
 
 const StatCard = ({ title, stat }) => {
-    const renderPieChart = (data) => {
+    const renderPieChart = (stat) => {
+        const data = Object.keys(stat)
+            .filter((prop) => prop !== "total")
+            .map((prop) => {
+                return { key: prop, data: stat[prop] };
+            });
+
         return (
             <div className="flex align-center">
                 <PieChart
-                    width={350}
-                    height={250}
+                    height={200}
                     data={data}
-                    // series={
-                    //   <PieArcSeries
-                    //     cornerRadius={4}
-                    //     padAngle={0.02}
-                    //     padRadius={200}
-                    //     doughnut={true}
-                    //     colorScheme="blue-four"
-                    //   />
-                    // }
+                    series={
+                        <PieArcSeries
+                            cornerRadius={4}
+                            padAngle={0.02}
+                            padRadius={200}
+                            doughnut={true}
+                            colorScheme="cybertron"
+                        />
+                    }
                 />
             </div>
         );
@@ -28,18 +33,12 @@ const StatCard = ({ title, stat }) => {
 
             {renderPieChart(stat)}
 
-            <div className="grid grid-cols-3 gap-y-5">
-                {Object.keys(stat).map((prop) => {
-                    return (
-                        <div className="flex flex-col items-center justify-self-start space-y-[2px]">
-                            <span className="text-xl">{stat[prop]}</span>
-                            <span className="-mt-1 text-sm first-letter:capitalize">
-                                {prop}
-                            </span>
-                        </div>
-                    );
-                })}
-            </div>
+            {stat.total && (
+                <div>
+                    <span className="text-sm">Total - </span>
+                    <span>{stat["total"]}</span>
+                </div>
+            )}
         </div>
     );
 };

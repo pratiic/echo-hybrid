@@ -10,12 +10,15 @@ import StatCard from "../components/stat-card";
 
 const Statistics = () => {
     const { appStats, loading, error } = useSelector((state) => state.stats);
+    const { authUser } = useSelector((state) => state.auth);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        getAppStatistics();
-    }, []);
+        if (authUser) {
+            getAppStatistics();
+        }
+    }, [authUser]);
 
     const getAppStatistics = async () => {
         if (!appStats) {

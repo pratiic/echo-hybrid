@@ -16,15 +16,21 @@ export const exportRecDataset = async (request, response, next) => {
             },
         });
 
-        const fileName = "data-set.csv";
-        const destinationPath = path.join(
-            os.homedir(),
-            "Desktop",
-            "product-recommendation"
-        );
-        const csvFilePath = path.join(destinationPath, fileName);
+        const orders = await prisma.order.findMany({
+            where: {
+                isDeleted: false,
+            },
+        });
+
+        // const fileName = "data-set.csv";
+        // const destinationPath = path.join(
+        //   os.homedir(),
+        //   "Desktop",
+        //   "product-recommendation"
+        // );
+        // const csvFilePath = path.join(destinationPath, fileName);
         const csvWriter = createObjectCsvWriter({
-            path: csvFilePath,
+            path: "similarity-data-set.csv",
             header: [
                 { id: "id", title: "id" },
                 { id: "name", title: "name" },

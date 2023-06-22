@@ -181,3 +181,12 @@ export const suspensionInclusionFields = {
         },
     },
 };
+
+export const productSelectionFields = {
+    id: true,
+    rating: true,
+    name: true,
+    price: true,
+    isSecondHand: true,
+    images: true,
+};

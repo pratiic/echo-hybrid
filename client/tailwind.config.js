@@ -35,7 +35,7 @@ module.exports = {
                 variants: "repeat(auto-fit, auto)",
                 "list-request": "repeat(auto-fit, 15rem)",
                 "list-report": "repeat(auto-fit, 20rem)",
-                "list-stat": "repeat(auto-fit, 18rem)",
+                "list-stat": "repeat(auto-fit, minmax(18rem, 1fr))",
             },
             scale: {
                 103: "1.03",

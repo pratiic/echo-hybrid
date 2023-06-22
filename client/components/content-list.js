@@ -44,12 +44,14 @@ const ContentList = ({
     return (
         <div>
             <div
-                className={`${(type === "product" ||
-                    type === "seller" ||
-                    type === "category-request" ||
-                    type === "report" ||
-                    type === "suspension") &&
-                    "grid"} ${
+                className={`${
+                    (type === "product" ||
+                        type === "seller" ||
+                        type === "category-request" ||
+                        type === "report" ||
+                        type === "suspension") &&
+                    "grid"
+                } ${
                     type === "product" || type === "seller"
                         ? "grid-cols-list-xs 600:grid-cols-list"
                         : type === "category-request"
@@ -65,12 +67,6 @@ const ContentList = ({
                             <ContentCard
                                 {...content}
                                 key={content.id}
-                                {...{
-                                    owner:
-                                        type === "seller"
-                                            ? content.user
-                                            : content.store.user,
-                                }}
                                 type={type}
                             />
                         );
