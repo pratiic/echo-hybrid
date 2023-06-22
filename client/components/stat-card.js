@@ -3,13 +3,16 @@ import { PieChart, PieArcSeries } from "reaviz";
 const StatCard = ({ title, stat }) => {
   const renderPieChart = (stat) => {
     const data = Object.keys(stat).map((prop) => {
+      // if (prop !== "total") {
+      //   return { key: prop, data: stat[prop] };
+      // }
       return { key: prop, data: stat[prop] };
     });
 
     return (
       <div className="flex align-center">
         <PieChart
-          // height={200}
+          height={150}
           data={data}
           series={
             <PieArcSeries
