@@ -1,0 +1,10 @@
+id,name,categoryName,subCategory,brand,userId,orderId
+15,iphone 13,accessories,phone,apple,3,10
+9,sofa set,furnishing,sofa,,3,7
+14,harry potter,education,book,,3,13
+11,playstation,gaming consoles,play station,Sony Interactive Entertainment,3,14
+20,golden retriever,pets,dog,,2,5
+23,dog food,pet supplies,food,,2,9
+21,air fryer,home and kitchen,electronics,,2,8
+18,betta fish,pets,fish,,2,6
+24,acoustic guitar,musical instruments,guitar,,2,11
