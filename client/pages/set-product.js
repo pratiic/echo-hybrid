@@ -244,7 +244,7 @@ const SetProduct = () => {
                     placeholder="min 50 chars, max 200 chars"
                     view="textarea"
                     minChars={50}
-                    maxChars={150}
+                    maxChars={200}
                     value={description}
                     error={descriptionError}
                     onChange={setDescription}
@@ -274,7 +274,6 @@ const SetProduct = () => {
 
                 <InputGroup
                     label="delivery charge"
-                    placeholder="leave empty for free shipping"
                     view="number"
                     min={0}
                     showRequired={false}

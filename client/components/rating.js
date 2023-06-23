@@ -185,8 +185,9 @@ const Rating = ({
             {!onlyStars && (
                 <React.Fragment>
                     <div
-                        className={`flex flex-wrap items-center dark-light ${ratings.length >
-                            0 && "mt-2"}`}
+                        className={`flex flex-wrap items-center dark-light ${
+                            ratings.length > 0 && "mt-2"
+                        }`}
                     >
                         <span className="block mb-1 mr-3 text-sm">
                             By {ratings?.length}{" "}

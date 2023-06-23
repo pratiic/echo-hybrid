@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { showGenericModal } from "../redux/slices/modal-slice";
-import { setAlert } from "../redux/slices/alerts-slice";
 
 import InfoBanner from "./info-banner";
 import Button from "./button";
 import PrimaryInfo from "./product-info/primary";
 import SecondaryInfo from "./product-info/secondary";
-import VariationsSetter from "./variations-setter";
 import StockSetter from "./stock-setter";
 
 const ProductInfo = ({

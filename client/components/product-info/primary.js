@@ -59,8 +59,9 @@ const PrimaryInfo = ({
 
                     {/* product state info */}
                     <div
-                        className={`flex items-center space-x-3 mb-2 ${isSecondHand &&
-                            "-mt-1"}`}
+                        className={`flex items-center space-x-3 mb-2 ${
+                            isSecondHand && "-mt-1"
+                        }`}
                     >
                         <Tag
                             text={isSecondHand ? "second hand" : "brand new"}

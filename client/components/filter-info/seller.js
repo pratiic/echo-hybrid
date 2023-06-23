@@ -19,7 +19,7 @@ const SellerFilterInfo = () => {
         return (
             <React.Fragment>
                 , <span className="font-semibold">{totalCount} </span>
-                {singularOrPluralCount(totalCount, "seller", "sellers")} found
+                found
             </React.Fragment>
         );
     };
@@ -28,7 +28,7 @@ const SellerFilterInfo = () => {
         <div className="filter-info-container">
             <p className="filter-info-text">
                 Showing{" "}
-                <span className="filter-info-highlight">
+                <span className="font-semibold">
                     {capitalizeFirstLetter(
                         activeFilter === "all"
                             ? `all sellers`
