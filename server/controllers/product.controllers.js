@@ -355,7 +355,7 @@ export const getProductDetails = async (request, response, next) => {
     try {
         // get product details and similar product Ids parallelly for efficiency
         // if the product is not found, similar products will also be empty
-        const [product, similarProductIds] = await Promise.all([
+        const [product, similarProductInfo] = await Promise.all([
             prisma.product.findUnique({
                 where: {
                     id: productId,
@@ -393,7 +393,7 @@ export const getProductDetails = async (request, response, next) => {
                     },
                 },
             }),
-            // fetcher(`similar/${productId}`),
+            fetcher(`similar/${productId}`),
         ]);
 
         if (!product) {
@@ -407,18 +407,22 @@ export const getProductDetails = async (request, response, next) => {
         // get similar products
         let similarProducts = [];
 
-        // try {
-        //     similarProducts = await prisma.product.findMany({
-        //         where: {
-        //             id: {
-        //                 in: similarProductIds,
-        //             },
-        //         },
-        //         select: productSelectionFields,
-        //     });
-        // } catch (error) {
-        //     console.log(error.message);
-        // }
+        try {
+            const similarProductIds = similarProductInfo.map((info) => {
+                return info.productId;
+            });
+
+            similarProducts = await prisma.product.findMany({
+                where: {
+                    id: {
+                        in: similarProductIds,
+                    },
+                },
+                select: productSelectionFields,
+            });
+        } catch (error) {
+            console.log(error.message);
+        }
 
         response.json({ product: { ...product, similar: similarProducts } });
     } catch (error) {
