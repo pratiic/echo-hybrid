@@ -406,6 +406,8 @@ export const getProductDetails = async (request, response, next) => {
                 return info.productId;
             });
 
+            console.log(similarProductInfo);
+
             similarProducts = await prisma.product.findMany({
                 where: {
                     id: {
@@ -414,6 +416,17 @@ export const getProductDetails = async (request, response, next) => {
                 },
                 select: productSelectionFields,
             });
+
+            similarProducts = similarProducts.map((similarProduct) => {
+                return {
+                    ...similarProduct,
+                    similarity: similarProductInfo.find(
+                        (info) => info.productId === similarProduct.id
+                    ).similarity,
+                };
+            });
+
+            similarProducts.sort((a, b) => b.similarity - a.similarity);
         } catch (error) {
             console.log(error.message);
         }
