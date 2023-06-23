@@ -144,7 +144,7 @@ export const postProduct = async (request, response, next) => {
 export const getProducts = async (request, response, next) => {
     let user = request.user;
     user.address = user.address || {};
-    const filter = request.query.filter || "all";
+    let filter = request.query.filter || "all";
     const sortType = request.query.sortType || "desc";
     let sortBy = request.query.sortBy || "createdAt";
     const category = request.query.category;
@@ -277,24 +277,13 @@ export const getProducts = async (request, response, next) => {
             store: {
                 suspension: null,
             },
-            // OR: [
-            //     {
-            //         isSecondHand: false,
-            //     },
-            //     {
-            //         isSecondHand: true,
-            //         hasBeenSold: false,
-            //     },
-            // ],
         };
     }
 
-    if (category) {
-        // products of a particular category
-        primaryFilter.categoryName = category;
-    }
-
     if (searchQuery) {
+        // search among all products
+        filter = "all";
+
         const fields = ["name", "brand", "subCategory"];
 
         const searchFilter = {
@@ -311,13 +300,35 @@ export const getProducts = async (request, response, next) => {
         primaryFilter = { ...primaryFilter, ...searchFilter };
     }
 
-    const whereObj = {
+    if (category && !searchQuery) {
+        // products of a particular category
+        primaryFilter.categoryName = category;
+        filter = "all";
+    }
+
+    let whereObj = {
         ...primaryFilter,
         ...(filter === "delivered" ? filterMap[filter]() : filterMap[filter]),
     };
 
+    let recommendedProductInfo = [];
+
+    if (filter === "recommended") {
+        recommendedProductInfo = await fetcher(`recommendations/${user.id}`);
+        const recommendedProductIds = recommendedProductInfo.map((info) => {
+            return info.productId;
+        });
+
+        whereObj = {
+            ...whereObj,
+            id: {
+                in: recommendedProductIds,
+            },
+        };
+    }
+
     try {
-        const [products, totalCount] = await Promise.all([
+        let [products, totalCount] = await Promise.all([
             prisma.product.findMany({
                 where: whereObj,
                 select: productSelectionFields,
@@ -336,6 +347,22 @@ export const getProducts = async (request, response, next) => {
                 where: whereObj,
             }),
         ]);
+
+        // post processing for recommended products
+        if (filter === "recommended") {
+            // assign each product its corresponding similarity for sorting
+            products = products.map((product) => {
+                return {
+                    ...product,
+                    similarity: recommendedProductInfo.find(
+                        (info) => info.productId === product.id
+                    ).similarity,
+                };
+            });
+
+            // sort products based on similarity
+            // products.sort((a, b) => b.similarity - a.similarity);
+        }
 
         response.json({ products, totalCount });
     } catch (error) {
@@ -405,8 +432,6 @@ export const getProductDetails = async (request, response, next) => {
             const similarProductIds = similarProductInfo.map((info) => {
                 return info.productId;
             });
-
-            console.log(similarProductInfo);
 
             similarProducts = await prisma.product.findMany({
                 where: {

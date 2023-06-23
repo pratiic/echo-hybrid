@@ -19,7 +19,7 @@ const ContentCard = ({
     user, // s -> seller
     business, // s
     storeType, // s
-    forCarousel,
+    forCarousel, // p,
 }) => {
     const router = useRouter();
     const { theme } = useSelector((state) => state.theme);

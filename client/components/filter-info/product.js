@@ -30,31 +30,39 @@ const ProductFilterInfo = ({ activeCategory, showingShopProducts, count }) => {
 
         return (
             <React.Fragment>
-                ,<span className="font-semibold"> {count}</span> found
+                ,<span className="font-semibold"> {count}</span> total
             </React.Fragment>
         );
     };
 
-    // if not activeCategory -> all categories
     return (
         <div className="filter-info-container">
-            <p className="filter-info-text">
+            <p className="filter-info-text text-blue-four">
                 Showing{" "}
-                <span className="filter-info-highlight">
-                    {capitalizeFirstLetter(
-                        filterMap[
-                            !showingShopProducts
-                                ? activeFilter
-                                : sellerFilter.activeFilter
-                        ]
-                    )}
-                </span>{" "}
-                from{" "}
-                <span className="filter-info-highlight">
-                    {capitalizeFirstLetter(activeCategory || "All")}
-                </span>{" "}
-                {activeCategory ? "category" : "categories"}
-                {renderTotalCount()}
+                <span>
+                    {activeCategory
+                        ? `products from ${capitalizeFirstLetter(
+                              activeCategory
+                          )} category`
+                        : `${filterMap[activeFilter]}`}
+                </span>
+                {/* <span className="filter-info-highlight">
+                    {capitalizeFirstLetter(filterMap[activeFilter])}
+                </span>
+                {
+                    // do not show which category in case of recommended products
+                    activeFilter !== "recommended" && (
+                        <React.Fragment>
+                            {" "}
+                            from{" "}
+                            <span className="filter-info-highlight">
+                                {capitalizeFirstLetter(activeCategory || "All")}
+                            </span>{" "}
+                            {activeCategory ? "category" : "categories"}
+                        </React.Fragment>
+                    )
+                } */}
+                {/* {renderTotalCount()} */}
             </p>
         </div>
     );

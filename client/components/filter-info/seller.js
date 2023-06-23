@@ -28,14 +28,11 @@ const SellerFilterInfo = () => {
         <div className="filter-info-container">
             <p className="filter-info-text">
                 Showing{" "}
-                <span className="font-semibold">
-                    {capitalizeFirstLetter(
-                        activeFilter === "all"
-                            ? `all sellers`
-                            : `sellers from your ${activeLocationType}`
-                    )}
-                </span>
-                {renderTotalCount()}
+                {activeFilter === "all"
+                    ? `all sellers`
+                    : `sellers from your
+                    ${activeLocationType}`}
+                {/* {renderTotalCount()} */}
             </p>
         </div>
     );

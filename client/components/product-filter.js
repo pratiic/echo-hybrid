@@ -9,6 +9,7 @@ import {
     ArrowUpIcon,
     ArrowDownIcon,
     CalendarIcon,
+    UserIcon,
 } from "@heroicons/react/outline";
 import { FaCity } from "react-icons/fa";
 import { MdDeliveryDining, MdTransferWithinAStation } from "react-icons/md";
@@ -63,6 +64,7 @@ const ProductFilter = ({ isGlobal }) => {
 
     const filterOptions = [
         { name: "all", icon: <DotsHorizontalIcon className="icon-no-bg" /> },
+        { name: "recommended", icon: <UserIcon className="icon-no-bg" /> },
         {
             name: "location",
             icon: <LocationMarkerIcon className="icon-no-bg" />,

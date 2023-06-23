@@ -4,7 +4,8 @@ export const getFilterMap = (
     showingShopProducts
 ) => {
     return {
-        all: "all products",
+        all: "all products from all categories",
+        recommended: "recommended products",
         location: `products of your ${
             !showingShopProducts ? locationFilter : sellerFilter.locationFilter
         }`,

@@ -17,12 +17,8 @@ const productFilterSlice = createSlice({
     },
     reducers: {
         setFilterOptions: (state, action) => {
-            const {
-                activeFilter,
-                locationFilter,
-                sortingType,
-                orderType,
-            } = action.payload.options;
+            const { activeFilter, locationFilter, sortingType, orderType } =
+                action.payload.options;
 
             if (!action.payload.isGlobal) {
                 // filter for seller products
@@ -40,8 +36,6 @@ const productFilterSlice = createSlice({
     },
 });
 
-export const {
-    setFilterOptions,
-    resetSellerFilterOptions,
-} = productFilterSlice.actions;
+export const { setFilterOptions, resetSellerFilterOptions } =
+    productFilterSlice.actions;
 export default productFilterSlice.reducer;
