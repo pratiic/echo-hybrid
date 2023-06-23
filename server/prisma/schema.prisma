@@ -142,19 +142,19 @@ model Product {
     subCategory    String
     isDeleted      Boolean  @default(false)
     hasBeenSold    Boolean  @default(false) // only for second hand products
+    categoryName   String?
 
-    store        Store?             @relation(fields: [storeId], references: [id], onDelete: Cascade)
-    storeId      Int?
-    reviews      Review[]
-    ratings      Rating[]
-    category     Category?          @relation(fields: [categoryName], references: [name])
-    categoryName String?
-    stock        Stock?
-    variations   ProductVariation[]
-    orders       Order[]
-    cartItems    CartItem[]
-    reports      Report[]
-    suspension   Suspension?
+    store      Store?             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    storeId    Int?
+    reviews    Review[]
+    ratings    Rating[]
+    category   Category?          @relation(fields: [categoryName], references: [name])
+    stock      Stock?
+    variations ProductVariation[]
+    orders     Order[]
+    cartItems  CartItem[]
+    reports    Report[]
+    suspension Suspension?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

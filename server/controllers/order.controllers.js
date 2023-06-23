@@ -6,6 +6,7 @@ import {
 } from "../lib/data-source.lib.js";
 import { checkDelivery } from "../lib/delivery.lib.js";
 import { sendEmail } from "../lib/email.lib.js";
+import { fetcher } from "../lib/http.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { capitalizeFirstLetter } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
@@ -254,6 +255,19 @@ export const placeOrder = async (request, response, next) => {
                 }
             }
         }
+
+        // add the order to the recommender data set
+        try {
+            fetcher("recommendations/orders", "POST", {
+                id: product.id,
+                name: product.name,
+                categoryName: product.categoryName,
+                subCategory: product.subCategory,
+                brand: product.brand,
+                orderId: createdOrder.id,
+                userId: user.id,
+            });
+        } catch (error) {}
 
         io.emit("order", createdOrder);
 
