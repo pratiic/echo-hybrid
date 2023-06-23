@@ -20,6 +20,7 @@ const ContentCard = ({
   user, // s -> seller
   business, // s
   storeType, // s
+  width = false, //for recommended carousel
 }) => {
   const router = useRouter();
   const { theme } = useSelector((state) => state.theme);
@@ -58,7 +59,8 @@ const ContentCard = ({
       widthFit={false}
     >
       <div
-        className="rounded cursor-pointer h-fit dark-light hover:scale-103 hover:shadow-lg hover:shadow-gray-two transition-all duration-300 active:scale-100 active:shadow-none dark:shadow-t-black"
+        className={`rounded cursor-pointer h-fit dark-light hover:scale-103 hover:shadow-lg hover:shadow-gray-two transition-all duration-300 active:scale-100 active:shadow-none dark:shadow-t-black ${width &&
+          "w-[15rem]"}`}
         onClick={handleContentClick}
       >
         <div className="min-h-[9rem] relative rounded-t">
