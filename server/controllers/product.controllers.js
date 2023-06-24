@@ -252,6 +252,10 @@ export const getProducts = async (request, response, next) => {
 
     if (storeId) {
         // products belongining to a store
+        if (filter === "recommended") {
+            filter = "all";
+        }
+
         primaryFilter.storeId = storeId;
     }
 
@@ -429,6 +433,8 @@ export const getProductDetails = async (request, response, next) => {
         let similarProducts = [];
 
         try {
+            console.log(similarProductInfo);
+
             const similarProductIds = similarProductInfo.map((info) => {
                 return info.productId;
             });
@@ -529,13 +535,17 @@ export const deleteProduct = async (request, response, next) => {
     const io = request.io;
 
     try {
-        await prisma.$transaction(async (prisma) => {
-            prisma.product.update({
+        prisma.$transaction(async (prisma) => {
+            await prisma.product.updateMany({
                 where: { id: product.id },
-                data: productDeletionFields,
+                data: {
+                    storeId: null,
+                    isDeleted: true,
+                    categoryName: null,
+                },
             });
 
-            Promise.all(
+            await Promise.all(
                 ["review", "rating", "productVariation", "stock"].map(
                     (model) => {
                         return prisma[model].deleteMany({
@@ -554,6 +564,7 @@ export const deleteProduct = async (request, response, next) => {
 
         response.json({ message: "the product has been deleted" });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     }
 };

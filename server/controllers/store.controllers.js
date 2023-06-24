@@ -16,7 +16,7 @@ export const registerStore = async (request, response, next) => {
         return next(new HttpError(errorMsg, 400));
     }
 
-    if (!user.address) {
+    if (storeType === "IND" && !user.address) {
         return next(new HttpError("you need to set your address first", 400));
     }
 
@@ -134,6 +134,12 @@ export const getStores = async (request, response, next) => {
         province: getAddressFilter("province"),
         city: getAddressFilter("city"),
         area: getAddressFilter("area"),
+        individual: {
+            storeType: "IND",
+        },
+        business: {
+            storeType: "BUS",
+        },
     };
 
     let searchFilter = {};
