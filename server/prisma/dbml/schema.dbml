@@ -118,12 +118,12 @@ Table Product {
   subCategory String [not null]
   isDeleted Boolean [not null, default: false]
   hasBeenSold Boolean [not null, default: false]
+  categoryName String
   store Store
   storeId Int
   reviews Review [not null]
   ratings Rating [not null]
   category Category
-  categoryName String
   stock Stock
   variations ProductVariation [not null]
   orders Order [not null]
