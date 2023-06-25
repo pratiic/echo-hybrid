@@ -13,6 +13,7 @@ const SearchBar = ({
     className,
     focusOnLoad = false,
     value = "",
+    searching,
     clearSearch,
     onChange,
     onSubmit,
@@ -75,8 +76,9 @@ const SearchBar = ({
         <form onSubmit={handleFormSubmit} className={className}>
             <div className="flex items-center">
                 <div
-                    className={`flex items-center border dark:border-gray-700 w-full 400:w-72 py-[9px] px-2 rounded-full transition-all duration-200 ${isFocused &&
-                        "border-blue-three"}`}
+                    className={`flex items-center border dark:border-gray-700 w-full 400:w-72 py-[9px] px-2 rounded-full transition-all duration-200 ${
+                        isFocused && "border-blue-three"
+                    }`}
                 >
                     <FiSearch className="h-[18px] w-[18px] text-gray-500 mr-2" />
                     <input
@@ -108,13 +110,15 @@ const SearchBar = ({
                     <span className="font-semibold text-blue-400">
                         {router.query.query}
                     </span>{" "}
-                    <span className="dark-light">
-                        ({resultsCount}{" "}
-                        {resultsCount === 0 || resultsCount > 1
-                            ? pluralMap[contentType]
-                            : contentType}{" "}
-                        found)
-                    </span>
+                    {!searching && (
+                        <span className="dark-light">
+                            ({resultsCount}{" "}
+                            {resultsCount === 0 || resultsCount > 1
+                                ? pluralMap[contentType]
+                                : contentType}{" "}
+                            found)
+                        </span>
+                    )}
                 </p>
             )}
         </form>

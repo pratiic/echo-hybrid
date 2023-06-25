@@ -17,7 +17,7 @@ const SidebarItem = ({
     return (
         <CustomLink
             className={`${
-                showSidebar ? "hidden 1000:flex" : "flex"
+                !showSidebar ? "hidden 1000:flex" : "flex"
             } items-center w-fit px-5 py-2 mb-4 last:mb-0 rounded-full hover: cursor-pointer hover:bg-gray-two active:bg-gray-300 transition-all duration-200 dark:hover:bg-gray-700 dark:active:bg-gray-800 ${
                 active
                     ? "text-blue-three bg-gray-four font-semibold dark:bg-gray-800"
@@ -28,8 +28,9 @@ const SidebarItem = ({
             <div className="relative">
                 {count > 0 && (
                     <span
-                        className={`absolute -top-1 -right-[2px] count ${!countFlat &&
-                            "animate-bounce"}`}
+                        className={`absolute -top-1 -right-[2px] count ${
+                            !countFlat && "animate-bounce"
+                        }`}
                     >
                         {count}
                     </span>

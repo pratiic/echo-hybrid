@@ -35,9 +35,7 @@ const Sidebar = () => {
     const { showSidebar } = useSelector((state) => state.sidebar);
     const { notifications } = useSelector((state) => state.notifications);
     const { sellerOrders } = useSelector((state) => state.orders);
-    const { userTransactions, sellerTransactions } = useSelector(
-        (state) => state.transactions
-    );
+    const { sellerTransactions } = useSelector((state) => state.transactions);
     const { completed } = useSelector((state) => state.delivery);
     const { chats } = useSelector((state) => state.chat);
     const { requests: categoryRequests } = useSelector(
@@ -47,6 +45,7 @@ const Sidebar = () => {
     const { requests: businessRequests } = useSelector(
         (state) => state.businesses
     );
+    const { items: cartItems } = useSelector((state) => state.cart);
 
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [ordersCount, setOrdersCount] = useState(0);
@@ -57,13 +56,14 @@ const Sidebar = () => {
     const [categoryRequestsCount, setCategoryRequestsCount] = useState(0);
     const [reportsCount, setReportsCount] = useState(0);
     const [businessRequestsCount, setBusinessRequestsCount] = useState(0);
+    const [cartItemsCount, setCartItemsCount] = useState(0);
     const [activeLink, setActiveLink] = useState("");
     const [linksToRender, setLinksToRender] = useState([]);
 
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const [commonLinks, setCommonLinks] = useState([
+    const commonLinks = [
         {
             name: "chats",
             linkTo: "/chats",
@@ -83,9 +83,9 @@ const Sidebar = () => {
             linkTo: "/signin",
             icon: <LogoutIcon className="icon-sidebar" />,
         },
-    ]);
+    ];
 
-    const [links, setLinks] = useState([
+    const links = [
         {
             name: "products",
             linkTo: "/products",
@@ -134,9 +134,9 @@ const Sidebar = () => {
             activePath: "/profile",
         },
         commonLinks[commonLinks.length - 1],
-    ]);
+    ];
 
-    const [deliveryLinks, setDeliveryLinks] = useState([
+    const deliveryLinks = [
         {
             name: "pending",
             linkTo: "/delivery/?show=pending",
@@ -150,7 +150,7 @@ const Sidebar = () => {
             activePath: "/delivery?show=completed",
         },
         ...commonLinks,
-    ]);
+    ];
 
     const adminLinks = [
         {
@@ -288,6 +288,10 @@ const Sidebar = () => {
     }, [businessRequests]);
 
     useEffect(() => {
+        setCartItemsCount(cartItems.length);
+    }, [cartItems]);
+
+    useEffect(() => {
         for (let link of linksToRender) {
             if (
                 router.pathname === link.activePath ||
@@ -336,7 +340,7 @@ const Sidebar = () => {
 
     return (
         <nav
-            className={`px-[30px] 1000:px-0 border-r border-faint pt-4 1000:w-[200px] left-0 1000:left-auto h-[calc(100vh-64px)] fixed overflow-y-scroll transition-scale origin-left duration-300 first:pt-0 last:pb-0 scrollbar-hide ${
+            className={`px-[40px] 1000:px-0 border-r border-faint pt-4 1000:w-[200px] left-0 1000:left-auto h-[calc(100vh-64px)] fixed overflow-y-scroll transition-scale origin-left duration-300 first:pt-0 last:pb-0 scrollbar-hide ${
                 showSidebar
                     ? "z-30 bg-white dark:bg-gray-seven"
                     : "1000:scale-x-100 scale-x-0"
@@ -393,6 +397,8 @@ const Sidebar = () => {
                                 ? reportsCount
                                 : link.name === "businesses"
                                 ? businessRequestsCount
+                                : link.name === "cart"
+                                ? cartItemsCount
                                 : 0
                         }
                         active={activeLink === link.name}

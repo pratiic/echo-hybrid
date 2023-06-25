@@ -5,23 +5,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../lib/strings";
 import { fetcher } from "../lib/fetcher";
 import { showGenericModal } from "../redux/slices/modal-slice";
+import { setCategory } from "../redux/slices/products-slice";
 
 import CustomLink from "./custom-link";
 import Icon from "./icon";
 import CategoryRequestor from "./category-requestor";
 
-const CategoriesPanel = ({
-    show,
-    activeCategory,
-    showCount = true,
-    setActiveCategory,
-    togglePanel,
-}) => {
+const CategoriesPanel = ({ show, showCount = true, togglePanel }) => {
     const [categories, setCategories] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
     const [isRestricted, setIsRestricted] = useState(false);
 
     const { authUser } = useSelector((state) => state.auth);
+    const { category: activeCategory } = useSelector((state) => state.products);
 
     const dispatch = useDispatch();
     const categoryStyle = `flex items-center rounded-2xl px-3 py-1 cursor-pointer transition-all duration-200`;
@@ -61,7 +57,7 @@ const CategoriesPanel = ({
     }
 
     const handleClick = (categoryName) => {
-        setActiveCategory(categoryName);
+        dispatch(setCategory(categoryName));
         togglePanel();
     };
 

@@ -54,7 +54,7 @@ const Statistics = () => {
                 <PageHeader heading="statistics" />
             </div>
 
-            <div className="grid grid-cols-list-stat gap-5">
+            <div className="grid grid-cols-list-stat gap-5 pb-5">
                 {Object.keys(appStats).map((key) => {
                     return <StatCard title={key} stat={appStats[key]} />;
                 })}

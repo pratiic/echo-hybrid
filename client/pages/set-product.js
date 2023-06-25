@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 import { clearErrors, displayError } from "../lib/validation";
 import { generateFormData } from "../lib/form-data";
@@ -225,12 +226,17 @@ const SetProduct = () => {
         }
     };
 
+    const getHeading = () => {
+        return mode === "create" ? "Add a product" : "Update product";
+    };
+
     return (
         <section>
-            <Form
-                heading={mode === "create" ? "Add a product" : "Update product"}
-                onSubmit={handleFormSubmit}
-            >
+            <Head>
+                <title>{getHeading()}</title>
+            </Head>
+
+            <Form heading={getHeading()} onSubmit={handleFormSubmit}>
                 <InputGroup
                     label="product name"
                     placeholder="min 5 chars, max 100 chars"

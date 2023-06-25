@@ -1,7 +1,14 @@
+import { createObjectCsvWriter } from "csv-writer";
+import fs from "fs";
+
 import { transactionSelectionFields } from "../lib/data-source.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
-import { validateMonthYear } from "../validators/transaction.validators.js";
+import {
+    validateMonthYear,
+    validateYear,
+} from "../validators/transaction.validators.js";
+import { getSubtotal } from "../lib/transaction.lib.js";
 
 export const getTransactions = async (request, response, next) => {
     const user = request.user;
@@ -210,6 +217,225 @@ export const acknowledgeTransactions = async (request, response, next) => {
     }
 };
 
+export const generateCSV = async (request, response, next) => {
+    const user = request.user;
+    const type = request.query.type; // indicates sales or purchase history
+    const displayType = request.query.display;
+    const year = parseInt(request.query.year) || -1;
+    const month = parseInt(request.query.month) || -1;
+
+    if (type !== "user" && type !== "seller") {
+        return next(
+            new HttpError(
+                "invalid type - valid types are 'user' for purchase history and 'seller' for sales history"
+            )
+        );
+    }
+
+    if (
+        displayType !== "all" &&
+        displayType !== "month" &&
+        displayType !== "year"
+    ) {
+        return next(
+            new HttpError(
+                "invalid display type - valid types are 'all' for all history, 'month' for the history of a specific month and 'year' for the history of a specific year"
+            )
+        );
+    }
+
+    const errorMsg =
+        displayType === "year"
+            ? validateYear(year)
+            : displayType === "month"
+            ? validateMonthYear({ month, year })
+            : "";
+
+    if (errorMsg) {
+        return next(new HttpError(errorMsg, 400));
+    }
+
+    const displayFilter =
+        displayType === "year"
+            ? { createdYear: year }
+            : displayType === "month"
+            ? { createdYear: year, createdMonth: month }
+            : {};
+
+    const whereObj = {
+        order: getTypeFilter(type, user),
+        ...displayFilter,
+    };
+
+    try {
+        const transactions = await prisma.transaction.findMany({
+            where: whereObj,
+            select: {
+                id: true,
+                order: {
+                    include: {
+                        product: true,
+                        store: {
+                            include: {
+                                user: true,
+                                business: true,
+                            },
+                        },
+                    },
+                },
+                createdAt: true,
+            },
+        });
+
+        if (transactions.length === 0) {
+            return next(
+                new HttpError(
+                    "there are no transactions to generate csv for",
+                    400
+                )
+            );
+        }
+
+        const transactionFields = [
+            {
+                id: "transactionId",
+                title: "transaction Id",
+            },
+            {
+                id: "productId",
+                title: "product Id",
+            },
+            {
+                id: "productName",
+                title: "product name",
+            },
+            {
+                id: "productVariant",
+                title: "product variant",
+            },
+            {
+                id: "unitPrice",
+                title: "unit price",
+            },
+            {
+                id: "quantity",
+                title: "quantity",
+            },
+            {
+                id: "delivery",
+                title: "delivery",
+            },
+            {
+                id: "deliveryCharge",
+                title: "delivery charge",
+            },
+            {
+                id: "subTotal",
+                title: "sub total",
+            },
+            {
+                id: "orderId",
+                title: "order Id",
+            },
+            {
+                id: "sellerId",
+                title: "seller Id",
+            },
+            {
+                id: "sellerName",
+                title: "seller name",
+            },
+            {
+                id: "orderDate",
+                title: "ordered date",
+            },
+            {
+                id: "orderCompletionDate",
+                title: "order completion date",
+            },
+        ];
+
+        const filePath = `${
+            type === "user" ? "purchase" : "sales"
+        }-history.csv`;
+
+        const csvWriter = createObjectCsvWriter({
+            path: filePath,
+            header: transactionFields,
+        });
+
+        const transactionRecords = transactions.map((transaction) => {
+            const {
+                id,
+                order: {
+                    id: orderId,
+                    product: { id: productId, name: productName },
+                    unitPrice,
+                    variant,
+                    quantity,
+                    consumerAddress,
+                    isDelivered,
+                    deliveryCharge,
+                    store: {
+                        id: sellerId,
+                        user: { fullName: sellerName },
+                        storeType,
+                    },
+                    createdAt: orderCreatedAt,
+                },
+                createdAt,
+            } = transaction;
+
+            return {
+                transactionId: id,
+                productId,
+                productName,
+                productVariant: variant ? getVariantInfo(variant) : "N/A",
+                unitPrice,
+                quantity: quantity || 1,
+                consumerAddress: isDelivered ? consumerAddress : "N/A",
+                delivery: isDelivered ? "available" : "not available",
+                deliveryCharge: isDelivered ? deliveryCharge : "N/A",
+                subTotal: getSubtotal(
+                    unitPrice,
+                    quantity,
+                    deliveryCharge,
+                    true,
+                    isDelivered
+                ),
+                orderId,
+                sellerId: type === "user" ? sellerId : "N/A",
+                sellerName:
+                    type === "user"
+                        ? storeType === "IND"
+                            ? sellerName
+                            : store.business.name
+                        : "N/A",
+                orderDate: orderCreatedAt,
+                orderCompletionDate: createdAt,
+            };
+        });
+
+        await csvWriter.writeRecords(transactionRecords);
+
+        response.setHeader("Content-Type", "text/csv");
+        response.setHeader(
+            "Content-Disposition",
+            `attachment; filename = ${filePath}`
+        );
+
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(response);
+
+        fileStream.on("end", () => {
+            fs.unlinkSync(filePath);
+        });
+    } catch (error) {
+        console.log(error);
+        next(new HttpError());
+    }
+};
+
 function getTypeFilter(type, user) {
     let typeFilter = {};
 
@@ -224,4 +450,16 @@ function getTypeFilter(type, user) {
     }
 
     return typeFilter;
+}
+
+function getVariantInfo(variant) {
+    let variantInfo = "";
+
+    Object.keys(variant).forEach((key) => {
+        if (key !== "id" && key !== "quantity") {
+            variantInfo += `${key} ${variant[key]}\n`;
+        }
+    });
+
+    return variantInfo;
 }

@@ -3,6 +3,7 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
+import path from "path";
 
 import { errorHandler } from "./middleware/error.middleware.js";
 import { router as authRouter } from "./routes/auth.routes.js";
@@ -69,8 +70,8 @@ app.use("/api/rec", recRouter());
 app.use(errorHandler);
 
 if (process.env.NODE_ENV !== "test") {
-  const port = process.env.PORT || 8000;
-  server.listen(port, () => {
-    console.log(`the server is listening on port ${port}`);
-  });
+    const port = process.env.PORT || 8000;
+    server.listen(port, () => {
+        console.log(`the server is listening on port ${port}`);
+    });
 }

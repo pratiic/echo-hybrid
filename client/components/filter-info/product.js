@@ -1,28 +1,16 @@
 import React from "react";
 import { useSelector } from "react-redux";
-
-import {
-    capitalizeFirstLetter,
-    singularOrPluralCount,
-} from "../../lib/strings";
 import { getFilterMap } from "../../lib/filter";
 
-const ProductFilterInfo = ({ activeCategory, showingShopProducts, count }) => {
+const ProductFilterInfo = ({ activeCategory, count }) => {
     const { activeFilter, locationFilter, sellerFilter } = useSelector(
         (state) => state.filter
     );
 
-    const filterMap = getFilterMap(
-        locationFilter,
-        sellerFilter,
-        showingShopProducts
-    );
+    const filterMap = getFilterMap(locationFilter)[activeFilter];
 
     const renderTotalCount = () => {
-        const filter =
-            filterMap[
-                !showingShopProducts ? activeFilter : sellerFilter.activeFilter
-            ];
+        const filter = filterMap[activeFilter];
 
         if (filter === "all products" || count === 0) {
             return;
@@ -37,32 +25,17 @@ const ProductFilterInfo = ({ activeCategory, showingShopProducts, count }) => {
 
     return (
         <div className="filter-info-container">
-            <p className="filter-info-text text-blue-four">
+            <p className="filter-info-text">
                 Showing{" "}
-                <span>
+                <span className="filter-info-highlight">
+                    {filterMap[activeFilter]}
+                </span>{" "}
+                from{" "}
+                <span className="filter-info-highlight">
                     {activeCategory
-                        ? `products from ${capitalizeFirstLetter(
-                              activeCategory
-                          )} category`
-                        : `${filterMap[activeFilter]}`}
+                        ? `${activeCategory} category`
+                        : "all categories"}
                 </span>
-                {/* <span className="filter-info-highlight">
-                    {capitalizeFirstLetter(filterMap[activeFilter])}
-                </span>
-                {
-                    // do not show which category in case of recommended products
-                    activeFilter !== "recommended" && (
-                        <React.Fragment>
-                            {" "}
-                            from{" "}
-                            <span className="filter-info-highlight">
-                                {capitalizeFirstLetter(activeCategory || "All")}
-                            </span>{" "}
-                            {activeCategory ? "category" : "categories"}
-                        </React.Fragment>
-                    )
-                } */}
-                {/* {renderTotalCount()} */}
             </p>
         </div>
     );

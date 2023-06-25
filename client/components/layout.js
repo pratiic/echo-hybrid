@@ -23,6 +23,8 @@ import Report from "../real-time/report";
 import Transaction from "../real-time/transaction";
 import Suspension from "../cache/suspension";
 import DeliveryPersonnel from "../cache/delivery-personnel";
+import Overlay from "../components/overlay";
+import Cart from "../cache/cart";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -138,6 +140,8 @@ const Layout = ({ children }) => {
                 <Modal />
                 <Header />
 
+                <Overlay />
+
                 {authUser?.isVerified && !authUser?.suspension && (
                     <>
                         {/* fake components for real time and to preserve cache  */}
@@ -148,7 +152,12 @@ const Layout = ({ children }) => {
                             </React.Fragment>
                         )}
                         {!authUser?.isAdmin &&
-                            !authUser?.isDeliveryPersonnel && <Transaction />}
+                            !authUser?.isDeliveryPersonnel && (
+                                <React.Fragment>
+                                    <Transaction />
+                                    <Cart />
+                                </React.Fragment>
+                            )}
                         {authUser?.isDeliveryPersonnel && <Delivery />}
                         {!authUser?.isDeliveryPersonnel && <Business />}
                         {authUser?.isAdmin && (
@@ -169,8 +178,9 @@ const Layout = ({ children }) => {
                     {authUser && <Sidebar />}
 
                     <section
-                        className={`py-2 ${authUser &&
-                            "1000:ml-[200px] 1000:pl-7 "}`}
+                        className={`py-2 ${
+                            authUser && "1000:ml-[200px] 1000:pl-7 "
+                        }`}
                     >
                         {children}
                         <AlertsContainer />

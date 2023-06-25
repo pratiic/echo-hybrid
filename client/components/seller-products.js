@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { BiCategory } from "react-icons/bi";
 import { PlusIcon } from "@heroicons/react/outline";
 import { useSelector } from "react-redux";
 
@@ -8,7 +7,6 @@ import { fetcher } from "../lib/fetcher";
 import { getFilterMap } from "../lib/filter";
 import { capitalizeFirstLetter } from "../lib/strings";
 
-import Icon from "./icon";
 import FilterTrigger from "./filter-trigger";
 import SearchBar from "./search-bar";
 import ContentList from "./content-list";
@@ -106,8 +104,9 @@ const SellerProducts = ({ sellerId }) => {
                 placeholder="Search products..."
                 resultsCount={totalCount}
                 contentType="product"
-                className="mb-5 -mt-3"
                 value={query}
+                searching={loading}
+                className="mb-5 -mt-3"
                 clearSearch={() => {
                     setQuery("");
                     if (router.query.query) {
@@ -117,13 +116,12 @@ const SellerProducts = ({ sellerId }) => {
                 }}
             />
 
-            {/* count of products */}
-            {!query && totalCount > 0 && (
+            {!query && (
                 <div className="-mt-2 mb-4 text-sm ml-1 dark-light">
                     <span>
                         {capitalizeFirstLetter(
-                            getFilterMap(locationFilter, sellerFilter, true)[
-                                activeFilter
+                            getFilterMap(locationFilter)[
+                                sellerFilter.activeFilter
                             ]
                         )}{" "}
                         -

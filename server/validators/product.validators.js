@@ -12,7 +12,7 @@ const productSchema = Joi.object({
     madeIn: Joi.string().max(30).allow("").allow(null).trim(),
     deliveryCharge: Joi.number().integer().positive().required(),
     category: Joi.string().required(),
-    subCategory: Joi.string().min(3).max(15).required(),
+    subCategory: Joi.string().min(3).max(25).required(),
 });
 
 export const validateProduct = (productInfo, isSecondHand) => {

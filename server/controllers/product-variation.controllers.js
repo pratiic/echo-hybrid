@@ -21,7 +21,7 @@ export const setProductVariations = async (request, response, next) => {
         return next(new HttpError("product variations already set", 400));
     }
 
-    const errorMsg = validateVariations(variations);
+    let errorMsg = validateVariations(variations);
 
     if (errorMsg) {
         return next(new HttpError(errorMsg, 400));

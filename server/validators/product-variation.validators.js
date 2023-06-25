@@ -2,13 +2,17 @@ import Joi from "joi";
 import { validate } from "./base.validators.js";
 
 const labelSchema = Joi.object({
-    label: Joi.string().min(3).max(15).required(),
+    label: Joi.string().min(3).max(15).required().trim(),
 });
 const optionSchema = Joi.object({
     option: Joi.string().required().max(15),
 });
 
 const validateLabel = (label) => {
+    if (label.toLowerCase().trim() === "quantity") {
+        return "'Quantity' as label is not allowed, try 'Qty' instead";
+    }
+
     return validate({ label }, labelSchema);
 };
 

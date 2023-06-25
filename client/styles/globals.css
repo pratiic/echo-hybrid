@@ -177,7 +177,7 @@ textarea {
   }
 
   .error {
-    @apply pl-1 text-red-400 text-sm;
+    @apply block pl-1 text-red-400 text-sm leading-tight;
   }
 
   .heading-generic-modal-base {
@@ -323,5 +323,5 @@ textarea {
 }
 
 .filter-info-highlight {
-  @apply font-semibold text-blue-three;
+  @apply inline-block font-semibold text-blue-three first-letter:capitalize;
 }

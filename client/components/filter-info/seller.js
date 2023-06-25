@@ -11,6 +11,13 @@ const SellerFilterInfo = () => {
         (state) => state.sellers
     );
 
+    const filterMap = {
+        all: "all sellers",
+        individual: "individual sellers",
+        business: "registered businesses",
+        location: `sellers from your ${activeLocationType}`,
+    };
+
     const renderTotalCount = () => {
         if (totalCount === 0) {
             return;
@@ -27,11 +34,7 @@ const SellerFilterInfo = () => {
     return (
         <div className="filter-info-container">
             <p className="filter-info-text">
-                Showing{" "}
-                {activeFilter === "all"
-                    ? `all sellers`
-                    : `sellers from your
-                    ${activeLocationType}`}
+                Showing {filterMap[activeFilter]}
                 {/* {renderTotalCount()} */}
             </p>
         </div>

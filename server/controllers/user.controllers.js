@@ -110,7 +110,7 @@ export const deleteAvatar = async (request, response, next) => {
                 id: user.id,
             },
             data: {
-                avatar: `https://avatars.dicebear.com/api/initials/${user.firstName}${user.lastName}.svg`,
+                avatar: `https://avatars.dicebear.com/api/initials/${user.firstName[0]}${user.lastName[0]}.svg`,
             },
         });
         await prisma.image.delete({

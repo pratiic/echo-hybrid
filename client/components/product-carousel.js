@@ -4,7 +4,7 @@ import ContentCard from "./content-card";
 
 const ProductCarousel = ({ products }) => {
     return (
-        <div className="mt-3 flex space-x-5 overflow-x-auto scrollbar-hide">
+        <div className="mt-3 flex space-x-5 overflow-x-auto">
             {products.map((product) => {
                 return (
                     <div className="w-[15rem]">
