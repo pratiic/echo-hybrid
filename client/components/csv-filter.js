@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { closeModal } from "../redux/slices/modal-slice";
 import { fetcher } from "../lib/fetcher";
+import { setErrorAlert } from "../redux/slices/alerts-slice";
 
 const CsvFilter = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -78,12 +79,12 @@ const CsvFilter = () => {
   const handleButtonClick = async () => {
     try {
       const data = await fetcher(
-        `transactions/csv/?type=${userType}&displayType=${activeFilter}&year=${activeYear}&month=${activeMonth}`
+        `transactions/csv/?type=${userType}&display=${activeFilter}&year=${activeYear}&month=${activeMonth}`
       );
 
       console.log(data);
     } catch (error) {
-      console.log(error.message);
+      dispatch(setErrorAlert({ message: error.message }));
     } finally {
       dispatch(closeModal());
     }

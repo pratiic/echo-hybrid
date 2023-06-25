@@ -70,8 +70,8 @@ app.use("/api/rec", recRouter());
 app.use(errorHandler);
 
 if (process.env.NODE_ENV !== "test") {
-    const port = process.env.PORT || 8000;
-    server.listen(port, () => {
-        console.log(`the server is listening on port ${port}`);
-    });
+  const port = process.env.PORT || 8000;
+  server.listen(port, () => {
+    console.log(`the server is listening on port ${port}`);
+  });
 }
