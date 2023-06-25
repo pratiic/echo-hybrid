@@ -8,6 +8,7 @@ import {
     getProductDetails,
     getProducts,
     postProduct,
+    // searchProducts,
     updateProduct,
 } from "../controllers/product.controllers.js";
 import { getUpload } from "../middleware/multer.middleware.js";
@@ -60,6 +61,22 @@ export const productRouter = (io) => {
         },
         getProducts
     );
+
+    // router.get(
+    //     "/search/:query",
+    //     (request, response, next) => {
+    //         request.select = {
+    //             address: true,
+    //             store: {
+    //                 select: {
+    //                     id: true,
+    //                 },
+    //             },
+    //         };
+    //         auth(request, response, next);
+    //     },
+    //     searchProducts
+    // );
 
     router.get("/:productId", auth, getProductDetails);
 

@@ -7,23 +7,23 @@ import Icon from "./icon";
 import { setSidebar } from "../redux/slices/sidebar-slice";
 
 const HamburgerMenu = () => {
-  const { showSidebar } = useSelector((state) => state.sidebar);
+    const { showSidebar } = useSelector((state) => state.sidebar);
 
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-  const handleHamburgerClick = () => {
-    dispatch(setSidebar(!showSidebar));
-  };
+    const handleHamburgerClick = () => {
+        dispatch(setSidebar(!showSidebar));
+    };
 
-  return (
-    <Icon
-      className="mr-1 500:mr-2 -ml-2 1000:hidden "
-      onClick={handleHamburgerClick}
-    >
-      {!showSidebar && <CgMenu className="icon" />}
-      {showSidebar && <XIcon className="icon" />}
-    </Icon>
-  );
+    return (
+        <Icon
+            className="mr-1 500:mr-2 -ml-2 1000:hidden "
+            onClick={handleHamburgerClick}
+        >
+            {!showSidebar && <CgMenu className="icon" />}
+            {showSidebar && <XIcon className="icon" />}
+        </Icon>
+    );
 };
 
 export default HamburgerMenu;

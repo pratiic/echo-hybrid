@@ -138,7 +138,8 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
                 )}
                 {displayPeriod !== "all" && (
                     <React.Fragment>
-                        in
+                        {" "}
+                        in{" "}
                         <span className="font-semibold">
                             {capitalizeFirstLetter(displayPeriod)}
                         </span>
@@ -251,13 +252,14 @@ const TransactionsList = ({ dateLabels, displayOption, transactionType }) => {
 
     return (
         <div
-            className={`-mt-4 ${((transactionType === "user" &&
-                userTransactions.length > 0) ||
-                (transactionType === "seller" &&
-                    sellerTransactions.length > 0)) &&
+            className={`-mt-4 ${
+                ((transactionType === "user" && userTransactions.length > 0) ||
+                    (transactionType === "seller" &&
+                        sellerTransactions.length > 0)) &&
                 !userQuery &&
                 !sellerQuery &&
-                "750:w-fit"}`}
+                "750:w-fit"
+            }`}
         >
             {getTransactionMessage()}
 

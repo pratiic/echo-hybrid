@@ -30,12 +30,21 @@ const productFilterSlice = createSlice({
                 state.orderType = orderType;
             }
         },
+        resetFilterOptions: (state, action) => {
+            state.activeFilter = options.activeFilter;
+            state.locationFilter = options.locationFilter;
+            state.sortingType = options.sortingType;
+            state.orderType = options.orderType;
+        },
         resetSellerFilterOptions: (state, action) => {
             state.sellerFilter = options;
         },
     },
 });
 
-export const { setFilterOptions, resetSellerFilterOptions } =
-    productFilterSlice.actions;
+export const {
+    setFilterOptions,
+    resetFilterOptions,
+    resetSellerFilterOptions,
+} = productFilterSlice.actions;
 export default productFilterSlice.reducer;

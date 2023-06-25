@@ -285,9 +285,6 @@ export const getProducts = async (request, response, next) => {
     }
 
     if (searchQuery) {
-        // search among all products
-        filter = "all";
-
         const fields = ["name", "brand", "subCategory"];
 
         const searchFilter = {
@@ -304,10 +301,9 @@ export const getProducts = async (request, response, next) => {
         primaryFilter = { ...primaryFilter, ...searchFilter };
     }
 
-    if (category && !searchQuery) {
+    if (category) {
         // products of a particular category
         primaryFilter.categoryName = category;
-        filter = "all";
     }
 
     let whereObj = {
@@ -374,6 +370,93 @@ export const getProducts = async (request, response, next) => {
     }
 };
 
+// export const searchProducts = async (request, response, next) => {
+//     let user = request.user;
+//     user.address = user.address || {};
+//     const searchQuery = request.params.query;
+//     const filter = request.query.filter || "all";
+//     const sortType = request.query.sortType || "desc";
+//     let sortBy = request.query.sortBy || "createdAt";
+//     const storeId = request.query.storeId;
+//     const page = parseInt(request.query.page) || 1;
+//     const PAGE_SIZE = 15;
+
+//     if (sortBy === "date added") {
+//         sortBy = "createdAt";
+//     }
+
+//     const filterMap = getBaseFilterMap(user.address, filter);
+//     const fields = ["name", "brand", "categoryName", "subCategory"];
+
+//     let primaryFilter = {
+//         OR: fields.map((field) => {
+//             return {
+//                 [field]: {
+//                     contains: searchQuery.trim(),
+//                     mode: "insensitive",
+//                 },
+//             };
+//         }),
+//     };
+
+//     if (storeId) {
+//         // products belongining to a store
+//         primaryFilter.storeId = storeId;
+//     }
+
+//     if (
+//         (!storeId && !user.isAdmin) ||
+//         (storeId && storeId !== user.store?.id && !user.isAdmin)
+//     ) {
+//         // only show suspended products and products of a supsended seller to the admin or inside the store of the requesting user
+//         primaryFilter = {
+//             ...primaryFilter,
+//             suspension: null,
+//             store: {
+//                 suspension: null,
+//             },
+//         };
+//     }
+
+//     primaryFilter = {
+//         ...primaryFilter,
+//         ...(filter === "delivered" ? filterMap[filter]() : filterMap[filter]),
+//         isDeleted: false,
+//         NOT: {
+//             name: "new product", // when tests are run, they result in some residue products named "new product"
+//         },
+//     };
+
+//     try {
+//         const [products, totalCount] = await Promise.all([
+//             prisma.product.findMany({
+//                 where: primaryFilter,
+//                 select: productSelectionFields,
+//                 orderBy: [
+//                     {
+//                         [sortBy]: sortType,
+//                     },
+//                     {
+//                         createdAt: "asc",
+//                     },
+//                 ],
+//                 take: PAGE_SIZE,
+//                 skip: (page - 1) * PAGE_SIZE,
+//             }),
+//             prisma.product.count({
+//                 where: primaryFilter,
+//             }),
+//         ]);
+
+//         response.json({
+//             products,
+//             totalCount,
+//         });
+//     } catch (error) {
+//         next(new HttpError());
+//     }
+// };
+
 export const getProductDetails = async (request, response, next) => {
     const productId = parseInt(request.params.productId) || 0;
 
@@ -433,8 +516,6 @@ export const getProductDetails = async (request, response, next) => {
         let similarProducts = [];
 
         try {
-            console.log(similarProductInfo);
-
             const similarProductIds = similarProductInfo.map((info) => {
                 return info.productId;
             });
@@ -667,3 +748,92 @@ export const deleteProductImage = async (request, response, next) => {
 function createPrice(price) {
     return parseFloat(parseFloat(price).toFixed());
 }
+
+function getAddressFilter(field, address) {
+    return {
+        OR: [
+            {
+                isSecondHand: true,
+                store: {
+                    user: {
+                        address: {
+                            [field]: address[field],
+                        },
+                    },
+                },
+            },
+            {
+                isSecondHand: false,
+                store: {
+                    business: {
+                        address: {
+                            [field]: address[field],
+                        },
+                    },
+                },
+            },
+        ],
+    };
+}
+
+// function getBaseFilterMap(address) {
+//     const baseFilterMap = {
+//         "second hand": {
+//             isSecondHand: true,
+//         },
+//         "brand new": {
+//             isSecondHand: false,
+//         },
+//         province: getAddressFilter("province", address),
+//         city: getAddressFilter("city", address),
+//         area: getAddressFilter("area", address),
+//         delivered: () => {
+//             if (!checkDeliverySingle(address)) {
+//                 return {
+//                     id: -1,
+//                 };
+//             }
+
+//             return {
+//                 OR: [
+//                     {
+//                         isSecondHand: true,
+//                         store: {
+//                             user: {
+//                                 address: {
+//                                     province: "bagmati",
+//                                     city: {
+//                                         in: [
+//                                             "kathmandu",
+//                                             "bhaktapur",
+//                                             "lalitpur",
+//                                         ],
+//                                     },
+//                                 },
+//                             },
+//                         },
+//                     },
+//                     {
+//                         isSecondHand: false,
+//                         store: {
+//                             business: {
+//                                 address: {
+//                                     province: "bagmati",
+//                                     city: {
+//                                         in: [
+//                                             "kathmandu",
+//                                             "bhaktapur",
+//                                             "lalitpur",
+//                                         ],
+//                                     },
+//                                 },
+//                             },
+//                         },
+//                     },
+//                 ],
+//             };
+//         },
+//     };
+
+//     return baseFilterMap;
+// }

@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Head from "next/head";
 
-import { setCartItems, setError, setLoading } from "../redux/slices/cart-slice";
-import { fetcher } from "../lib/fetcher";
 import { checkDelivery } from "../lib/delivery";
 
 import PageHeader from "../components/page-header";
@@ -20,12 +18,6 @@ const Cart = () => {
     );
     const { authUser } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
-
-    useEffect(() => {
-        if (needToFetch) {
-            fetchCartItems();
-        }
-    }, [needToFetch]);
 
     useEffect(() => {
         setTotalUnitPrice(
@@ -48,20 +40,6 @@ const Cart = () => {
             }, 0)
         );
     }, [items]);
-
-    const fetchCartItems = async () => {
-        dispatch(setLoading(true));
-
-        try {
-            const data = await fetcher("carts");
-
-            dispatch(setCartItems(data.items));
-        } catch (error) {
-            dispatch(setError(error.message));
-        } finally {
-            dispatch(setLoading(false));
-        }
-    };
 
     return (
         <section>

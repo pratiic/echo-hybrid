@@ -72,7 +72,7 @@ const PrimaryInfo = ({
 
                     {/* product price  */}
                     <h3 className="flex items-center mb-1">
-                        <span className="text-blue-three font-semibold text-lg 650:text-xl">
+                        <span className="text-blue-three font-semibold text-xl 650:text-2xl">
                             Rs. {addCommas(price)}
                         </span>{" "}
                         {per && (

@@ -45,6 +45,8 @@ router.delete(
     (request, ...op) => {
         request.select = {
             avatar: true,
+            firstName: true,
+            lastName: true,
         };
         auth(request, ...op);
     },

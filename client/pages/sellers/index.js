@@ -4,8 +4,10 @@ import {
     DotsHorizontalIcon,
     LocationMarkerIcon,
     ArrowsExpandIcon,
+    UserIcon,
 } from "@heroicons/react/outline";
 import { FaCity } from "react-icons/fa";
+import { AiOutlineShop } from "react-icons/ai";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -54,6 +56,14 @@ const Sellers = () => {
 
     const filterOptions = [
         { name: "all", icon: <DotsHorizontalIcon className="icon-no-bg" /> },
+        {
+            name: "individual",
+            icon: <UserIcon className="icon-no-bg" />,
+        },
+        {
+            name: "business",
+            icon: <AiOutlineShop className="icon-no-bg" />,
+        },
         {
             name: "location",
             icon: <LocationMarkerIcon className="icon-no-bg" />,

@@ -27,6 +27,8 @@ const ProductFilter = ({ isGlobal }) => {
         isGlobal ? state.filter : state.filter.sellerFilter
     );
     const { authUser } = useSelector((state) => state.auth);
+    const { query } = useSelector((state) => state.products);
+
     const {
         activeFilter: af,
         locationFilter: lf,
@@ -62,19 +64,35 @@ const ProductFilter = ({ isGlobal }) => {
         dispatch(closeModal());
     };
 
-    const filterOptions = [
+    let filterOptions = [
         { name: "all", icon: <DotsHorizontalIcon className="icon-no-bg" /> },
-        { name: "recommended", icon: <UserIcon className="icon-no-bg" /> },
-        {
-            name: "location",
-            icon: <LocationMarkerIcon className="icon-no-bg" />,
-            disabled: !authUser?.address || isRestricted,
-        },
-        {
-            name: "delivered",
-            icon: <MdDeliveryDining className="icon-no-bg" />,
-            disabled: !authUser?.address || isRestricted,
-        },
+    ];
+
+    if (isGlobal && !isRestricted) {
+        // do not show 'recommended' option when searching products
+        filterOptions = [
+            ...filterOptions,
+            {
+                name: "recommended",
+                icon: <UserIcon className="icon-no-bg" />,
+                disabled: !isGlobal || isRestricted,
+            },
+        ];
+    }
+
+    if (!isRestricted) {
+        filterOptions = [
+            ...filterOptions,
+            {
+                name: "delivered",
+                icon: <MdDeliveryDining className="icon-no-bg" />,
+                disabled: !authUser?.address,
+            },
+        ];
+    }
+
+    filterOptions = [
+        ...filterOptions,
         {
             name: "second hand",
             icon: <MdTransferWithinAStation className="icon-no-bg" />,
@@ -84,6 +102,18 @@ const ProductFilter = ({ isGlobal }) => {
             icon: <TbCertificate className="icon-no-bg" />,
         },
     ];
+
+    if (!isRestricted) {
+        filterOptions = [
+            ...filterOptions,
+            {
+                name: "location",
+                icon: <LocationMarkerIcon className="icon-no-bg" />,
+                disabled: !authUser?.address,
+            },
+        ];
+    }
+
     const locationOptions = [
         { name: "province", icon: <ArrowsExpandIcon className="icon-no-bg" /> },
         { name: "city", icon: <FaCity className="icon-no-bg" /> },

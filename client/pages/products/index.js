@@ -121,16 +121,13 @@ const Products = () => {
                 resultsCount={totalCount}
                 contentType="product"
                 value={query}
+                searching={loading}
                 className="mb-5 -mt-2"
             />
 
             <CategoriesPanel
                 show={showCategories}
-                activeCategory={category}
                 showCount={!query}
-                setActiveCategory={(categoryName) =>
-                    dispatch(setCategory(categoryName))
-                }
                 togglePanel={toggleCategoriesPanel}
             />
 
@@ -147,8 +144,9 @@ const Products = () => {
                 loadingMsg={loading && "Loading products..."}
                 error={error}
                 emptyMsg={
-                    !query &&
-                    `There are no products in this category and filter option`
+                    !query && !category && activeFilter === "recommended"
+                        ? "once you order products in Echo, we will be able to recommend you products based on your order history"
+                        : "There are no products in this category and filter option"
                 }
                 human="no-items"
                 incrementPageNumber={

@@ -5,8 +5,12 @@ import { fetcher } from "../lib/fetcher";
 import { clearErrors, displayError } from "../lib/validation";
 import { generateFormData } from "../lib/form-data";
 import { updateAuthUser } from "../redux/slices/auth-slice";
-import { closeModal, showLoadingModal } from "../redux/slices/modal-slice";
-import { setAlert } from "../redux/slices/alerts-slice";
+import {
+    closeModal,
+    showConfirmationModal,
+    showLoadingModal,
+} from "../redux/slices/modal-slice";
+import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 
 import FileSelector from "./file-selector";
 import Form from "./form";
@@ -100,34 +104,30 @@ const UserDetails = () => {
     };
 
     const deleteUserAvatar = async () => {
-        try {
-            const data = await fetcher(`users/avatar`, "DELETE");
-            dispatch(updateAuthUser({ avatar: data.avatar }));
-        } catch (error) {
-            console.log(error.message);
-        }
-        // dispatch(
-        //   showConfirmationModal({
-        //     message: "are you sure you want to delete your avatar ?",
-        //     handler: async () => {
-        //       dispatch(showLoadingModal("deleting your avatar..."));
+        dispatch(
+            showConfirmationModal({
+                title: "avatar deletion",
+                message: "are you sure you want to delete your avatar ?",
+                handler: async () => {
+                    dispatch(showLoadingModal("deleting your avatar..."));
 
-        //       try {
-        //         const data = await fetcher(`users/avatar`, "DELETE");
-        //         dispatch(updateAuthUser({ avatar: data.avatar }));
-        //         dispatch(
-        //           setAlert({
-        //             message: "your avatar has been deleted",
-        //           })
-        //         );
-        //       } catch (error) {
-        //         dispatch(setErrorAlert(error.message));
-        //       } finally {
-        //         dispatch(closeModal());
-        //       }
-        //     },
-        //   })
-        // );
+                    try {
+                        const data = await fetcher(`users/avatar`, "DELETE");
+
+                        dispatch(updateAuthUser({ avatar: data.avatar }));
+                        dispatch(
+                            setAlert({
+                                message: "your avatar has been deleted",
+                            })
+                        );
+                    } catch (error) {
+                        dispatch(setErrorAlert(error.message));
+                    } finally {
+                        dispatch(closeModal());
+                    }
+                },
+            })
+        );
     };
 
     return (

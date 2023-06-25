@@ -3,6 +3,7 @@ import auth from "../middleware/auth.middleware.js";
 import {
     acknowledgeTransactions,
     deleteTransaction,
+    generateCSV,
     getTransactions,
 } from "../controllers/transaction.controllers.js";
 
@@ -40,6 +41,8 @@ export const transactionRouter = (io) => {
         },
         acknowledgeTransactions
     );
+
+    router.get("/csv", auth, generateCSV);
 
     return router;
 };

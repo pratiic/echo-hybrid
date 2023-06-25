@@ -12,6 +12,7 @@ import {
     setTotalCount,
 } from "../redux/slices/products-slice";
 import { fetcher } from "../lib/fetcher";
+import { resetFilterOptions } from "../redux/slices/filter-slice";
 
 const Product = () => {
     const {
@@ -25,18 +26,30 @@ const Product = () => {
         needToFetch,
         page,
         fetchCounter,
-        query,
         loading,
         loadingMore,
         category,
+        query,
         PAGE_SIZE,
     } = useSelector((state) => state.products);
     const dispatch = useDispatch();
 
     useEffect(() => {
+        dispatch(resetFilterOptions());
+        dispatch(setFetchCounter(fetchCounter + 1));
+    }, [query]);
+
+    useEffect(() => {
+        if (activeFilter === "recommended") {
+            dispatch(resetFilterOptions());
+        }
+        dispatch(setFetchCounter(fetchCounter + 1));
+    }, [category]);
+
+    useEffect(() => {
         dispatch(setPage(1));
         dispatch(setFetchCounter(fetchCounter + 1));
-    }, [activeFilter, locationFilter, sortBy, sortType, category, query]);
+    }, [activeFilter, locationFilter, sortBy, sortType]);
 
     useEffect(() => {
         dispatch(setNeedToFetch(true));
@@ -62,11 +75,11 @@ const Product = () => {
         }
 
         try {
-            const data = await fetcher(
-                `products/?filter=${
-                    activeFilter === "location" ? locationFilter : activeFilter
-                }&sortBy=${sortBy}&sortType=${sortType}&category=${category}&query=${query}&page=${page}`
-            );
+            let url = `products/?filter=${
+                activeFilter === "location" ? locationFilter : activeFilter
+            }&sortBy=${sortBy}&sortType=${sortType}&query=${query}&category=${category}&page=${page}`;
+
+            const data = await fetcher(url);
 
             if (page === 1) {
                 dispatch(setProducts(data.products));
