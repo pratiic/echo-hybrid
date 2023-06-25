@@ -274,7 +274,7 @@ textarea {
   }
 
   .modal-title {
-    @apply text-2xl font-semibold mb-1 leading-tight;
+    @apply text-2xl font-semibold mb-1 leading-tight black-white;
   }
 
   .address {
@@ -284,6 +284,10 @@ textarea {
   .restricted-msg {
     @apply dark-light italic text-sm;
   }
+
+  .options-toggle-label {
+    @apply inline-block dark-light mb-1 ml-1
+}
 }
 
 .shadow-custom {

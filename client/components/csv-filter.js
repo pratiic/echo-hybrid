@@ -1,158 +1,186 @@
 import React, { useState } from "react";
 
-import OptionsToggle from "./options-toggle";
-import Button from "./button";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import { closeModal } from "../redux/slices/modal-slice";
 import { fetcher } from "../lib/fetcher";
-import { setErrorAlert } from "../redux/slices/alerts-slice";
+import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
+import { capitalizeFirstLetter } from "../lib/strings";
+
+import OptionsToggle from "./options-toggle";
+import Button from "./button";
+import { monthToNumberMap } from "../lib/date-time";
 
 const CsvFilter = () => {
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [activeMonth, setActiveMonth] = useState("january");
-  const [activeYear, setActiveYear] = useState("2023");
+    const [activeFilter, setActiveFilter] = useState("month");
+    const [activeMonth, setActiveMonth] = useState("january");
+    const [activeYear, setActiveYear] = useState("2023");
 
-  //   const { authUser } = useSelector((state) => state.auth);
-  const router = useRouter();
-  const dispatch = useDispatch();
+    const router = useRouter();
+    const dispatch = useDispatch();
 
-  const filterOptions = [
-    {
-      name: "all",
-    },
-    {
-      name: "month",
-    },
-    {
-      name: "year",
-    },
-  ];
-  const monthOptions = [
-    {
-      name: "january",
-    },
-    {
-      name: "february",
-    },
-    {
-      name: "march",
-    },
-    {
-      name: "april",
-    },
-    {
-      name: "may",
-    },
-    {
-      name: "june",
-    },
-    {
-      name: "july",
-    },
-    {
-      name: "august",
-    },
-    {
-      name: "september",
-    },
-    {
-      name: "october",
-    },
-    {
-      name: "november",
-    },
-    {
-      name: "december",
-    },
-  ];
-  const yearOptions = [
-    {
-      name: "2023",
-    },
-  ];
+    const filterOptions = [
+        {
+            name: "all",
+        },
+        {
+            name: "month",
+        },
+        {
+            name: "year",
+        },
+    ];
+    const monthOptions = [
+        {
+            name: "january",
+        },
+        {
+            name: "february",
+        },
+        {
+            name: "march",
+        },
+        {
+            name: "april",
+        },
+        {
+            name: "may",
+        },
+        {
+            name: "june",
+        },
+        {
+            name: "july",
+        },
+        {
+            name: "august",
+        },
+        {
+            name: "september",
+        },
+        {
+            name: "october",
+        },
+        {
+            name: "november",
+        },
+        {
+            name: "december",
+        },
+    ];
+    const yearOptions = [
+        {
+            name: "2023",
+        },
+    ];
 
-  const headingStyles = "mb-2 text-xl font-semibold black-white";
+    const transactionType = router.query.show === "user" ? "user" : "seller";
 
-  const userType = router.query.show === "user" ? "user" : "seller";
+    const handleButtonClick = async () => {
+        try {
+            const data = await fetcher(
+                `transactions/csv/?type=${transactionType}&display=${activeFilter}&year=${activeYear}&month=${monthToNumberMap[activeMonth]}`,
+                "GET",
+                {},
+                "blob"
+            );
 
-  const handleButtonClick = async () => {
-    try {
-      const data = await fetcher(
-        `transactions/csv/?type=${userType}&display=${activeFilter}&year=${activeYear}&month=${activeMonth}`
-      );
+            const fileName = `${
+                transactionType === "user" ? "purchase" : "sales"
+            }-history-${
+                activeFilter === "all"
+                    ? "all"
+                    : activeFilter === "year"
+                    ? activeYear
+                    : `${activeMonth}-${activeYear}`
+            }.csv`;
 
-      console.log(data);
-    } catch (error) {
-      dispatch(setErrorAlert({ message: error.message }));
-    } finally {
-      dispatch(closeModal());
-    }
-  };
+            const blob = new Blob([data], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
 
-  return (
-    <div className="space-y-3 px-3">
-      <h2 className={headingStyles}>Download Type</h2>
-      <OptionsToggle
-        options={filterOptions}
-        active={activeFilter}
-        type="dropdown"
-        dropdownHasShadow={false}
-        onClick={(filter) => setActiveFilter(filter)}
-      />
+            dispatch(closeModal());
+        } catch (error) {
+            if (error.statusCode === 400) {
+                return dispatch(
+                    setAlert({
+                        type: "info",
+                        message:
+                            "there are no transactions to generate csv for",
+                    })
+                );
+            }
 
-      {activeFilter === "month" && (
-        <div className="flex space-x-5">
-          <div>
-            <h2>Month</h2>
-            <OptionsToggle
-              options={monthOptions}
-              active={activeMonth}
-              type="dropdown"
-              dropdownHasShadow={false}
-              onClick={(month) => setActiveMonth(month)}
-            />
-          </div>
-          <div>
-            <h2>Year</h2>
-            <OptionsToggle
-              options={yearOptions}
-              active={activeYear}
-              type="dropdown"
-              dropdownHasShadow={false}
-              onClick={(year) => setActiveYear(year)}
-            />
-          </div>
+            dispatch(setErrorAlert(error.message));
+        } finally {
+        }
+    };
+
+    return (
+        <div className="space-y-3 w-[300px]">
+            <h2 className="modal-title">Download options</h2>
+
+            <div className="w-fit">
+                <OptionsToggle
+                    options={filterOptions}
+                    active={activeFilter}
+                    type="dropdown"
+                    dropdownHasShadow={false}
+                    onClick={(filter) => setActiveFilter(filter)}
+                />
+            </div>
+
+            {activeFilter !== "all" && (
+                <div className="flex space-x-5">
+                    {activeFilter === "month" && (
+                        <div>
+                            <span className="options-toggle-label">Month</span>
+                            <OptionsToggle
+                                options={monthOptions}
+                                active={activeMonth}
+                                type="dropdown"
+                                dropdownHasShadow={false}
+                                onClick={(month) => setActiveMonth(month)}
+                            />
+                        </div>
+                    )}
+
+                    <div>
+                        <h2 className="options-toggle-label">Year</h2>
+                        <OptionsToggle
+                            options={yearOptions}
+                            active={activeYear}
+                            type="dropdown"
+                            dropdownHasShadow={false}
+                            onClick={(year) => setActiveYear(year)}
+                        />
+                    </div>
+                </div>
+            )}
+
+            <div className="pt-1">
+                <p className="status-smaller text-sm text-left mb-2">
+                    {activeFilter === "all"
+                        ? "download all transaction history"
+                        : activeFilter === "month"
+                        ? `download transactions from ${capitalizeFirstLetter(
+                              activeMonth
+                          )} from year ${activeYear}`
+                        : `download transactions of year ${activeYear}`}
+                </p>
+
+                <Button full onClick={handleButtonClick}>
+                    Download
+                </Button>
+            </div>
         </div>
-      )}
-
-      {activeFilter === "year" && (
-        <div>
-          <h2>Year</h2>
-          <OptionsToggle
-            options={yearOptions}
-            active={activeYear}
-            type="dropdown"
-            dropdownHasShadow={false}
-            onClick={(year) => setActiveYear(year)}
-          />
-        </div>
-      )}
-
-      <div>
-        <p className="status">
-          {activeFilter === "all"
-            ? "download all transaction history"
-            : activeFilter === "month"
-            ? `download transactions of ${activeMonth} from year ${activeYear}`
-            : `download transactions of year ${activeYear}`}
-        </p>
-        <Button full onClick={handleButtonClick}>
-          Download
-        </Button>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default CsvFilter;

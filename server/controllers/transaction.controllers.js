@@ -221,8 +221,10 @@ export const generateCSV = async (request, response, next) => {
     const user = request.user;
     const type = request.query.type; // indicates sales or purchase history
     const displayType = request.query.display;
-    const year = parseInt(request.query.year) || -1;
-    const month = parseInt(request.query.month) || -1;
+    const year = parseInt(request.query.year);
+    const month = parseInt(request.query.month);
+
+    console.log(month);
 
     if (type !== "user" && type !== "seller") {
         return next(
@@ -418,18 +420,23 @@ export const generateCSV = async (request, response, next) => {
 
         await csvWriter.writeRecords(transactionRecords);
 
-        response.setHeader("Content-Type", "text/csv");
+        response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader(
             "Content-Disposition",
-            `attachment; filename = ${filePath}`
+            `attachment; filename=${filePath}`
         );
+        response.setHeader("file-name", filePath);
 
-        const fileStream = fs.createReadStream(filePath);
-        fileStream.pipe(response);
+        response.download(filePath, (err) => {
+            if (err) {
+                console.log(err);
+                next(new HttpError());
+            }
 
-        fileStream.on("end", () => {
             fs.unlinkSync(filePath);
         });
+
+        await csvWriter.writeRecords(transactionRecords);
     } catch (error) {
         console.log(error);
         next(new HttpError());
