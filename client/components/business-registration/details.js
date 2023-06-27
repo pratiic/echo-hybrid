@@ -2,29 +2,29 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 
-import { clearErrors, displayError } from "../../lib/validation";
 import { generateFormData } from "../../lib/form-data";
 import { setAlert } from "../../redux/slices/alerts-slice";
 import { updateAuthUser } from "../../redux/slices/auth-slice";
 import { fetcher } from "../../lib/fetcher";
+import { districtOptions, provinceOptions } from "../../lib/address";
 
 import Button from "../button";
-import Form from "../form";
 import InputGroup from "../input-group";
 import FileSelector from "../file-selector";
+import Form from "../form";
+import ErrorBanner from "../error-banner";
 
-const BusinessDetails = ({ business, handleCancellation }) => {
+const BusinessDetails = ({ business }) => {
     const [name, setName] = useState("");
-    const [nameError, setNameError] = useState("");
     const [PAN, setPAN] = useState("");
-    const [PANError, setPANError] = useState("");
     const [phone, setPhone] = useState("");
-    const [phoneError, setPhoneError] = useState("");
     const [regImage, setRegImage] = useState(null);
-    const [regImageError, setRegImageError] = useState("");
+    const [province, setProvince] = useState("bagmati");
+    const [city, setCity] = useState("");
+    const [area, setArea] = useState("");
+    const [description, setDescription] = useState("");
     const [registering, setRegistering] = useState(false);
-    const [fetching, setFetching] = useState(false);
-    const [fieldsDisabled, setFieldsDisabled] = useState(false);
+    const [error, setError] = useState("");
 
     const { selectedFiles } = useSelector((state) => state.files);
     const { authUser } = useSelector((state) => state.auth);
@@ -34,19 +34,10 @@ const BusinessDetails = ({ business, handleCancellation }) => {
 
     useEffect(() => {
         if (business) {
-            setFieldsDisabled(true);
-
             if (business.isVerified) {
                 router.push("/set-product");
-            } else if (business.address) {
-                // business has already been registered and address has already been set
-                router.push("/business-registration/?view=pending");
             } else {
-                // business has been already registered
-                const { name, PAN, phone } = business;
-                setName(name);
-                setPAN(PAN);
-                setPhone(phone);
+                router.push("/business-registration/?view=pending");
             }
         }
     }, [business]);
@@ -57,24 +48,26 @@ const BusinessDetails = ({ business, handleCancellation }) => {
         }
     }, [selectedFiles]);
 
+    useEffect(() => {
+        setCity(province === "bagmati" ? "kathmandu" : "");
+    }, [province]);
+
     const handleFormSubmit = async (event) => {
         event.preventDefault();
 
-        // business registered, address not set and not updating -> simply route to the address set page
-        if (business) {
-            return router.push("/business-registration/?view=address");
-        }
-
-        clearErrors([
-            setNameError,
-            setPANError,
-            setPhoneError,
-            setRegImageError,
-        ]);
         setRegistering(true);
+        setError("");
 
         try {
-            const formData = generateFormData({ name, PAN, phone });
+            const formData = generateFormData({
+                name,
+                PAN,
+                phone,
+                province,
+                city,
+                area,
+                description,
+            });
 
             if (regImage) {
                 formData.append("image", regImage);
@@ -93,84 +86,107 @@ const BusinessDetails = ({ business, handleCancellation }) => {
                     },
                 })
             );
-            dispatch(setAlert({ message: "business details have been set" }));
+            dispatch(setAlert({ message: "business has been registered" }));
 
-            router.push("/business-registration/?view=address");
+            router.push("/business-registration/?view=pending");
         } catch (error) {
-            if (error.message.toLowerCase() === "file too large") {
-                return setRegImageError(error.message);
-            }
-
-            displayError(
-                error.message,
-                ["name", "PAN", "phone", "business registration certificate"],
-                [setNameError, setPANError, setPhoneError, setRegImageError]
-            );
+            setError(error.message);
         } finally {
             setRegistering(false);
         }
     };
 
     return (
-        <section>
-            <Form onSubmit={handleFormSubmit}>
-                <InputGroup
-                    label="name"
-                    value={name}
-                    error={nameError}
-                    placeholder="legal business name"
-                    disabled={fieldsDisabled}
-                    onChange={setName}
-                />
+        <form
+            className="-mt-1 pb-5 w-fit 800:mx-auto"
+            onSubmit={handleFormSubmit}
+        >
+            <div className="flex flex-col 800:flex-row 800:space-x-12">
+                <div className="w-[20rem]">
+                    <h2 className="form-subheading">Business Details</h2>
 
-                <InputGroup
-                    label="PAN"
-                    value={PAN}
-                    error={PANError}
-                    placeholder="permanent account number"
-                    disabled={fieldsDisabled}
-                    onChange={setPAN}
-                />
+                    <InputGroup
+                        label="name"
+                        value={name}
+                        placeholder="legal business name"
+                        onChange={setName}
+                    />
 
-                <InputGroup
-                    label="phone"
-                    value={phone}
-                    error={phoneError}
-                    placeholder="landline or mobile"
-                    disabled={fieldsDisabled}
-                    onChange={setPhone}
-                />
+                    <InputGroup
+                        label="PAN"
+                        value={PAN}
+                        placeholder="permanent account number"
+                        onChange={setPAN}
+                    />
 
-                <div className="mt-3">
-                    <FileSelector
-                        prevSrc={business?.regImage}
-                        error={regImageError}
-                        label="Business Registration Certificate"
-                        isRequired={true}
-                        disabled={fieldsDisabled}
+                    <InputGroup
+                        label="phone"
+                        value={phone}
+                        placeholder="landline or mobile"
+                        onChange={setPhone}
+                    />
+
+                    <div className="mt-3">
+                        <FileSelector
+                            prevSrc={business?.regImage}
+                            label="Business Registration Certificate"
+                            isRequired={true}
+                        />
+                    </div>
+                </div>
+
+                <div className="w-[20rem]">
+                    <h2 className="form-subheading">Business Address</h2>
+
+                    <InputGroup
+                        label="province"
+                        view="select"
+                        options={provinceOptions}
+                        value={province}
+                        onChange={setProvince}
+                    />
+
+                    <InputGroup
+                        label="city"
+                        view={province === "bagmati" ? "select" : "input"}
+                        options={districtOptions}
+                        value={city}
+                        onChange={setCity}
+                    />
+
+                    <InputGroup
+                        label="area"
+                        placeholder="e.g. koteshwor"
+                        value={area}
+                        onChange={setArea}
+                    />
+
+                    <InputGroup
+                        label="description"
+                        value={description}
+                        placeholder="max 100 chars"
+                        onChange={setDescription}
+                        view="textarea"
                     />
                 </div>
+            </div>
 
-                <div className="flex items-center justify-between">
-                    {business && (
-                        <Button
-                            type="tertiary"
-                            rounded={false}
-                            onClick={handleCancellation}
-                        >
-                            cancel reigstration
-                        </Button>
-                    )}
-                    <Button
-                        loading={registering || fetching}
-                        full={!business}
-                        rounded={false}
-                    >
-                        Continue
-                    </Button>
-                </div>
-            </Form>
-        </section>
+            <div className="w-[20rem]">
+                {error && (
+                    <div className="mb-5">
+                        <ErrorBanner>{error}</ErrorBanner>
+                    </div>
+                )}
+
+                <Button
+                    loading={registering}
+                    rounded={false}
+                    className="w-full"
+                >
+                    {registering ? "registering" : "register"} business
+                </Button>
+            </div>
+        </form>
     );
 };
 

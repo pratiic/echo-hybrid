@@ -166,5 +166,7 @@ export const getAppStats = async (request, response, next) => {
         });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

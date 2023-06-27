@@ -183,25 +183,27 @@ const SellerPage = () => {
                 </InfoBanner>
             )}
 
-            {!authUser?.isDeliveryPersonnel && (
-                // do not show options toggle to delivery personnel
-                <div className="mb-5 -mt-1">
-                    <OptionsToggle
-                        options={options}
-                        rounded={false}
-                        active={activeOption}
-                        onClick={handleOptionClick}
-                    />
-                </div>
-            )}
+            <div className="mb-5 -mt-1">
+                <OptionsToggle
+                    options={options}
+                    rounded={false}
+                    active={activeOption}
+                    onClick={handleOptionClick}
+                />
+            </div>
 
             {activeOption === "details" && (
                 <SellerDetails
                     {...{ ...storeDetails, isMyStore, updateStore }}
                 />
             )}
+
             {activeOption === "products" && (
-                <SellerProducts sellerId={storeDetails?.id} />
+                <SellerProducts
+                    sellerId={storeDetails?.id}
+                    sellerType={storeDetails?.storeType}
+                    isMyStore={isMyStore}
+                />
             )}
         </section>
     );

@@ -90,21 +90,23 @@ const SignUp = () => {
                     <title>Create your account</title>
                 </Head>
 
-                <InputGroup
-                    label="first name"
-                    placeholder="min 3 chars, max 15"
-                    value={firstName}
-                    error={firstnameError}
-                    onChange={setfirstName}
-                />
+                <div className="flex space-x-3">
+                    <InputGroup
+                        label="first name"
+                        // placeholder="min 3 chars, max 15"
+                        value={firstName}
+                        error={firstnameError}
+                        onChange={setfirstName}
+                    />
 
-                <InputGroup
-                    label="last name"
-                    placeholder="min 3 chars, max 15 chars"
-                    value={lastName}
-                    error={lastnameError}
-                    onChange={setlastName}
-                />
+                    <InputGroup
+                        label="last name"
+                        // placeholder="min 3 chars, max 15 chars"
+                        value={lastName}
+                        error={lastnameError}
+                        onChange={setlastName}
+                    />
+                </div>
 
                 <InputGroup
                     label="email"

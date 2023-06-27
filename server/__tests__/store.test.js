@@ -66,15 +66,6 @@ describe("POST /api/stores REGISTER STORE", () => {
         expect(response.body.error).toBe("you need to set your address first");
     });
 
-    it("should return 400 status code if the address is not set - BUS", async () => {
-        const response = await supertest(app)
-            .post(`/api/stores/?type=BUS`)
-            .set("Authorization", `Bearer ${createdUser.token}`);
-
-        expect(response.statusCode).toBe(400);
-        expect(response.body.error).toBe("you need to set your address first");
-    });
-
     it("should register an individual store if provided valid data", async () => {
         await setAddress(app, createdUser.token);
 

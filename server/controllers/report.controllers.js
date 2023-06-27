@@ -124,6 +124,8 @@ export const reportTarget = async (request, response, next) => {
         }
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -166,6 +168,8 @@ export const getReports = async (request, response, next) => {
         response.json({ reports, totalCount });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -190,6 +194,8 @@ export const deleteReport = async (request, response, next) => {
         }
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -207,5 +213,7 @@ export const acknowledgeReports = async (request, response, next) => {
         response.json({ message: "acknowledged" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

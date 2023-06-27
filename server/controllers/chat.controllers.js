@@ -95,6 +95,8 @@ export const startChat = async (request, response, next) => {
         response.status(201).json({ chat: getChatData(createdChat) });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -132,6 +134,8 @@ export const getChats = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -180,6 +184,8 @@ export const resetUnseenMsgsCount = async (request, response, next) => {
         response.json({ message: "reset" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -198,5 +204,7 @@ export const deleteChat = async (request, response, next) => {
         response.json({});
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

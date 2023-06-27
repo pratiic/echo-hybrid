@@ -21,6 +21,8 @@ export const createUserCart = async (request, response, next) => {
         response.status(201).json({ cart: cart });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -199,6 +201,8 @@ export const setCartItem = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         return next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -260,6 +264,8 @@ export const getCartItems = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -287,6 +293,8 @@ export const removeCartItem = async (request, response, next) => {
         response.json({ message: "cart item has been removed" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -370,5 +378,7 @@ export const checkOrderAbility = async (request, response, next) => {
         });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

@@ -1,17 +1,16 @@
 import Joi from "joi";
 import { validate } from "./base.validators.js";
 import { causeSchema } from "./report.validators.js";
+import { addressSchema } from "./address.validators.js";
 
 const businessSchema = Joi.object({
     name: Joi.string().min(5).max(50).required().trim(),
     PAN: Joi.string().length(9).required().trim(),
     phone: Joi.string()
         .pattern(/^\d{9,10}$/)
-        .message("enter a valid 9 or 10-digit phone number"),
+        .message("enter a valid 9 or 10-digit phone number")
+        .required(),
 });
-const statusSchema = Joi.string()
-    .required()
-    .valid("PENDING", "ACCEPTED", "REJECTED");
 const registrationControlSchema = Joi.object({
     action: Joi.string().valid("accept", "reject").required().trim(),
     cause: Joi.when("action", {
@@ -21,16 +20,23 @@ const registrationControlSchema = Joi.object({
     }),
 });
 
-export const validateBusiness = (businessInfo) => {
-    return validate(businessInfo, businessSchema);
-};
+export const validateBusiness = (businessInfo, regImage) => {
+    // 1. validate business details
+    // 2. validate business address
 
-export const validateStatus = (status) => {
-    const schema = Joi.object({
-        status: statusSchema,
-    });
+    const detailsValidationError = validate(businessInfo, businessSchema);
 
-    return validate({ status }, schema);
+    if (detailsValidationError) {
+        return detailsValidationError;
+    }
+
+    if (!regImage) {
+        return "business registration certificate must be provided";
+    }
+
+    const addressValidationError = validate(businessInfo, addressSchema);
+
+    return addressValidationError;
 };
 
 export const validateBusinessRegistrationControl = (controlInfo) => {

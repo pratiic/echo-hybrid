@@ -240,15 +240,10 @@ describe("DELETE /api/delivery/personnel/:personnelId DELETE DELIVERY PERSONNEL"
     });
 
     it("should delete the delivery personnel if provided valid data", async () => {
-        const deliveryPersonnelResponse = await createDeliveryPersonnel(
-            app,
-            adminToken
-        );
-
         const response = await deleteDeliveryPersonnel(
             app,
             adminToken,
-            deliveryPersonnelResponse.body.user.id
+            deliveryPersonnel.body.user.id
         );
 
         expect(response.statusCode).toBe(200);

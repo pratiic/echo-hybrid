@@ -2,6 +2,7 @@ import { LocationMarkerIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 import { BsImage } from "react-icons/bs";
 import { useSelector } from "react-redux";
+import Image from "next/image";
 
 import { addCommas, capitalizeAll } from "../lib/strings";
 import { getAddress } from "../lib/address";
@@ -57,18 +58,25 @@ const ContentCard = ({
         <div
             className={`rounded cursor-pointer h-fit dark-light transition-all duration-300 ${
                 forCarousel
-                    ? "w-[15rem]"
+                    ? "w-[16rem]"
                     : "hover:scale-103 hover:shadow-lg hover:shadow-gray-two active:scale-100 active:shadow-none dark:shadow-t-black"
             }`}
             onClick={handleContentClick}
         >
-            <div className="min-h-[9rem] relative rounded-t">
+            <div className="h-[12rem] bg-gray-50 dark:bg-gray-800 relative rounded-t">
                 {/* show icon until the image is loaded */}
                 <BsImage className="image-placeholder" />
-                <img
+                {/* <img
                     src={getImageSrc()}
                     alt={name}
-                    className="rounded-t min-h-[9rem] max-h-[12rem] w-full image relative"
+                    className="rounded-t min-h-[10rem] max-h-[12rem] w-full image relative"
+                /> */}
+                <Image
+                    src={getImageSrc()}
+                    alt={name}
+                    className="rounded-t w-full image relative"
+                    layout="fill"
+                    objectFit="cover"
                 />
             </div>
 

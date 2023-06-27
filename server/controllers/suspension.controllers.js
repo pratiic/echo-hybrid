@@ -157,6 +157,8 @@ export const controlSuspension = async (request, response, next) => {
         console.log(error);
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -205,5 +207,7 @@ export const getSuspensions = async (request, response, next) => {
         console.log(error);
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

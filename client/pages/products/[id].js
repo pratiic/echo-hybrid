@@ -38,7 +38,7 @@ const ProductPage = () => {
     //   console.log(activeProduct);
 
     useEffect(() => {
-        if (activeProduct && activeProduct?.store?.userId === authUser.id) {
+        if (activeProduct && activeProduct?.store?.userId === authUser?.id) {
             setIsMyProduct(true);
         } else {
             setIsMyProduct(false);

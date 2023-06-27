@@ -10,15 +10,8 @@ const BusinessPending = ({ business, handleCancellation }) => {
     const router = useRouter();
 
     useEffect(() => {
-        if (business) {
-            if (business.isVerified) {
-                router.push("/set-product");
-            }
-
-            if (!business.address) {
-                // not verified, address not set
-                router.push("/business-registration/?view=address");
-            }
+        if (business?.isVerified) {
+            router.push("/set-product");
         }
     }, [business]);
 

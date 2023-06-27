@@ -107,6 +107,8 @@ export const getTransactions = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -191,6 +193,8 @@ export const deleteTransaction = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -214,6 +218,8 @@ export const acknowledgeTransactions = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -440,6 +446,8 @@ export const generateCSV = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 

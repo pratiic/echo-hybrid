@@ -14,32 +14,10 @@ describe("GET /api/addresses SET ADDRESS", () => {
 
     beforeAll(async () => {
         createdUser = await createNewUser(app);
-
-        await supertest(app)
-            .post("/api/stores/?type=BUS")
-            .set("Authorization", `Bearer ${createdUser.token}`);
-        await supertest(app)
-            .post("/api/businesses")
-            .set("Authorization", `Bearer ${createdUser.token}`)
-            .field("name", "new business")
-            .field("PAN", "154329879")
-            .field("phone", "9810222399")
-            .attach("image", "images/business.jpeg");
     });
 
-    it("should set address when provided valid data - USER", async () => {
+    it("should set user address when provided valid data", async () => {
         const response = await setAddress(app, createdUser.token, validAddress);
-
-        expect(response.statusCode).toBe(200);
-    });
-
-    it("should set address when provided valid data - BUSINESS", async () => {
-        const response = await setAddress(
-            app,
-            createdUser.token,
-            validAddress,
-            "business"
-        );
 
         expect(response.statusCode).toBe(200);
     });

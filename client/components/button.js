@@ -11,6 +11,7 @@ const Button = ({
     children,
     rounded = false,
     textAsIs,
+    className,
     onClick,
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -47,10 +48,11 @@ const Button = ({
                     : large
                     ? "py-[12px] px-9 text-lg"
                     : "py-[9px] px-5"
-            } ${disabled && "opacity-80 pointer-events-none"} ${loading &&
-                "pointer-events-none"} ${
-                rounded ? "rounded-full" : "rounded"
-            } ${!textAsIs && "capitalize"}`}
+            } ${disabled && "opacity-80 pointer-events-none"} ${
+                loading && "pointer-events-none"
+            } ${rounded ? "rounded-full" : "rounded"} ${
+                !textAsIs && "capitalize"
+            } ${className}`}
             onClick={(event) => {
                 !loading && onClick && onClick(event);
             }}

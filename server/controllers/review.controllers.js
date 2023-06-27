@@ -85,6 +85,8 @@ export const postReview = async (request, response, next) => {
         response.status(201).json({ review: finalReview });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -114,6 +116,8 @@ export const getReviews = async (request, response, next) => {
         response.json({ reviews });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -194,5 +198,7 @@ export const deleteReview = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

@@ -34,7 +34,10 @@ const SellerFilterInfo = () => {
     return (
         <div className="filter-info-container">
             <p className="filter-info-text">
-                Showing {filterMap[activeFilter]}
+                Showing{" "}
+                <span className="filter-info-highlight">
+                    {filterMap[activeFilter]}
+                </span>
                 {/* {renderTotalCount()} */}
             </p>
         </div>

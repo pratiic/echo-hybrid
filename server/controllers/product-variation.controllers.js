@@ -45,5 +45,7 @@ export const setProductVariations = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

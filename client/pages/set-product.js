@@ -9,13 +9,14 @@ import { generateFormData } from "../lib/form-data";
 import { fetcher } from "../lib/fetcher";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 import { updateProduct } from "../redux/slices/products-slice";
-import { showGenericModal } from "../redux/slices/modal-slice";
+import { closeModal, showGenericModal } from "../redux/slices/modal-slice";
 
 import Form from "../components/form";
 import InputGroup from "../components/input-group";
 import Button from "../components/button";
 import FileSelector from "../components/file-selector";
 import CustomWarranty from "../components/custom-warranty";
+import StockInfo from "../components/stock-info";
 
 const SetProduct = () => {
   const [name, setName] = useState("");
@@ -110,9 +111,23 @@ const SetProduct = () => {
 
   useEffect(() => {
     if (warranty === "custom") {
-      dispatch(showGenericModal(<CustomWarranty />));
+      dispatch(
+        showGenericModal(<CustomWarranty onSubmit={handleCustomWarranty} />)
+      );
     }
   }, [warranty]);
+
+  const handleCustomWarranty = (customWarranty) => {
+    dispatch(closeModal());
+
+    setWarranty(customWarranty);
+    console.log(warranty);
+
+    // warrantyOptions = [
+    //   ...warrantyOptions,
+    //   { label: customWarranty, value: customWarranty },
+    // ];
+  };
 
   const stockTypeOptions = [
     { label: "flat", value: "flat" },

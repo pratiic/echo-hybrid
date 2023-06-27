@@ -12,6 +12,7 @@ const Form = ({
     hasBackArrow = true,
     onSubmit,
     centered = true,
+    className,
     children,
 }) => {
     const router = useRouter();
@@ -62,7 +63,7 @@ const Form = ({
                 </div>
             )}
 
-            <div className={`w-[20rem] ${centered && "mx-auto"}`}>
+            <div className={`w-[20rem] ${centered && "mx-auto"} ${className}`}>
                 {children}
             </div>
         </form>

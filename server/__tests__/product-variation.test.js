@@ -270,7 +270,7 @@ describe("POST /api/product-variations SET PRODUCT VARIATION", () => {
         const createdUser = await createNewUser(app);
         const response = await setProductVariations(app, createdUser.token);
 
-        await deleteCreatedUser(app, createdUser.token);
+        await deleteCreatedUser(app, createdUser.id);
 
         expect(response.statusCode).toBe(200);
     });
@@ -301,7 +301,7 @@ describe("POST /api/product-variations SET PRODUCT VARIATION", () => {
             false
         );
 
-        await deleteCreatedUser(app, createdUser.token);
+        await deleteCreatedUser(app, createdUser.id);
 
         expect(response.statusCode).toBe(400);
         expect(response.body.error).toBe("product variations already set");

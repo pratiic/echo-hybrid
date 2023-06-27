@@ -1,4 +1,3 @@
-import { businessInclusionFields } from "../lib/data-source.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { trimValues } from "../lib/strings.lib.js";
 import { HttpError } from "../models/http-error.models.js";
@@ -63,20 +62,10 @@ export const setAddress = async (request, response, next) => {
             update: addressInfo,
         });
 
-        if (targetType === "business") {
-            // targetType -> business means new business registration request
-            const business = await prisma.business.findUnique({
-                where: {
-                    id: user.store.business.id,
-                },
-                include: businessInclusionFields,
-            });
-
-            io.emit("business-request", business);
-        }
-
         response.json({ address });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

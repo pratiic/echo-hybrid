@@ -1,6 +1,8 @@
 import axios from "axios";
 
 import { getProp } from "./local-storage";
+import { store } from "../redux/store";
+import { signUserOut } from "../redux/slices/auth-slice";
 
 export const fetcher = async (url, method = "GET", data, responseType) => {
     const authUser = getProp("authUser");
@@ -26,8 +28,16 @@ export const fetcher = async (url, method = "GET", data, responseType) => {
         return res.data;
     } catch (error) {
         const errMsg = error.response?.data?.error;
-        const errorObj = new Error(errMsg || "something went wrong, try again");
-        errorObj.statusCode = error.response?.status;
-        throw errorObj;
+
+        if (errMsg === "jwt expired") {
+            // sign user out
+            store.dispatch(signUserOut());
+        } else {
+            const errorInstance = new Error(
+                errMsg || "something went wrong, try again"
+            );
+            errorInstance.statusCode = error.response?.status;
+            throw errorInstance;
+        }
     }
 };

@@ -695,6 +695,7 @@ describe("POST /api/orders/:orderId/completion REQUEST COMPLETION", () => {
     let createdUser,
         deliveryToken,
         indSeller,
+        busSeller,
         secondHandProduct,
         deliveredOrder,
         undeliveredOrder;
@@ -703,6 +704,7 @@ describe("POST /api/orders/:orderId/completion REQUEST COMPLETION", () => {
         const orderElements = await prepareOrderElements();
         createdUser = orderElements.createdUser;
         indSeller = orderElements.indSeller;
+        busSeller = orderElements.busSeller;
         secondHandProduct = orderElements.secondHandProduct;
 
         deliveryToken = await signInAsDeliveryPersonnel(app);
@@ -827,6 +829,7 @@ describe("POST /api/orders/:orderId/completion REQUEST COMPLETION", () => {
     afterAll(async () => {
         await deleteCreatedUser(app, createdUser.id);
         await deleteCreatedUser(app, indSeller.id);
+        await deleteCreatedUser(app, busSeller.id);
     });
 });
 
@@ -834,6 +837,7 @@ describe("PATCH /api/orders/:orderId/completion HANDLE COMPLETION REQUEST", () =
     let createdUser,
         deliveryToken,
         indSeller,
+        busSeller,
         secondHandProduct,
         deliveredOrder,
         undeliveredOrder;
@@ -842,6 +846,7 @@ describe("PATCH /api/orders/:orderId/completion HANDLE COMPLETION REQUEST", () =
         const orderElements = await prepareOrderElements();
         createdUser = orderElements.createdUser;
         indSeller = orderElements.indSeller;
+        busSeller = orderElements.busSeller;
         secondHandProduct = orderElements.secondHandProduct;
 
         deliveryToken = await signInAsDeliveryPersonnel(app);
@@ -948,6 +953,7 @@ describe("PATCH /api/orders/:orderId/completion HANDLE COMPLETION REQUEST", () =
     afterAll(async () => {
         await deleteCreatedUser(app, createdUser.id);
         await deleteCreatedUser(app, indSeller.id);
+        await deleteCreatedUser(app, busSeller.id);
     });
 });
 

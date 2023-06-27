@@ -7,106 +7,123 @@ import { HttpError } from "../models/http-error.models.js";
 import {
     validateBusiness,
     validateBusinessRegistrationControl,
-    validateStatus,
 } from "../validators/business.validators.js";
 
 export const registerBusiness = async (request, response, next) => {
     const user = request.user;
     const businessInfo = request.body;
+    const io = request.io;
 
-    const errorMsg = validateBusiness(businessInfo);
+    const errorMsg = validateBusiness(businessInfo, request.file);
 
     if (errorMsg) {
         return next(new HttpError(errorMsg, 400));
     }
 
-    if (!request.file) {
-        return next(
-            new HttpError(
-                "business registration certificate must be provided",
-                400
-            )
-        );
-    }
-
     try {
-        const store = await prisma.store.findUnique({
-            where: { userId: user.id },
-            include: {
-                business: {
-                    select: {
-                        id: true,
+        await prisma.$transaction(async (prisma) => {
+            const store = await prisma.store.findUnique({
+                where: { userId: user.id },
+                include: {
+                    business: {
+                        select: {
+                            id: true,
+                        },
                     },
                 },
-            },
-        });
+            });
 
-        // can sell only after registering as a seller
-        if (!store) {
-            return next(
-                new HttpError("you need to register as a seller first", 400)
-            );
-        }
+            // can sell only after registering as a seller
+            if (!store) {
+                return next(
+                    new HttpError("you need to register as a seller first", 400)
+                );
+            }
 
-        // must have a store of type BUS
-        if (store.storeType === "IND") {
-            return next(
-                new HttpError(
-                    "you are already registered as an individual seller",
-                    400
-                )
-            );
-        }
+            // must have a store of type BUS
+            if (store.storeType === "IND") {
+                return next(
+                    new HttpError(
+                        "you are already registered as an individual seller",
+                        400
+                    )
+                );
+            }
 
-        // one account -> only one business
-        if (store.business) {
-            return next(
-                new HttpError(
-                    "there is already a business registered with this account",
-                    400
-                )
-            );
-        }
+            // one account -> only one business
+            if (store.business) {
+                return next(
+                    new HttpError(
+                        "there is already a business registered with this account",
+                        400
+                    )
+                );
+            }
 
-        let { name, PAN, phone } = businessInfo;
-        [name, PAN, phone] = trimValues(name, PAN, phone);
-
-        const createdBusiness = await prisma.business.create({
-            data: {
+            let { name, PAN, phone, province, city, area, description } =
+                businessInfo;
+            [name, PAN, phone, province, city, area, description] = trimValues(
                 name,
                 PAN,
                 phone,
-                storeId: store.id,
-                // isVerified: true,
-            },
-        });
+                province,
+                city,
+                area,
+                description
+            );
 
-        // handle business registration certificate image
-        const imageData = prepareImageData(
-            "business",
-            createdBusiness.id,
-            request.file
-        );
-
-        const [, updatedBusiness] = await Promise.all([
-            prisma.image.create({
-                data: imageData,
-            }),
-            prisma.business.update({
-                where: {
-                    id: createdBusiness.id,
-                },
+            const createdBusiness = await prisma.business.create({
                 data: {
-                    regImage: imageData.src,
+                    name,
+                    PAN,
+                    phone,
+                    storeId: store.id,
                 },
-            }),
-        ]);
+            });
 
-        response.status(201).json({
-            business: updatedBusiness,
+            // handle business registration certificate image and create business address
+            const imageData = prepareImageData(
+                "business",
+                createdBusiness.id,
+                request.file
+            );
+
+            const [, updatedBusiness, createdAddress] = await Promise.all([
+                prisma.image.create({
+                    data: imageData,
+                }),
+                prisma.business.update({
+                    where: {
+                        id: createdBusiness.id,
+                    },
+                    data: {
+                        regImage: imageData.src,
+                    },
+                }),
+                prisma.address.create({
+                    data: {
+                        province,
+                        city,
+                        area,
+                        description,
+                        businessId: createdBusiness.id,
+                    },
+                }),
+            ]);
+
+            io.emit("business-request", {
+                ...updatedBusiness,
+                address: createdBusiness,
+            });
+
+            response.status(201).json({
+                business: { ...updatedBusiness, address: createdAddress },
+            });
         });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -143,6 +160,8 @@ export const getBusinessDetails = async (request, response, next) => {
         response.json({ business });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -156,15 +175,6 @@ export const controlBusinessRegistration = async (request, response, next) => {
     if (business.isVerified) {
         return next(
             new HttpError("the business has already been verified", 400)
-        );
-    }
-
-    if (!business.address) {
-        return next(
-            new HttpError(
-                "the address of the business has not been set yet",
-                400
-            )
         );
     }
 
@@ -223,81 +233,8 @@ export const controlBusinessRegistration = async (request, response, next) => {
         console.log(error);
 
         next(new HttpError());
-    }
-};
-
-// accept or reject a business
-export const modifyBusinessStatus = async (request, response, next) => {
-    const business = request.business;
-    const status = request.query.status;
-
-    const errorMsg = validateStatus(status);
-
-    if (errorMsg) {
-        return next(new HttpError(errorMsg, 400));
-    }
-
-    try {
-        if (
-            business.store.userId !== request.user.id &&
-            !request.user.isAdmin
-        ) {
-            return next(
-                new HttpError(
-                    "only the business owner or an admin is allowed to perform this action",
-                    401
-                )
-            );
-        }
-
-        // valid transitions
-        // for business owner
-        // 1. REJECTED -> PENDING
-        // for admin
-        // 1. PENDING -> ACCEPTED / REJECTED
-
-        const currentStatus = business.status;
-        const conditionMap = {
-            owner: currentStatus === "REJECTED" && status === "PENDING",
-            admin:
-                currentStatus === "PENDING" &&
-                (status === "ACCEPTED" || status === "REJECTED"),
-        };
-        const errorMsgMap = {
-            admin: "pending -> accepted / rejected",
-            owner: "rejected -> pending",
-        };
-        const role =
-            business.store.userId === request.user.id ? "owner" : "admin";
-
-        if (role === "admin" && !business.address?.id) {
-            return next(new HttpError("address must be set first", 400));
-        }
-
-        if (conditionMap[role]) {
-            const updatedBusiness = await prisma.business.update({
-                where: {
-                    id: business.id,
-                },
-                data: {
-                    status,
-                },
-            });
-
-            response.json({
-                business: updatedBusiness,
-            });
-        } else {
-            return next(
-                new HttpError(
-                    `invalid status transition. valid transitions: ${errorMsgMap[role]}`,
-                    400
-                )
-            );
-        }
-    } catch (error) {
-        console.log(error.message);
-        next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -337,6 +274,8 @@ export const updateBusiness = async (request, response, next) => {
         response.json({ business: updatedBusiness });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -375,6 +314,8 @@ export const deleteBusiness = async (request, response, next) => {
         });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -415,6 +356,8 @@ export const getBusinessRequests = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -433,5 +376,7 @@ export const acknowledgedBusinessRequests = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

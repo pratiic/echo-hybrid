@@ -16,12 +16,14 @@ const productSchema = Joi.object({
 });
 
 export const validateProduct = (productInfo, isSecondHand) => {
-    const stockTypeSchema = Joi.object({
+    // for brand new products
+    const extraSchema = Joi.object({
         stockType: Joi.string().valid("flat", "varied").required().trim(),
+        warranty: Joi.number().integer().min(0).allow(null).allow(""),
     });
 
     if (!isSecondHand) {
-        const errorMsg = validate(productInfo, stockTypeSchema);
+        const errorMsg = validate(productInfo, extraSchema);
 
         if (errorMsg) {
             return errorMsg;

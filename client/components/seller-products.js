@@ -10,9 +10,9 @@ import { capitalizeFirstLetter } from "../lib/strings";
 import FilterTrigger from "./filter-trigger";
 import SearchBar from "./search-bar";
 import ContentList from "./content-list";
-import Button from "./button";
+import Icon from "./icon";
 
-const SellerProducts = ({ sellerId }) => {
+const SellerProducts = ({ sellerId, sellerType, isMyStore }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -83,19 +83,19 @@ const SellerProducts = ({ sellerId }) => {
     return (
         <section>
             <div className="flex items-center mb-8">
-                {sellerId === authUser?.store?.id && (
-                    <Button
-                        type="tertiary"
-                        small
-                        onClick={() => router.push("/set-product/?mode=create")}
-                    >
-                        <PlusIcon className="icon-no-bg mr-2" />
-                        add product
-                    </Button>
-                )}
+                <FilterTrigger
+                    isGlobal={false}
+                    sellerType={sellerType}
+                    isMyStore={isMyStore}
+                />
 
-                {authUser?.store?.id !== sellerId && (
-                    <FilterTrigger isGlobal={false} />
+                {sellerId === authUser?.store?.id && (
+                    <Icon
+                        toolName="add product"
+                        onClick={() => router.push("/set-product")}
+                    >
+                        <PlusIcon className="icon ml-2" />
+                    </Icon>
                 )}
             </div>
 

@@ -13,6 +13,7 @@ import { singularOrPlural, singularOrPluralCount } from "../../lib/strings";
 import PageHeader from "../../components/page-header";
 import GenericSearch from "../../components/generic-search";
 import DeliveriesList from "../../components/deliveries-list";
+import { getProp, setProp } from "../../lib/local-storage";
 
 const Deliveries = () => {
     const [activeOption, setActiveOption] = useState("");
@@ -31,12 +32,30 @@ const Deliveries = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (router.query.show) {
-            setActiveOption(router.query.show);
-        } else {
-            router.push("/delivery/?show=pending");
+        const lastDeliveryQuery = getProp("lastDeliveryQuery") || "pending";
+        setActiveOption(lastDeliveryQuery);
+
+        return () => {
+            setProp("lastDeliveryQuery", "");
+        };
+    }, []);
+
+    useEffect(() => {
+        if (activeOption) {
+            router.push(`/delivery/?show=${activeOption}`);
         }
-    }, [router]);
+    }, [activeOption]);
+
+    useEffect(() => {
+        // there aren't separate page files for pending and completed delivery to improve code reuse
+        // if reloaded when in /delivery/?show=completed, it will redirect to the default route /delivery/?show=pending
+        // by storing the last query value in the local storage, we can set the query to that value when reloaded
+
+        if (router.query.show) {
+            setProp("lastDeliveryQuery", router.query.show);
+            setActiveOption(router.query.show);
+        }
+    }, [router.query]);
 
     useEffect(() => {
         if (
@@ -50,7 +69,7 @@ const Deliveries = () => {
     const getPageTitle = () => {
         return activeOption === "pending"
             ? "Orders to deliver"
-            : "completed deliveries";
+            : "Completed deliveries";
     };
 
     const acknowledgeCompletedDeliveries = async () => {

@@ -73,6 +73,8 @@ export const getDeliveries = async (request, response, next) => {
         console.log(error);
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -97,6 +99,8 @@ export const deleteDelivery = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -112,6 +116,8 @@ export const acknowledgeDeliveries = async (request, response, next) => {
         response.json({});
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -172,6 +178,8 @@ export const getDeliveryPersonnel = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -212,5 +220,7 @@ export const deleteDeliveryPersonnel = async (request, response, next) => {
         response.json({});
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

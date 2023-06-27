@@ -86,6 +86,8 @@ export const replyToReview = async (request, response, next) => {
         }
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -110,6 +112,8 @@ export const getReplies = async (request, response, next) => {
         response.json({ replies });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -156,5 +160,7 @@ export const deleteReply = async (request, response, next) => {
         response.json({ message: "the reply has been deleted" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

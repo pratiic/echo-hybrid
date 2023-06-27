@@ -229,7 +229,7 @@ textarea {
   }
 
   .image-placeholder {
-    @apply h-14 w-14 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-300;
+    @apply h-14 w-14 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-500;
   }
 
   .count {
@@ -286,8 +286,12 @@ textarea {
   }
 
   .options-toggle-label {
-    @apply inline-block dark-light mb-1 ml-1
-}
+    @apply inline-block dark-light mb-1 ml-1;
+   }
+
+   .form-subheading {
+    @apply text-xl font-semibold mb-3 tracking-wide dark-light;
+   }
 }
 
 .shadow-custom {
@@ -311,7 +315,7 @@ textarea {
 }
 
 .toggle-face {
-  @apply flex items-center bg-gray-four px-3 py-2 rounded capitalize text-gray-one cursor-pointer hover:text-t-black hover:bg-gray-two active:bg-gray-300 transition-all duration-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-400 dark:hover:text-g-white dark:active:bg-gray-800;
+  @apply flex items-center bg-gray-four dark:bg-gray-800 px-3 py-2 rounded capitalize dark-light cursor-pointer hover:text-t-black hover:bg-gray-two active:bg-gray-300 transition-all duration-200  dark:hover:bg-gray-700 dark:hover:text-g-white dark:active:bg-gray-800;
 }
 
 .border-faint {

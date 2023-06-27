@@ -6,7 +6,6 @@ import { HttpError } from "../models/http-error.models.js";
 import { validateProduct } from "../validators/product.validators.js";
 import {
     genericUserFields,
-    productDeletionFields,
     productSelectionFields,
 } from "../lib/data-source.lib.js";
 import { checkDeliverySingle } from "../lib/delivery.lib.js";
@@ -59,18 +58,29 @@ export const postProduct = async (request, response, next) => {
         deliveryCharge,
         category,
         subCategory,
+        warranty,
     } = productInfo;
-    [name, description, per, brand, madeIn, stockType, category, subCategory] =
-        trimValues(
-            name,
-            description,
-            per,
-            brand,
-            madeIn,
-            stockType,
-            category,
-            subCategory
-        );
+    [
+        name,
+        description,
+        per,
+        brand,
+        madeIn,
+        stockType,
+        category,
+        subCategory,
+        warranty,
+    ] = trimValues(
+        name,
+        description,
+        per,
+        brand,
+        madeIn,
+        stockType,
+        category,
+        subCategory,
+        warranty
+    );
 
     try {
         const createdProduct = await prisma.product.create({
@@ -86,6 +96,7 @@ export const postProduct = async (request, response, next) => {
                 deliveryCharge: parseInt(deliveryCharge),
                 categoryName: category,
                 subCategory,
+                warranty: forBusiness ? parseInt(warranty) || 0 : 0,
                 storeId: store.id,
             },
         });
@@ -138,6 +149,8 @@ export const postProduct = async (request, response, next) => {
         }
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -191,6 +204,14 @@ export const getProducts = async (request, response, next) => {
         },
         "brand new": {
             isSecondHand: false,
+        },
+        "sold out": {
+            hasBeenSold: true,
+        },
+        suspended: {
+            NOT: {
+                suspension: null,
+            },
         },
         province: getAddressFilter("province"),
         city: getAddressFilter("city"),
@@ -288,14 +309,21 @@ export const getProducts = async (request, response, next) => {
         const fields = ["name", "brand", "subCategory"];
 
         const searchFilter = {
-            OR: fields.map((field) => {
-                return {
-                    [field]: {
-                        contains: searchQuery.trim(),
-                        mode: "insensitive",
+            OR: [
+                ...fields.map((field) => {
+                    return {
+                        [field]: {
+                            contains: searchQuery.trim(),
+                            mode: "insensitive",
+                        },
+                    };
+                }),
+                {
+                    id: {
+                        equals: parseInt(searchQuery.trim()) || -1,
                     },
-                };
-            }),
+                },
+            ],
         };
 
         primaryFilter = { ...primaryFilter, ...searchFilter };
@@ -367,6 +395,8 @@ export const getProducts = async (request, response, next) => {
         response.json({ products, totalCount });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -547,6 +577,8 @@ export const getProductDetails = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -608,6 +640,8 @@ export const updateProduct = async (request, response, next) => {
         response.json({ product: updatedProduct });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -616,30 +650,26 @@ export const deleteProduct = async (request, response, next) => {
     const io = request.io;
 
     try {
-        prisma.$transaction(async (prisma) => {
-            await prisma.product.updateMany({
-                where: { id: product.id },
-                data: {
-                    storeId: null,
-                    isDeleted: true,
-                    categoryName: null,
-                },
-            });
-
-            await Promise.all(
-                ["review", "rating", "productVariation", "stock"].map(
-                    (model) => {
-                        return prisma[model].deleteMany({
-                            where: {
-                                productId: product.id,
-                            },
-                        });
-                    }
-                )
-            );
-
-            await fetcher(`similar/products/${product.id}`, "DELETE");
+        await prisma.product.updateMany({
+            where: { id: product.id },
+            data: {
+                storeId: null,
+                isDeleted: true,
+                categoryName: null,
+            },
         });
+
+        await Promise.all(
+            ["review", "rating", "productVariation", "stock"].map((model) => {
+                return prisma[model].deleteMany({
+                    where: {
+                        productId: product.id,
+                    },
+                });
+            })
+        );
+
+        await fetcher(`similar/products/${product.id}`, "DELETE");
 
         io.emit("product-delete", product.id);
 
@@ -647,6 +677,7 @@ export const deleteProduct = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
     }
 };
 
@@ -698,6 +729,8 @@ export const addProductImages = async (request, response, next) => {
         response.json({ images: imageSources });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -742,6 +775,8 @@ export const deleteProductImage = async (request, response, next) => {
         console.log(error);
         notFoundHandler(error.message, "image", next);
         return next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -749,32 +784,32 @@ function createPrice(price) {
     return parseFloat(parseFloat(price).toFixed());
 }
 
-function getAddressFilter(field, address) {
-    return {
-        OR: [
-            {
-                isSecondHand: true,
-                store: {
-                    user: {
-                        address: {
-                            [field]: address[field],
-                        },
-                    },
-                },
-            },
-            {
-                isSecondHand: false,
-                store: {
-                    business: {
-                        address: {
-                            [field]: address[field],
-                        },
-                    },
-                },
-            },
-        ],
-    };
-}
+// function getAddressFilter(field, address) {
+//     return {
+//         OR: [
+//             {
+//                 isSecondHand: true,
+//                 store: {
+//                     user: {
+//                         address: {
+//                             [field]: address[field],
+//                         },
+//                     },
+//                 },
+//             },
+//             {
+//                 isSecondHand: false,
+//                 store: {
+//                     business: {
+//                         address: {
+//                             [field]: address[field],
+//                         },
+//                     },
+//                 },
+//             },
+//         ],
+//     };
+// }
 
 // function getBaseFilterMap(address) {
 //     const baseFilterMap = {

@@ -14,14 +14,12 @@ import { updateAuthUser } from "../../redux/slices/auth-slice";
 
 import PageHeader from "../../components/page-header";
 import BusinessDetails from "../../components/business-registration/details";
-import BusinessAddress from "../../components/business-registration/address";
 import BusinessPending from "../../components/business-registration/pending";
 
 const BusinessRegistration = () => {
     const [activeView, setActiveView] = useState("");
     const [business, setBusiness] = useState(null);
     const [fetching, setFetching] = useState(false);
-    const [error, setError] = useState("");
     const [isCancelled, setIsCancelled] = useState(false);
 
     const router = useRouter();
@@ -29,9 +27,8 @@ const BusinessRegistration = () => {
     const { authUser } = useSelector((state) => state.auth);
 
     const viewTitleMap = {
-        details: "Provide details",
-        address: "Set address",
-        pending: "Pending",
+        details: "Business registration",
+        pending: "Registration pending",
     };
 
     useEffect(() => {
@@ -75,7 +72,6 @@ const BusinessRegistration = () => {
             const data = await fetcher(`businesses/0/details`);
             setBusiness(data.business);
         } catch (error) {
-            setError(error.message);
         } finally {
             setFetching(false);
         }
@@ -135,26 +131,13 @@ const BusinessRegistration = () => {
     return (
         <section>
             <Head>
-                <title>Register business | {viewTitleMap[activeView]}</title>
+                <title>{viewTitleMap[activeView]}</title>
             </Head>
 
-            <PageHeader
-                heading={`register business - ${viewTitleMap[activeView]}`}
-                hasBackArrow
-            />
+            <PageHeader heading={`${viewTitleMap[activeView]}`} hasBackArrow />
 
             {activeView === "details" && (
-                <BusinessDetails
-                    business={business}
-                    handleCancellation={handleCancellation}
-                />
-            )}
-
-            {activeView === "address" && (
-                <BusinessAddress
-                    business={business}
-                    setBusiness={setBusiness}
-                />
+                <BusinessDetails business={business} />
             )}
 
             {activeView === "pending" && (

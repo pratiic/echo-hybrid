@@ -33,6 +33,8 @@ export const addCategories = async (request, response, next) => {
         }
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -57,6 +59,8 @@ export const getCategories = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -114,6 +118,8 @@ export const requestCategory = async (request, response, next) => {
         response.json({ message: "category has been requested" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -158,6 +164,8 @@ export const controlCategoryRequest = async (request, response, next) => {
         }
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -175,6 +183,8 @@ export const acknowledgeRequests = async (request, response, next) => {
         response.json({ message: "acknowledged" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -219,6 +229,8 @@ export const deleteCategory = async (request, response, next) => {
         });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -239,5 +251,7 @@ export const getCategoryRequests = async (request, response, next) => {
         response.json({ requests });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

@@ -6,14 +6,22 @@ export const registerBusiness = async (
     name = "",
     PAN = "",
     phone = "",
-    image
+    image,
+    province = "",
+    city = "",
+    area = "",
+    description = ""
 ) => {
     const request = supertest(app)
         .post("/api/businesses")
         .set("Authorization", `Bearer ${token}`)
         .field("name", name)
         .field("PAN", PAN)
-        .field("phone", phone);
+        .field("phone", phone)
+        .field("province", province)
+        .field("city", city)
+        .field("area", area)
+        .field("description", description);
 
     if (image) {
         request.attach("image", "images/business.jpeg");

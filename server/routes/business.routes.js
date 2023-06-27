@@ -16,7 +16,10 @@ import { validateBusiness } from "../middleware/business.middleware.js";
 export const businessRouter = (io) => {
     const router = express.Router();
 
-    router.post("/", auth, getUpload().single("image"), registerBusiness);
+    router.post("/", auth, getUpload().single("image"), (request, ...op) => {
+        request.io = io;
+        registerBusiness(request, ...op);
+    });
 
     router.get(
         "/:businessId/details",

@@ -7,7 +7,7 @@ const ProductCarousel = ({ products }) => {
         <div className="mt-3 flex space-x-5 overflow-x-auto">
             {products.map((product) => {
                 return (
-                    <div className="w-[15rem]">
+                    <div className="w-[16rem]">
                         <ContentCard
                             {...product}
                             key={product.id}
