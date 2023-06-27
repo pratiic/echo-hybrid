@@ -9,11 +9,13 @@ import { generateFormData } from "../lib/form-data";
 import { fetcher } from "../lib/fetcher";
 import { setAlert, setErrorAlert } from "../redux/slices/alerts-slice";
 import { updateProduct } from "../redux/slices/products-slice";
+import { showGenericModal } from "../redux/slices/modal-slice";
 
 import Form from "../components/form";
 import InputGroup from "../components/input-group";
 import Button from "../components/button";
 import FileSelector from "../components/file-selector";
+import StockInfo from "../components/stock-info";
 
 const SetProduct = () => {
     const [name, setName] = useState("");
@@ -282,7 +284,6 @@ const SetProduct = () => {
                     label="delivery charge"
                     view="number"
                     min={0}
-                    showRequired={false}
                     value={deliveryCharge}
                     error={deliveryChargeError}
                     onChange={setDeliveryCharge}
@@ -297,7 +298,7 @@ const SetProduct = () => {
                                 view="select"
                                 options={stockTypeOptions}
                                 value={stockType}
-                                info={<StockTypeInfo />}
+                                info={<StockInfo />}
                                 showRequired={false}
                                 onChange={setStockType}
                             />
@@ -351,10 +352,10 @@ const SetProduct = () => {
                 <Button full loading={loading} rounded={false}>
                     {loading
                         ? mode === "create"
-                            ? "setting"
+                            ? "adding"
                             : "updating"
                         : mode === "create"
-                        ? "set"
+                        ? "add"
                         : "update"}{" "}
                     product
                 </Button>
@@ -362,48 +363,5 @@ const SetProduct = () => {
         </section>
     );
 };
-
-function StockTypeInfo() {
-    const stockTypes = [
-        {
-            title: "flat",
-            description: "Flat stock only has the quantity of a product.",
-        },
-        {
-            title: "varied",
-            description:
-                "Varied stock defines different variations of a product based on attributes such as color, size, etc. Each variant type has its own values, for e.g. color may have red, blue. Quantity can be defined for each combination of variants.",
-        },
-    ];
-
-    const InfoItem = ({ title, description }) => {
-        return (
-            <li className="mb-3">
-                <h4 className="capitalize text-lg font-semibold black-white">
-                    {title}
-                </h4>
-                <p className="dark-light">{description}</p>
-            </li>
-        );
-    };
-
-    return (
-        <div className="max-w-[300px]">
-            <h3 className="heading-generic-modal">Product stock types</h3>
-
-            <ul className="-mt-1">
-                {stockTypes.map((stockType, index) => {
-                    return (
-                        <InfoItem
-                            title={stockType.title}
-                            description={stockType.description}
-                            key={index}
-                        />
-                    );
-                })}
-            </ul>
-        </div>
-    );
-}
 
 export default SetProduct;

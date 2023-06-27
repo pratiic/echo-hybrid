@@ -119,6 +119,7 @@ Table Product {
   isDeleted Boolean [not null, default: false]
   hasBeenSold Boolean [not null, default: false]
   categoryName String
+  warranty Int [not null, default: 0]
   store Store
   storeId Int
   reviews Review [not null]
@@ -140,6 +141,16 @@ Table ProductVariation {
   options String[] [not null]
   product Product [not null]
   productId Int [not null]
+}
+
+Table Stock {
+  id Int [pk, increment]
+  quantity Int
+  variants Json
+  product Product [not null]
+  productId Int [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
 }
 
 Table Category {
@@ -229,16 +240,6 @@ Table Notification {
   destinationId Int [not null]
   linkTo String [default: '']
   seen Boolean [default: false]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-}
-
-Table Stock {
-  id Int [pk, increment]
-  quantity Int
-  variants Json
-  product Product [not null]
-  productId Int [unique, not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -436,6 +437,8 @@ Ref: Product.categoryName > Category.name
 
 Ref: ProductVariation.productId > Product.id [delete: Cascade]
 
+Ref: Stock.productId - Product.id [delete: Cascade]
+
 Ref: CategoryRequest.userId > User.id [delete: Cascade]
 
 Ref: Review.userId > User.id [delete: Cascade]
@@ -459,8 +462,6 @@ Ref: Address.userId - User.id [delete: Cascade]
 Ref: Address.businessId - Business.id [delete: Cascade]
 
 Ref: Notification.originId > User.id [delete: Cascade]
-
-Ref: Stock.productId - Product.id [delete: Cascade]
 
 Ref: Order.productId > Product.id [delete: Cascade]
 

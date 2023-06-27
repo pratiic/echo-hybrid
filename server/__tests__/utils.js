@@ -111,19 +111,14 @@ export const createBusiness = async (
         .field("name", "new business")
         .field("PAN", "152347865")
         .field("phone", "9810222399")
-        .attach("image", "images/profile.jpeg");
-
-    const adminToken = await signInAsAdmin(app);
-
-    const addressResponse = await setAddress(
-        app,
-        token,
-        "business",
-        withinDelivery
-    );
-    response.body.business.address = addressResponse.body.address;
+        .attach("image", "images/profile.jpeg")
+        .field("province", withinDelivery ? "bagmati" : "province no 1")
+        .field("city", withinDelivery ? "kathmandu" : "jhapa")
+        .field("area", withinDelivery ? "koteshwor" : "birtamode");
 
     if (verifyBusiness) {
+        const adminToken = await signInAsAdmin(app);
+
         await supertest(app)
             .patch(
                 `/api/businesses/registration/${response.body.business.id}/?action=accept`

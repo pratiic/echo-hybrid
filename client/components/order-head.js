@@ -11,7 +11,7 @@ const OrderHead = ({ product, variant, quantity, allowProductControl }) => {
                 {/* product image */}
                 <img
                     src={product?.images[0]}
-                    className="image w-[9rem] rounded"
+                    className="image w-[9rem] rounded max-h-[175px]"
                 />
             </div>
 

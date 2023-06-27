@@ -116,12 +116,17 @@ const auth = async (request, response, next) => {
         let msg = "",
             status = null;
 
-        if (error.message === "jwt malformed") {
+        if (
+            error.message === "jwt malformed" ||
+            error.message === "jwt expired"
+        ) {
             msg = error.message;
             status = 401;
         }
 
         return next(new HttpError(msg, status));
+    } finally {
+        await prisma.$disconnect();
     }
 
     next();

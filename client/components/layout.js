@@ -25,6 +25,7 @@ import Suspension from "../cache/suspension";
 import DeliveryPersonnel from "../cache/delivery-personnel";
 import Overlay from "../components/overlay";
 import Cart from "../cache/cart";
+import Seller from "../cache/seller";
 
 const Layout = ({ children }) => {
     const { authUser } = useSelector((state) => state.auth);
@@ -171,6 +172,7 @@ const Layout = ({ children }) => {
                         <Chat />
                         <Category />
                         <Product />
+                        <Seller />
                     </>
                 )}
 

@@ -52,6 +52,8 @@ export const updateUser = async (request, response, next) => {
         console.log(error);
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -94,6 +96,8 @@ export const resetPassword = async (request, response, next) => {
         console.log(error);
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -122,6 +126,8 @@ export const deleteAvatar = async (request, response, next) => {
         response.json({ avatar: updatedUser.avatar });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -144,6 +150,8 @@ export const getUserDetails = async (request, response, next) => {
         });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -170,11 +178,32 @@ export const deleteUser = async (request, response, next) => {
                     userId,
                 },
             }),
+            prisma.store.deleteMany({
+                where: {
+                    userId: null,
+                },
+            }),
+            prisma.product.deleteMany({
+                where: {
+                    name: "new product",
+                    isDeleted: true,
+                    storeId: null,
+                },
+            }),
+            prisma.chat.deleteMany({
+                where: {
+                    userIds: {
+                        has: userId,
+                    },
+                },
+            }),
         ]);
 
         response.json({});
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -193,5 +222,7 @@ export const verifyUser = async (request, response, next) => {
             response.json({});
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

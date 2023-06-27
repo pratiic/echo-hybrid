@@ -26,5 +26,7 @@ export const getImage = async (request, response, next) => {
         response.send(image.binary);
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

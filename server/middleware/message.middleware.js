@@ -49,6 +49,8 @@ export const validateChat = async (request, response, next) => {
         next();
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -75,5 +77,7 @@ export const validateMessage = async (request, response, next) => {
         next();
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

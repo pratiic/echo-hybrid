@@ -64,7 +64,11 @@ const SellerDetails = ({
                         </div>
                     )}
 
-                    <div className="text-sm flex flex-col space-y-2">
+                    <div
+                        className={`text-sm flex flex-col space-y-2 ${
+                            !business ? "mt-1" : ""
+                        }`}
+                    >
                         {/* how long the seller has been selling  */}
                         <div className="flex items-center dark-light">
                             <CalendarIcon className="icon-no-bg" />

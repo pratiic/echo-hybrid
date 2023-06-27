@@ -41,6 +41,8 @@ export const sendNotification = async (request, response, next) => {
         });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -84,6 +86,8 @@ export const getNotifications = async (request, response, next) => {
         response.json({ notifications, totalCount });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -120,6 +124,8 @@ export const deleteNotification = async (request, response, next) => {
         response.json({ message: "notification deleted" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -136,6 +142,8 @@ export const deleteAllNotifications = async (request, response, next) => {
         response.json({});
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -151,5 +159,7 @@ export const setNotificationsSeen = async (request, response, next) => {
         response.json({});
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

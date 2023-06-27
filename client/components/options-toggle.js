@@ -12,6 +12,7 @@ const OptionsToggle = ({
     rounded = true,
     centered = false,
     dropdownHasShadow = true,
+    forModal,
     onClick,
 }) => {
     const [showDropdown, setShowDropdown] = useState(false);
@@ -71,7 +72,10 @@ const OptionsToggle = ({
     // type is dropdown
     return (
         <div className="relative">
-            <CustomLink className="toggle-face" onClick={toggleDropdown}>
+            <CustomLink
+                className={`toggle-face ${forModal ? "dark:bg-gray-700" : ""}`}
+                onClick={toggleDropdown}
+            >
                 {active}{" "}
                 <ChevronDownIcon className="icon-general h-4 w-4 ml-3" />
             </CustomLink>

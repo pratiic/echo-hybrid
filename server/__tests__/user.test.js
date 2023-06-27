@@ -4,7 +4,6 @@ import { app } from "../index.js";
 import {
     createNewUser,
     deleteCreatedUser,
-    signInAsAdmin,
     signInAsDeliveryPersonnel,
 } from "./utils.js";
 
@@ -256,7 +255,7 @@ describe("DELETE /api/users/avatar DELETE USER AVATAR", () => {
     });
 
     it("should return 400 status code if the requesting user has an avatar", async () => {
-        const upRes = await supertest(app)
+        await supertest(app)
             .patch(`/api/users`)
             .attach("avatar", "images/profile.jpeg")
             .set("Authorization", `Bearer ${createdUser.token}`);

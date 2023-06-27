@@ -19,10 +19,10 @@ export const authSlice = createSlice({
             setProp("authUser", state.authUser);
         },
         signUserOut: (state, action) => {
-            state.authUser = null;
-            setProp("authUser", "");
-            setProp("theme", "light");
             location.reload();
+            setProp("authUser", null);
+            setProp("theme", "light");
+            state.authUser = null;
         },
     },
 });

@@ -278,6 +278,8 @@ export const placeOrder = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        // await prisma.$disconnect();
     }
 };
 
@@ -387,6 +389,8 @@ export const getOrders = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        // await prisma.$disconnect();
     }
 };
 
@@ -563,11 +567,11 @@ export const controlOrder = async (request, response, next) => {
                 },
             };
 
-            sendEmail(
-                order.origin.email,
-                `Order ${emailMap[action].subject}`,
-                emailMap[action].text
-            );
+            // sendEmail(
+            //     order.origin.email,
+            //     `Order ${emailMap[action].subject}`,
+            //     emailMap[action].text
+            // );
         }
 
         io.emit(`order-${action}`, {
@@ -592,6 +596,8 @@ export const controlOrder = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        // await prisma.$disconnect();
     }
 };
 
@@ -611,6 +617,8 @@ export const acknowledgeOrders = async (request, response, next) => {
         response.json({});
     } catch (error) {
         next(new HttpError());
+    } finally {
+        // await prisma.$disconnect();
     }
 };
 
@@ -650,6 +658,8 @@ export const deleteOrder = async (request, response, next) => {
         response.json({ message: "order has been deleted" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        // await prisma.$disconnect();
     }
 };
 
@@ -710,6 +720,8 @@ export const requestCompletion = async (request, response, next) => {
         console.log(error);
 
         next(new HttpError());
+    } finally {
+        // await prisma.$disconnect();
     }
 };
 
@@ -739,100 +751,100 @@ export const handleCompletionRequest = async (request, response, next) => {
     }
 
     try {
-        await prisma.$transaction(async (prisma) => {
-            let createdTransaction, createdDelivery;
+        let createdTransaction, createdDelivery;
 
-            if (action === "accept") {
-                // update the status of the order and create a transaction
-                const operations = [
-                    prisma.order.update({
-                        where: {
-                            id: order.id,
-                        },
-                        data: {
-                            status: "COMPLETED",
-                            isDeleted: true,
-                        },
-                    }),
-                    prisma.transaction.create({
+        if (action === "accept") {
+            // update the status of the order and create a transaction
+            const operations = [
+                prisma.order.update({
+                    where: {
+                        id: order.id,
+                    },
+                    data: {
+                        status: "COMPLETED",
+                        isDeleted: true,
+                    },
+                }),
+                prisma.transaction.create({
+                    data: {
+                        orderId: order.id,
+                        createdMonth: new Date().getMonth(),
+                        createdYear: new Date().getFullYear(),
+                    },
+                    select: transactionSelectionFields,
+                }),
+            ];
+
+            if (order.isDelivered) {
+                // create a delivery
+                operations.push(
+                    prisma.delivery.create({
                         data: {
                             orderId: order.id,
-                            createdMonth: new Date().getMonth(),
-                            createdYear: new Date().getFullYear(),
+                            madeById: order.orderCompletion.requestorId,
                         },
-                        select: transactionSelectionFields,
-                    }),
-                ];
-
-                if (order.isDelivered) {
-                    // create a delivery
-                    operations.push(
-                        prisma.delivery.create({
-                            data: {
-                                orderId: order.id,
-                                madeById: order.orderCompletion.requestorId,
-                            },
-                            include: deliveryInclusionFields,
-                        })
-                    );
-                }
-
-                if (order.product.isSecondHand) {
-                    // second hand product -> hasBeenSold true after order completion
-                    operations.push(
-                        prisma.product.update({
-                            where: {
-                                id: order.product.id,
-                            },
-                            data: {
-                                hasBeenSold: true,
-                            },
-                        })
-                    );
-                }
-
-                const data = await Promise.all(operations);
-                createdTransaction = data[1];
-                createdDelivery = data[2];
+                        include: deliveryInclusionFields,
+                    })
+                );
             }
 
-            // delete order completion request
-            await prisma.orderCompletion.delete({
-                where: {
-                    id: order.orderCompletion.id,
-                },
-            });
-
-            io.emit(`order-completion-${action}`, {
-                id: order.id,
-                originId: order.originId,
-                updateInfo:
-                    action === "accept"
-                        ? {
-                              status: "completed",
-                              orderCompletion: null,
-                          }
-                        : {
-                              orderCompletion: null,
-                          },
-            });
-
-            if (createdTransaction) {
-                io.emit("new-transaction", createdTransaction);
+            if (order.product.isSecondHand) {
+                // second hand product -> hasBeenSold true after order completion
+                operations.push(
+                    prisma.product.update({
+                        where: {
+                            id: order.product.id,
+                        },
+                        data: {
+                            hasBeenSold: true,
+                        },
+                    })
+                );
             }
 
-            if (createdDelivery) {
-                io.emit("delivery-completion", {
-                    ...createdDelivery,
-                });
-            }
+            const data = await Promise.all(operations);
+            createdTransaction = data[1];
+            createdDelivery = data[2];
+        }
 
-            response.json(
-                action === "accept" ? { transaction: createdTransaction } : {}
-            );
+        // delete order completion request
+        await prisma.orderCompletion.delete({
+            where: {
+                id: order.orderCompletion.id,
+            },
         });
+
+        io.emit(`order-completion-${action}`, {
+            id: order.id,
+            originId: order.originId,
+            updateInfo:
+                action === "accept"
+                    ? {
+                          status: "completed",
+                          orderCompletion: null,
+                      }
+                    : {
+                          orderCompletion: null,
+                      },
+        });
+
+        if (createdTransaction) {
+            io.emit("new-transaction", createdTransaction);
+        }
+
+        if (createdDelivery) {
+            io.emit("delivery-completion", {
+                ...createdDelivery,
+            });
+        }
+
+        response.json(
+            action === "accept" ? { transaction: createdTransaction } : {}
+        );
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        // await prisma.$disconnect();
     }
 };

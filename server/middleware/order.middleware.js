@@ -20,5 +20,7 @@ export const validateOrder = async (request, response, next) => {
         next();
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

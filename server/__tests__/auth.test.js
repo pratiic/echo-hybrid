@@ -2,6 +2,7 @@ import supertest from "supertest";
 
 import { app } from "../index.js";
 import { createNewUser, deleteCreatedUser } from "./utils.js";
+import { getVerificationCode } from "../lib/verification.lib.js";
 
 describe("POST /api/auth/signin", () => {
     it("should sign a user in with valid data", async () => {
@@ -69,12 +70,14 @@ describe("POST /api/auth/signin", () => {
 
 describe("POST /api/auth/signup", () => {
     it("should create a new user with valid data", async () => {
-        const response = await supertest(app).post("/api/auth/signup").send({
-            firstName: "Joe",
-            lastName: "doe",
-            email: "joe.doe@example.com",
-            password: "password",
-        });
+        const response = await supertest(app)
+            .post("/api/auth/signup")
+            .send({
+                firstName: "Joe",
+                lastName: "doe",
+                email: `joe.doe${getVerificationCode()}@example.com`,
+                password: "password",
+            });
 
         await deleteCreatedUser(app, response.body.user.id);
 

@@ -9,6 +9,10 @@ const optionSchema = Joi.object({
 });
 
 const validateLabel = (label) => {
+    if (!label) {
+        label = "";
+    }
+
     if (label.toLowerCase().trim() === "quantity") {
         return "'Quantity' as label is not allowed, try 'Qty' instead";
     }

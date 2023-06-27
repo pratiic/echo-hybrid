@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import { XCircleIcon } from "@heroicons/react/outline";
+import Image from "next/image";
 
 import {
     closeModal,
@@ -25,6 +26,7 @@ const Gallery = ({ images = [], isMyProduct, onDelete }) => {
     const handleDeleteClick = () => {
         dispatch(
             showConfirmationModal({
+                title: "product image deletion",
                 message: "are you sure you want to delete this image?",
                 handler: async () => {
                     dispatch(showLoadingModal("deleting product image..."));

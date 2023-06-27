@@ -7,7 +7,7 @@ const ProductFilterInfo = ({ activeCategory, count }) => {
         (state) => state.filter
     );
 
-    const filterMap = getFilterMap(locationFilter)[activeFilter];
+    const filterMap = getFilterMap(locationFilter);
 
     const renderTotalCount = () => {
         const filter = filterMap[activeFilter];

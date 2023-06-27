@@ -23,57 +23,55 @@ export const sendMessage = async (request, response, next) => {
 
         const chatUserId = chat.userIds.find((userId) => userId !== user.id);
 
-        await prisma.$transaction(async (prisma) => {
-            const [createdMessage, uc] = await Promise.all([
-                prisma.message.create({
-                    data: {
-                        text: messageInfo.text?.trim(),
-                        chatId: chat.id,
-                        userId: user.id,
+        const [createdMessage, uc] = await Promise.all([
+            prisma.message.create({
+                data: {
+                    text: messageInfo.text?.trim(),
+                    chatId: chat.id,
+                    userId: user.id,
+                },
+            }),
+            prisma.chat.update({
+                where: {
+                    id: chat.id,
+                },
+                data: {
+                    // increment the count of unseen messages for the chat user (the other user in the chat)
+                    unseenMsgsCounts: {
+                        ...chat.unseenMsgsCounts,
+                        [chatUserId]: ++chat.unseenMsgsCounts[chatUserId],
                     },
+                },
+            }),
+        ]);
+
+        finalMessage = createdMessage;
+        updatedChat = uc;
+
+        if (request.file) {
+            // handle message image
+            const imageData = prepareImageData(
+                "message",
+                createdMessage.id,
+                request.file
+            );
+
+            const [, updatedMessage] = await Promise.all([
+                prisma.image.create({
+                    data: imageData,
                 }),
-                prisma.chat.update({
+                prisma.message.update({
                     where: {
-                        id: chat.id,
+                        id: createdMessage.id,
                     },
                     data: {
-                        // increment the count of unseen messages for the chat user (the other user in the chat)
-                        unseenMsgsCounts: {
-                            ...chat.unseenMsgsCounts,
-                            [chatUserId]: ++chat.unseenMsgsCounts[chatUserId],
-                        },
+                        image: imageData.src,
                     },
                 }),
             ]);
 
-            finalMessage = createdMessage;
-            updatedChat = uc;
-
-            if (request.file) {
-                // handle message image
-                const imageData = prepareImageData(
-                    "message",
-                    createdMessage.id,
-                    request.file
-                );
-
-                const [, updatedMessage] = await Promise.all([
-                    prisma.image.create({
-                        data: imageData,
-                    }),
-                    prisma.message.update({
-                        where: {
-                            id: createdMessage.id,
-                        },
-                        data: {
-                            image: imageData.src,
-                        },
-                    }),
-                ]);
-
-                finalMessage = updatedMessage;
-            }
-        });
+            finalMessage = updatedMessage;
+        }
 
         io.emit("new-message", {
             chatId: finalMessage.chatId,
@@ -94,6 +92,8 @@ export const sendMessage = async (request, response, next) => {
         console.log(error);
 
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -115,6 +115,8 @@ export const getMessages = async (request, response, next) => {
         response.json({ messages });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -158,6 +160,8 @@ export const setMessageSeen = async (request, response, next) => {
         response.json({ message: updatedMessage });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -207,6 +211,9 @@ export const deleteMessage = async (request, response, next) => {
             message: "the message has been deleted",
         });
     } catch (error) {
+        console.log(error);
         next(new HttpError(error));
+    } finally {
+        await prisma.$disconnect();
     }
 };

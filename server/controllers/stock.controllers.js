@@ -132,5 +132,7 @@ export const setStock = async (request, response, next) => {
         response.json({ stock: createdStock });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

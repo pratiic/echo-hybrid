@@ -11,12 +11,20 @@ import ProductFilter from "./product-filter";
 import CustomLink from "./custom-link";
 import Icon from "./icon";
 
-const FilterTrigger = ({ isGlobal = true }) => {
+const FilterTrigger = ({ isGlobal = true, sellerType, isMyStore }) => {
     const dispatch = useDispatch();
 
     const handleTriggerClick = () => {
         dispatch(setOverflowScroll(false));
-        dispatch(showGenericModal(<ProductFilter isGlobal={isGlobal} />));
+        dispatch(
+            showGenericModal(
+                <ProductFilter
+                    isGlobal={isGlobal}
+                    sellerType={sellerType}
+                    isMyStore={isMyStore}
+                />
+            )
+        );
     };
 
     return (

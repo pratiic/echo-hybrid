@@ -1,7 +1,7 @@
 import supertest from "supertest";
 
 import { app } from "../index.js";
-import { createNewUser, deleteCreatedUser, signInAsAdmin } from "./utils.js";
+import { createNewUser, deleteCreatedUser } from "./utils.js";
 
 describe("GET /api/accounts/verification CREATE ACCOUNT VERIFICATION", () => {
     let unverifiedUser, verifiedUser;
@@ -56,6 +56,8 @@ describe("POST /api/accounts/verification VERIFY ACCOUNT", () => {
             .post(`/api/accounts/verification/?code=sO2ZXFzF`)
             .set("Authorization", `Bearer ${verifiedUser.token}`);
 
+        await deleteCreatedUser(app, verifiedUser.id);
+
         expect(response.statusCode).toBe(400);
         expect(response.body.error).toBe("the user is already verified");
     });
@@ -79,7 +81,7 @@ describe("POST /api/accounts/verification VERIFY ACCOUNT", () => {
     });
 
     afterAll(async () => {
-        deleteCreatedUser(app, createdUser.id);
+        await deleteCreatedUser(app, createdUser.id);
     });
 });
 
@@ -225,7 +227,6 @@ describe("PATCH /api/accounts/recovery RECOVER ACCOUNT", () => {
     });
 
     afterAll(async () => {
-        const adminToken = await signInAsAdmin(app);
-        await deleteCreatedUser(app, createdUser.id, adminToken);
+        await deleteCreatedUser(app, createdUser.id);
     });
 });

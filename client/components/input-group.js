@@ -90,7 +90,7 @@ const InputGroup = ({
                         placeholder={placeholder}
                         value={value}
                         disabled={disabled}
-                        className={`py-[9px] ${inputClassName}`}
+                        className={`py-[10px] ${inputClassName}`}
                         onChange={handleInputChange}
                         onFocus={handleInputFocus}
                         onBlur={handleInputBlur}
@@ -99,7 +99,7 @@ const InputGroup = ({
 
                 {view === "select" && (
                     <select
-                        className="capitalize border rounded py-[9px] cursor-pointer dark:bg-gray-eight black-white dark:border-gray-700"
+                        className="block mt-[2px] capitalize border rounded py-[11px] outline-none cursor-pointer dark:bg-gray-eight black-white dark:border-gray-700"
                         value={value}
                         onChange={handleInputChange}
                     >
@@ -135,12 +135,8 @@ const InputGroup = ({
                         min={min}
                         max={max}
                         step={step}
-                        className={`border rounded px-2 py-[9px] dark:bg-gray-eight black-white dark:border-gray-700 ${
-                            value.length > 6
-                                ? "w-[120px]"
-                                : value.length > 3
-                                ? "w-[100px]"
-                                : "w-[75px]"
+                        className={`border rounded px-2 py-[10px] dark:bg-gray-eight black-white dark:border-gray-700 ${
+                            value.length > 6 ? "w-[150px]" : "w-[100px]"
                         }`}
                         onChange={handleInputChange}
                     />

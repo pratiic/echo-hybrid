@@ -45,6 +45,8 @@ export const registerStore = async (request, response, next) => {
         response.status(201).json({ store: createdStore });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -83,7 +85,7 @@ export const getStoreDetails = async (request, response, next) => {
         }
 
         // check if the business has been verified
-        if (store.storeType === "BUS" && !store.business.isVerified) {
+        if (store.storeType === "BUS" && !store.business?.isVerified) {
             return next(
                 new HttpError(
                     "the business of this seller has not been verified yet"
@@ -95,6 +97,8 @@ export const getStoreDetails = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -170,7 +174,6 @@ export const getStores = async (request, response, next) => {
 
     const whereObj = {
         ...filterMap[filter],
-        ...searchFilter,
         isDeleted: false,
         NOT: {
             // do not get the requesting user's own store
@@ -179,6 +182,16 @@ export const getStores = async (request, response, next) => {
             },
         },
         suspension: null,
+        OR: [
+            { storeType: "IND" },
+            {
+                storeType: "BUS",
+                business: {
+                    isVerified: true,
+                },
+            },
+        ],
+        ...searchFilter,
     };
 
     try {
@@ -213,6 +226,8 @@ export const getStores = async (request, response, next) => {
     } catch (error) {
         console.log(error);
         return next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -270,5 +285,7 @@ export const deleteStore = async (request, response, next) => {
         response.json({ message: "the store has been deleted" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

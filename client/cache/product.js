@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
+    setCategory,
     setError,
     setFetchCounter,
     setLoading,
@@ -36,6 +37,7 @@ const Product = () => {
 
     useEffect(() => {
         dispatch(resetFilterOptions());
+        dispatch(setCategory(""));
         dispatch(setFetchCounter(fetchCounter + 1));
     }, [query]);
 

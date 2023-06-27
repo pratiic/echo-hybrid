@@ -42,6 +42,8 @@ export const createAccountVerification = async (request, response, next) => {
         });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -89,6 +91,8 @@ export const verifyAccount = async (request, response, next) => {
         });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -132,6 +136,8 @@ export const createAccountRecovery = async (request, response, next) => {
         response.json({ message: "code to reset password has been sent" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -202,5 +208,7 @@ export const recoverAccount = async (request, response, next) => {
         response.json({ message: "the password has been reset" });
     } catch (error) {
         next(new HttpError());
+    } finally {
+        await prisma.$disconnect();
     }
 };

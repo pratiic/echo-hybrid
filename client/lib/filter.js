@@ -6,5 +6,7 @@ export const getFilterMap = (locationFilter) => {
         delivered: "products that are delivered to your location",
         "second hand": "second hand products",
         "brand new": "brand new products",
+        "sold out": "sold out products",
+        suspended: "suspended products",
     };
 };
