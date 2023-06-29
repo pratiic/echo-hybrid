@@ -15,6 +15,7 @@ import Button from "./button";
 import DeliveryInfo from "./delivery-info";
 import AddressSetter from "./address-setter";
 import Tag from "./tag";
+import { setFetchCounter } from "../redux/slices/products-slice";
 
 const OrderDetails = ({ quantity, variant, variantId, product }) => {
     const [placingOrder, setPlacingOrder] = useState(false);
@@ -25,6 +26,9 @@ const OrderDetails = ({ quantity, variant, variantId, product }) => {
     const [isDelivered, setIsDelivered] = useState(false);
 
     const { authUser } = useSelector((state) => state.auth);
+    const { fetchCounter: productsFetchCounter } = useSelector(
+        (state) => state.products
+    );
     const dispatch = useDispatch();
     const router = useRouter();
 
@@ -77,6 +81,9 @@ const OrderDetails = ({ quantity, variant, variantId, product }) => {
             if (data.cartItemId) {
                 dispatch(deleteCartItem(data.cartItemId));
             }
+
+            // when a product is ordered, the recommended products should be update to not include that product
+            dispatch(setFetchCounter(productsFetchCounter + 1));
 
             router.push("/orders/?show=user");
         } catch (error) {

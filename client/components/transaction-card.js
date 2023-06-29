@@ -119,8 +119,10 @@ const TransactionCard = ({
                 deliveryCharge={deliveryCharge}
                 unitPrice={unitPrice}
                 quantity={quantity}
-                createdAt={createdAt}
                 itemType="transaction"
+                isProductSecondHand={product?.isSecondHand}
+                productWarranty={product?.warranty}
+                createdAt={createdAt}
             />
 
             <div className="absolute bottom-0 right-0">

@@ -11,6 +11,7 @@ import { getAddress } from "../lib/address";
 import { getDate, getHowLongAgo } from "../lib/date-time";
 import { addCommas, capitalizeAll } from "../lib/strings";
 import { getSubtotal } from "../lib/order";
+import { getWarrantyDuration } from "../lib/product";
 
 import InfoUnit from "./info-unit";
 import IconInfo from "./icon-info";
@@ -27,8 +28,10 @@ const OrderRest = ({
     deliveryCharge,
     unitPrice,
     quantity,
-    createdAt,
+    isProductSecondHand,
+    productWarranty,
     itemType = "order",
+    createdAt,
 }) => {
     // information such as address, user, date of an order
     const { authUser } = useSelector((state) => state.auth);
@@ -127,6 +130,13 @@ const OrderRest = ({
                         <InfoUnit
                             label="delivery charge"
                             value={deliveryCharge}
+                        />
+                    )}
+
+                    {!isProductSecondHand && (
+                        <InfoUnit
+                            label="warranty"
+                            value={getWarrantyDuration(productWarranty)}
                         />
                     )}
                 </div>

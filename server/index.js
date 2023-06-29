@@ -3,7 +3,6 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
-import path from "path";
 
 import { errorHandler } from "./middleware/error.middleware.js";
 import { router as authRouter } from "./routes/auth.routes.js";

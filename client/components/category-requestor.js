@@ -35,9 +35,7 @@ const CategoryRequestor = () => {
 
     return (
         <form onSubmit={handleFormSubmit}>
-            <h3 className="text-2xl font-semibold black-white mb-2">
-                Request new category
-            </h3>
+            <h3 className="modal-title mb-2">Request new category</h3>
 
             <p className="dark-light max-w-[350px] mb-3">
                 Once the admin accepts or rejects the category you request, you

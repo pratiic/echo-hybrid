@@ -28,6 +28,7 @@ const ProductInfo = ({
     isSecondHand,
     isMyProduct,
     hasBeenSold,
+    warranty,
 }) => {
     const [secondaryProps, setSecondaryProps] = useState({});
     const dispatch = useDispatch();
@@ -41,6 +42,7 @@ const ProductInfo = ({
             isSecondHand,
             isMyProduct,
             brand,
+            warranty,
             createdAt,
         });
     }, [
@@ -51,6 +53,7 @@ const ProductInfo = ({
         isSecondHand,
         isMyProduct,
         brand,
+        warranty,
         createdAt,
     ]);
 

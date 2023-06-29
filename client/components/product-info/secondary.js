@@ -3,6 +3,7 @@ import { CalendarIcon, LocationMarkerIcon } from "@heroicons/react/outline";
 import { TbBuildingFactory } from "react-icons/tb";
 import { MdOutlinePrecisionManufacturing } from "react-icons/md";
 import { useSelector } from "react-redux";
+import { BiCheckShield, BiShieldX } from "react-icons/bi";
 
 import { getAddress } from "../../lib/address";
 import { getHowLongAgo, getDate } from "../../lib/date-time";
@@ -22,11 +23,24 @@ const SecondaryInfo = ({
     isMyProduct,
     showName,
     brand,
+    warranty,
 }) => {
     const sellerAddress = isSecondHand
         ? store?.user?.address
         : store?.business?.address;
     const { authUser } = useSelector((state) => state.auth);
+
+    const getWarrantyInfo = () => {
+        if (warranty) {
+            return `${
+                warranty % 12 === 0
+                    ? `${warranty / 12}-year`
+                    : `${warranty}-month`
+            } warranty`;
+        }
+
+        return "warranty not available";
+    };
 
     return (
         <div className="h-fit max-w-[300px] dark:rounded 1200:dark:bg-gray-800 1200:bg-gray-50 1200:px-5 1200:py-3 ">
@@ -88,6 +102,26 @@ const SecondaryInfo = ({
                         )}
                     </span>
                 </IconInfo>
+
+                {!isSecondHand && (
+                    <IconInfo
+                        icon={
+                            warranty ? (
+                                <BiCheckShield className="icon-no-bg" />
+                            ) : (
+                                <BiShieldX className="icon-no-bg" />
+                            )
+                        }
+                    >
+                        <span
+                            className={`first-letter:capitalize ${
+                                warranty ? "font-semibold" : ""
+                            }`}
+                        >
+                            {getWarrantyInfo()}
+                        </span>
+                    </IconInfo>
+                )}
 
                 <IconInfo icon={<CalendarIcon className="icon-no-bg" />}>
                     <span>

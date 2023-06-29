@@ -229,6 +229,8 @@ const OrderCard = ({
                     deliveryCharge,
                     unitPrice,
                     quantity,
+                    isProductSecondHand: product?.isSecondHand,
+                    productWarranty: product?.warranty,
                     createdAt,
                 }}
             />

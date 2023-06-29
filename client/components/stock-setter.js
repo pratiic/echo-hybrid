@@ -47,12 +47,6 @@ const StockSetter = ({
             dispatch(
                 showGenericModal(<VariationsSetter productId={productId} />)
             );
-            dispatch(
-                setAlert({
-                    message: "you need to set product variations first",
-                    type: "info",
-                })
-            );
         }
     }, [stockType, variations]);
 
@@ -347,7 +341,7 @@ const StockSetter = ({
     };
 
     return (
-        <div className="max-w-[350px] px-3">
+        <div className="max-w-[350px]">
             <h3 className="heading-generic-modal">
                 {currentStock ? "Update" : "Set"} product stock
             </h3>

@@ -8,7 +8,7 @@ import {
 } from "../validators/category.validators.js";
 
 export const addCategories = async (request, response, next) => {
-    const { categories } = request.body;
+    let { categories } = request.body;
 
     const errorMsg = validateCategories(categories);
 
@@ -16,10 +16,23 @@ export const addCategories = async (request, response, next) => {
         return next(new HttpError(errorMsg, 400));
     }
 
+    categories = categories.map((category) => {
+        return { name: category.name.toLowerCase().trim() };
+    });
+
     try {
-        await prisma.category.createMany({
-            data: categories,
-        });
+        await Promise.all([
+            prisma.category.createMany({
+                data: categories,
+            }),
+            prisma.categoryRequest.deleteMany({
+                where: {
+                    name: {
+                        in: categories.map((category) => category.name),
+                    },
+                },
+            }),
+        ]);
 
         response.json({ categories });
     } catch (error) {

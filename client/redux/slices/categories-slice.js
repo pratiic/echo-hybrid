@@ -47,8 +47,10 @@ export const categoriesSlice = createSlice({
             });
         },
         deleteCategoryRequest: (state, action) => {
+            const categoryName = action.payload.toLowerCase().trim();
+
             state.requests.list = state.requests.list.filter(
-                (request) => request.name !== action.payload
+                (request) => request.name !== categoryName
             );
         },
     },

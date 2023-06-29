@@ -111,7 +111,7 @@ const OrdersList = ({ orderType }) => {
             <div className="mb-5">
                 <GenericSearch
                     show={true}
-                    placeholder="Search products"
+                    placeholder="Product name or order Id..."
                     value={orderType === "user" ? userQuery : sellerQuery}
                     onSubmit={(query) =>
                         dispatch(setQuery({ type: orderType, query }))

@@ -4,9 +4,11 @@ import Head from "next/head";
 import { useSelector, useDispatch } from "react-redux";
 import { fetcher } from "../lib/fetcher";
 import { acknowledgeCategoryRequests } from "../redux/slices/categories-slice";
+import { showGenericModal } from "../redux/slices/modal-slice";
 
 import PageHeader from "../components/page-header";
 import ContentList from "../components/content-list";
+import CategoryAdder from "../components/category-adder";
 
 const CategoryRequests = () => {
     const {
@@ -30,13 +32,23 @@ const CategoryRequests = () => {
         }
     };
 
+    const handleAddClick = () => {
+        dispatch(showGenericModal(<CategoryAdder />));
+    };
+
     return (
         <section>
             <Head>
                 <title>Category requests</title>
             </Head>
 
-            <PageHeader heading="category requests" hasBackArrow />
+            <PageHeader
+                heading="category requests"
+                hasBackArrow
+                hasAddBtn
+                addToolname="add category"
+                onAddClick={handleAddClick}
+            />
 
             {requestsList.length > 0 && (
                 <p className="history-message -mt-2">
