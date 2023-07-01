@@ -1,7 +1,4 @@
-import {
-    genericUserFields,
-    reportInclusionFields,
-} from "../lib/data-source.lib.js";
+import { reportInclusionFields } from "../lib/data-source.lib.js";
 import prisma from "../lib/prisma.lib.js";
 import { HttpError } from "../models/http-error.models.js";
 import {
@@ -112,8 +109,6 @@ export const reportTarget = async (request, response, next) => {
 
         response.status(201).json({ report: createdReport });
     } catch (error) {
-        console.log(error);
-
         if (error.message.toLowerCase().includes("unique constraint failed")) {
             return next(
                 new HttpError(

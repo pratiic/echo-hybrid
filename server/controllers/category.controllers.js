@@ -24,8 +24,6 @@ export const addCategories = async (request, response, next) => {
         await Promise.all([
             prisma.category.createMany({
                 data: categories,
-            }),
-            prisma.categoryRequest.deleteMany({
                 where: {
                     name: {
                         in: categories.map((category) => category.name),
@@ -159,7 +157,7 @@ export const controlCategoryRequest = async (request, response, next) => {
         });
 
         if (action === "accept") {
-            const category = await prisma.category.create({
+            await prisma.category.create({
                 data: {
                     name,
                 },
