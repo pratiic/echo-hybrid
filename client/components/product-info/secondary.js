@@ -43,7 +43,7 @@ const SecondaryInfo = ({
     };
 
     return (
-        <div className="h-fit max-w-[300px] dark:rounded 1200:dark:bg-gray-800 1200:bg-gray-50 1200:px-5 1200:py-3 ">
+        <div className="h-fit max-w-[300px] dark:rounded 1200:dark:bg-gray-800 1200:bg-gray-50 1200:px-5 1200:py-3">
             {/* product name when displayed on a modal */}
             {showName && (
                 <h3 className="text-2xl black-white mb-3 font-semibold">

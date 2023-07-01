@@ -167,6 +167,7 @@ const SellerPage = () => {
                     isMyStore={isMyStore}
                     storeId={storeDetails?.id}
                     storeType={storeDetails?.storeType}
+                    business={storeDetails?.business}
                 />
             </PageHeader>
 

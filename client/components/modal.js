@@ -46,7 +46,7 @@ const Modal = () => {
     return (
         <div
             id="modal-overlay"
-            className={`flex items-center justify-center fixed top-0 left-0 min-h-screen min-w-[100vw] z-40 bg-modal-light dark:bg-modal-dark`}
+            className={`flex items-center justify-center fixed top-0 left-0 min-h-screen min-w-[100vw] z-30 bg-modal-light dark:bg-modal-dark`}
             onClick={handleOverlayClick}
         >
             <div

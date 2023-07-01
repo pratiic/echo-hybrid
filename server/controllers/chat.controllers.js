@@ -6,21 +6,15 @@ import { genericUserFields } from "../lib/data-source.lib.js";
 export const startChat = async (request, response, next) => {
     const reqUser = request.user;
     const chatUserId = parseInt(request.params.userId) || 0;
+    const withAdmin = request.withAdmin;
     const io = request.io;
-
-    // cannot start a chat with oneself
-    if (chatUserId === reqUser.id) {
-        return next(
-            new HttpError("you cannot start a chat with yourself", 400)
-        );
-    }
 
     try {
         // check to see if the provided user exists
         const chatUser = await prisma.user.findUnique({
-            where: {
-                id: chatUserId,
-            },
+            where: withAdmin
+                ? { email: process.env.ADMIN_EMAIL }
+                : { id: chatUserId },
         });
 
         if (!chatUser) {
@@ -29,6 +23,13 @@ export const startChat = async (request, response, next) => {
                     "the user you are trying to chat with was not found, they may have been deleted",
                     404
                 )
+            );
+        }
+
+        // cannot start a chat with oneself
+        if (chatUserId === reqUser.id) {
+            return next(
+                new HttpError("you cannot start a chat with yourself", 400)
             );
         }
 

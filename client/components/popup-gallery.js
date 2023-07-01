@@ -62,7 +62,7 @@ const PopupGallery = () => {
     return (
         <div
             id="overlay"
-            className="bg-modal-light flex items-center justify-center fixed top-0 left-0 h-screen w-screen z-30 outline-none scrollbar-thin"
+            className="bg-modal-light flex items-center justify-center fixed top-0 left-0 h-screen w-screen z-40 outline-none scrollbar-thin"
             ref={containerRef}
             tabIndex={-1}
             onClick={handleOverlayClick}

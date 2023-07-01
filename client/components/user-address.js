@@ -50,6 +50,8 @@ const UserAddress = () => {
     const handleFormSubmit = async (event) => {
         event.preventDefault();
 
+        console.log(province, city, area);
+
         setUpdating(true);
         clearErrors([
             setProvinceError,

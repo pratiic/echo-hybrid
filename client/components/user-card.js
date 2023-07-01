@@ -10,7 +10,6 @@ import Avatar from "./avatar";
 import ChatButton from "./chat-button";
 import Rating from "./rating";
 import CustomLink from "./custom-link";
-import Tag from "./tag";
 
 const UserCard = ({
     id,
@@ -25,6 +24,7 @@ const UserCard = ({
     stars,
     fullName,
     isDeliveryPersonnel,
+    isAdmin,
 }) => {
     const router = useRouter();
     const dispatch = useDispatch();
@@ -48,6 +48,7 @@ const UserCard = ({
                         avatar,
                         fullName,
                         isDeliveryPersonnel,
+                        isAdmin,
                     },
                 })
             );
@@ -91,8 +92,6 @@ const UserCard = ({
 
                         {/* user's email */}
                         <p className="text-sm">{email}</p>
-
-                        {/* {isDeliveryPersonnel && <Tag text="delivery" />} */}
 
                         {/* when showing ratings, show stars */}
                         {stars && (

@@ -326,7 +326,11 @@ export const getProducts = async (request, response, next) => {
             ],
         };
 
-        primaryFilter = { ...primaryFilter, ...searchFilter };
+        // primaryFilter = { ...primaryFilter, ...searchFilter };
+        primaryFilter = {
+            ...primaryFilter,
+            AND: [...(primaryFilter.AND || []), searchFilter],
+        };
     }
 
     if (category) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MenuAlt4Icon } from "@heroicons/react/outline";
+import { MenuAlt4Icon, IdentificationIcon } from "@heroicons/react/outline";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 
@@ -17,8 +17,9 @@ import Icon from "./icon";
 import Dropdown from "./dropdown";
 import DropdownItem from "./dropdown-item";
 import TargetReporter from "./target-reporter";
+import BusinessDetails from "./business-details";
 
-const SellerMenu = ({ storeId, storeType, isMyStore }) => {
+const SellerMenu = ({ storeId, storeType, isMyStore, business }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [deletionTitle, setDeletionTitle] = useState("");
 
@@ -87,6 +88,10 @@ const SellerMenu = ({ storeId, storeType, isMyStore }) => {
         router.push(`/chats/${storeId}`);
     };
 
+    const onDetailsClick = () => {
+        dispatch(showGenericModal(<BusinessDetails {...business} />));
+    };
+
     return (
         <div className="relative">
             <Icon className="icon" onClick={toggleDropdown}>
@@ -116,6 +121,17 @@ const SellerMenu = ({ storeId, storeType, isMyStore }) => {
                                 onClick={onReportClick}
                             >
                                 report seller
+                            </DropdownItem>
+                        )}
+
+                        {authUser?.isAdmin && (
+                            <DropdownItem
+                                icon={
+                                    <IdentificationIcon className="icon-no-bg" />
+                                }
+                                onClick={onDetailsClick}
+                            >
+                                business details
                             </DropdownItem>
                         )}
                     </React.Fragment>
