@@ -3,12 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import Head from "next/head";
 
+import { setActiveChat } from "../../redux/slices/chat-slice";
 import {
     addMessage,
     deleteMessage,
-    setActiveChat,
     updateMessage,
-} from "../../redux/slices/chat-slice";
+} from "../../redux/slices/messages-slice";
 import { capitalizeAll } from "../../lib/strings";
 import { fetcher } from "../../lib/fetcher";
 import useSocket from "../../hooks/use-socket";

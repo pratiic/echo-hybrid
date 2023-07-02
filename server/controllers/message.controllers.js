@@ -99,21 +99,41 @@ export const sendMessage = async (request, response, next) => {
 
 export const getMessages = async (request, response, next) => {
     const chat = request.chat;
+    const page = parseInt(request.query.page) || 1;
+    let skip = parseInt(request.query.skip) || -1;
+    const PAGE_SIZE = 25;
+
+    if (skip < 0) {
+        skip = 0;
+    }
 
     try {
-        const messages = await prisma.message.findMany({
-            where: {
-                chatId: chat.id,
-            },
-            orderBy: [
-                {
-                    createdAt: "asc",
+        const [messages, totalCount] = await Promise.all([
+            prisma.message.findMany({
+                where: {
+                    chatId: chat.id,
                 },
-            ],
-        });
+                orderBy: [
+                    {
+                        createdAt: "desc",
+                    },
+                ],
+                take: PAGE_SIZE,
+                skip: (page - 1) * PAGE_SIZE + skip,
+            }),
+            prisma.message.count({
+                where: {
+                    chatId: chat.id,
+                },
+            }),
+        ]);
 
-        response.json({ messages });
+        response.json({
+            messages: messages.sort((a, b) => a.createdAt - b.createdAt),
+            totalCount,
+        });
     } catch (error) {
+        console.log(error);
         next(new HttpError());
     } finally {
         await prisma.$disconnect();

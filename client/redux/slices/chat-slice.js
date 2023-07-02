@@ -33,29 +33,6 @@ const chatSlice = createSlice({
                 (chat) => chat.id !== action.payload
             );
         },
-        setMessages: (state, action) => {
-            state.chatMessages = action.payload;
-        },
-        addMessage: (state, action) => {
-            let existing = false;
-
-            for (let i = 0; i < state.chatMessages.length; i++) {
-                if (state.chatMessages[i].id === action.payload.id) {
-                    existing = true;
-                    break;
-                }
-            }
-
-            if (!existing) {
-                state.chatMessages = [...state.chatMessages, action.payload];
-            }
-        },
-        addOutgoingMsg: (state, action) => {
-            state.outgoingMsgs = [...state.outgoingMsgs, action.payload];
-        },
-        removeOutgoingMsg: (state) => {
-            state.outgoingMsgs.shift();
-        },
         setLoadingChats: (state, action) => {
             state.loadingChats = action.payload;
         },
@@ -106,33 +83,6 @@ const chatSlice = createSlice({
             });
             state.soundCounter += 1;
         },
-        deleteMessage: (state, action) => {
-            state.chatMessages = state.chatMessages.map((chatMessage) => {
-                if (chatMessage.id === action.payload) {
-                    return {
-                        ...chatMessage,
-                        text: "",
-                        image: "",
-                        deleted: true,
-                    };
-                }
-
-                return chatMessage;
-            });
-        },
-        updateMessage: (state, action) => {
-            state.chatMessages = state.chatMessages.map((chatMessage) => {
-                const { id, updateInfo } = action.payload;
-                if (chatMessage.id === id) {
-                    return {
-                        ...chatMessage,
-                        ...updateInfo,
-                    };
-                }
-
-                return chatMessage;
-            });
-        },
         toggleDeleteMode: (state) => {
             state.deleteMode = !state.deleteMode;
         },
@@ -146,14 +96,8 @@ export const {
     deleteChat,
     setChatError,
     setActiveChat,
-    setMessages,
-    addMessage,
     resetUnseenMsgsCount,
     setUnseenMsgsCount,
-    deleteMessage,
-    addOutgoingMsg,
-    removeOutgoingMsg,
     toggleDeleteMode,
-    updateMessage,
 } = chatSlice.actions;
 export default chatSlice.reducer;

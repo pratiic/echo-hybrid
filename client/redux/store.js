@@ -23,6 +23,7 @@ import reportsReducer from "./slices/reports-slice";
 import suspensionsReducer from "./slices/suspensions-slice";
 import transactionsReducer from "./slices/transactions-slice";
 import statsReducer from "./slices/stats-slice";
+import messagesReducer from "./slices/messages-slice";
 
 export const store = configureStore({
     reducer: {
@@ -48,6 +49,7 @@ export const store = configureStore({
         suspensions: suspensionsReducer,
         transactions: transactionsReducer,
         stats: statsReducer,
+        messages: messagesReducer,
     },
     middleware: [logger],
 });

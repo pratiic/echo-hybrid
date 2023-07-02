@@ -28,7 +28,8 @@ const Message = ({
 }) => {
     const [isUserMsg, setIsUserMsg] = useState(true);
 
-    const { deleteMode, chatMessages } = useSelector((state) => state.chat);
+    const { deleteMode } = useSelector((state) => state.chat);
+    const { messages } = useSelector((state) => state.messages);
     const dispatch = useDispatch();
 
     const deletedMsgStyle =
@@ -67,6 +68,7 @@ const Message = ({
     const handleDeleteClick = () => {
         dispatch(
             showConfirmationModal({
+                title: "message deletion",
                 message: "Are you sure you want to delete this message?",
                 handler: async () => {
                     dispatch(showLoadingModal("deleting your message..."));
@@ -84,9 +86,8 @@ const Message = ({
     };
 
     const getMarginBottom = () => {
-        // the margin of the last message before another user's
-        // messages start is a little bigger
-        const nextMsg = chatMessages[msgIndex + 1];
+        // the margin of the last message before another user's messages start is a little bigger
+        const nextMsg = messages[msgIndex + 1];
         if (nextMsg && nextMsg.userId !== userId) {
             return "mb-3";
         }
@@ -95,13 +96,12 @@ const Message = ({
     };
 
     const hasPointer = () => {
-        // the first message of a user's message has a point
-        // at its left or right
+        // the first message of a user's message has a point at its left or right
         if (deleted || isOutgoing || image) {
             return false;
         }
 
-        const prevMsg = chatMessages[msgIndex - 1];
+        const prevMsg = messages[msgIndex - 1];
         if (!prevMsg || prevMsg.userId !== userId) {
             return true;
         }
@@ -121,8 +121,9 @@ const Message = ({
                 <img
                     src={image}
                     alt="chat img"
-                    className={`rounded-t max-w-full max-h-[350px] block cursor-pointer ${!isOutgoing &&
-                        "mb-1"} ${isOutgoing && !text && "rounded-b"}`}
+                    className={`rounded-t max-w-full max-h-[350px] block cursor-pointer ${
+                        !isOutgoing && "mb-1"
+                    } ${isOutgoing && !text && "rounded-b"}`}
                     onClick={() => dispatch(openGallery({ images: [image] }))}
                 />
             )}

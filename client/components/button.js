@@ -6,6 +6,7 @@ const Button = ({
     full,
     center,
     small,
+    smaller,
     large,
     disabled = false,
     children,
@@ -45,6 +46,8 @@ const Button = ({
             } ${full && "w-full"} ${center && "mx-auto"} ${
                 small
                     ? "px-3 py-[7px]"
+                    : smaller
+                    ? "px-3 py-[5px]"
                     : large
                     ? "py-[12px] px-9 text-lg"
                     : "py-[9px] px-5"

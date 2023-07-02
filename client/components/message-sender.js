@@ -4,11 +4,11 @@ import { PaperAirplaneIcon } from "@heroicons/react/solid";
 import { XCircleIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 
+import { deleteChat } from "../redux/slices/chat-slice";
 import {
     addOutgoingMsg,
-    deleteChat,
     removeOutgoingMsg,
-} from "../redux/slices/chat-slice";
+} from "../redux/slices/messages-slice";
 import { resetFiles } from "../redux/slices/files-slice";
 import { setErrorAlert } from "../redux/slices/alerts-slice";
 import { setPreview } from "../lib/files";
